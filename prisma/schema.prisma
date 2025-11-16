@@ -1,0 +1,130 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                    String         @id @default(cuid())
+  clerkId               String         @unique
+  email                 String         @unique
+  name                  String?
+  grade                 String?        // "11", "12", "CUET"
+  preferredDifficulty   String?        // AI-determined preferred difficulty level
+  weakAreas             Json?          // AI-tracked weak subject/chapter areas
+  strongAreas           Json?          // AI-tracked strong subject/chapter areas
+  learningStyle         String?        // AI-determined learning style
+  lastRecommendation    DateTime?      // Last time AI generated recommendations
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+  quizAttempts          QuizAttempt[]
+  mockTests             MockTestAttempt[]
+  recommendations       Recommendation[]
+}
+
+model Subject {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  description String?
+  icon        String?
+  createdAt   DateTime  @default(now())
+  chapters    Chapter[]
+}
+
+model Chapter {
+  id              String    @id @default(cuid())
+  name            String
+  subjectId       String
+  subject         Subject   @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  description     String?
+  order           Int       @default(0)
+  createdAt       DateTime  @default(now())
+  questions       Question[]
+  
+  @@unique([subjectId, name])
+}
+
+model Question {
+  id              String    @id @default(cuid())
+  chapterId       String
+  chapter         Chapter   @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  questionText    String
+  options         Json      // Array of options
+  correctAnswer   String
+  explanation     String?
+  difficulty      String    @default("medium") // "easy", "medium", "hard"
+  createdAt       DateTime  @default(now())
+}
+
+model Quiz {
+  id              String        @id @default(cuid())
+  title           String
+  description     String?
+  subjectId       String?
+  chapterIds      Json          // Array of chapter IDs
+  questionCount   Int           @default(10)
+  duration        Int           // in minutes
+  createdAt       DateTime      @default(now())
+  attempts        QuizAttempt[]
+}
+
+model QuizAttempt {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quizId          String
+  quiz            Quiz      @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  answers         Json      // Array of {questionId, selectedAnswer}
+  score           Int       @default(0)
+  totalQuestions  Int
+  startedAt       DateTime  @default(now())
+  completedAt     DateTime?
+  timeSpent       Int?      // in seconds
+}
+
+model MockTest {
+  id              String            @id @default(cuid())
+  title           String
+  description     String?
+  examType        String            // "CUET", "Class11", "Class12"
+  totalQuestions  Int
+  duration        Int               // in minutes
+  sections        Json              // Array of sections with subjects
+  createdAt       DateTime          @default(now())
+  attempts        MockTestAttempt[]
+}
+
+model MockTestAttempt {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mockTestId      String
+  mockTest        MockTest  @relation(fields: [mockTestId], references: [id], onDelete: Cascade)
+  answers         Json      // Array of {questionId, selectedAnswer}
+  score           Int       @default(0)
+  totalQuestions  Int
+  sectionScores   Json      // Scores by section
+  startedAt       DateTime  @default(now())
+  completedAt     DateTime?
+  timeSpent       Int?      // in seconds
+}
+
+model Recommendation {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type            String    // "study_plan", "topic", "difficulty_adjustment", "content"
+  title           String
+  description     String
+  content         Json      // AI-generated recommendation details
+  priority        Int       @default(5) // 1-10, higher is more important
+  isRead          Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  expiresAt       DateTime? // Optional expiry for time-sensitive recommendations
+}

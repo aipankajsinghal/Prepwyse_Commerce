@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Light Theme (Default) */
+  :root {
+    --foreground-rgb: 15, 23, 42;
+    --background: 255, 255, 255;
+  }
+
+  /* Dark Theme */
+  .dark {
+    --foreground-rgb: 241, 245, 249;
+    --background: 15, 23, 42;
+  }
+
+  /* Ocean Theme */
+  .ocean {
+    --foreground-rgb: 224, 242, 254;
+    --background: 12, 74, 110;
+  }
+
+  /* Forest Theme */
+  .forest {
+    --foreground-rgb: 220, 252, 231;
+    --background: 20, 83, 45;
+  }
+
+  /* Sunset Theme */
+  .sunset {
+    --foreground-rgb: 254, 243, 199;
+    --background: 124, 45, 18;
+  }
+
+  body {
+    color: rgb(var(--foreground-rgb));
+    background: rgb(var(--background));
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+}
