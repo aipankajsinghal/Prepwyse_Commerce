@@ -4,6 +4,13 @@ An AI-powered EdTech application designed for commerce students in Class 11, Cla
 
 ## Features
 
+### ✨ AI-Powered Features
+- **AI-Generated Quizzes**: Generate custom questions using OpenAI based on selected chapters and difficulty
+- **Adaptive Difficulty**: Automatically adjusts quiz difficulty based on your performance history
+- **Personalized Recommendations**: Get AI-powered study suggestions tailored to your learning patterns
+- **Smart Explanations**: Receive detailed, context-aware explanations for each question
+- **Content Recommendations**: AI suggests which chapters to study next based on your progress
+
 ### 🎓 For Students
 - **Multi-Chapter Quiz Selection**: Create custom quizzes by selecting multiple chapters from any subject
 - **Full-Length Mock Tests**: Practice with mock tests designed as per actual exam patterns (CUET, Class 11, Class 12)
@@ -30,6 +37,7 @@ An AI-powered EdTech application designed for commerce students in Class 11, Cla
 - **Backend**: Next.js API Routes
 - **Database**: PostgreSQL with Prisma ORM
 - **Authentication**: Clerk
+- **AI**: OpenAI GPT-4 for intelligent features
 - **Icons**: Lucide React
 
 ## Getting Started
@@ -39,6 +47,7 @@ An AI-powered EdTech application designed for commerce students in Class 11, Cla
 - Node.js 18+ installed
 - PostgreSQL database
 - Clerk account (free tier available)
+- OpenAI API key (for AI features)
 
 ### Installation
 
@@ -69,7 +78,12 @@ NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
 NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
 NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
+
+# OpenAI API (for AI-powered features)
+OPENAI_API_KEY=your_openai_api_key_here
 ```
+
+**Get OpenAI API Key:** Visit [OpenAI Platform](https://platform.openai.com/api-keys) to create an API key.
 
 4. Set up the database:
 ```bash

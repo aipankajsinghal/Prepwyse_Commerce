@@ -2,6 +2,70 @@
 
 This document provides an overview of all implemented features in the PrepWyse Commerce application.
 
+## ✨ AI-Powered Features
+
+### 1. AI Quiz Generation
+**Location**: `/quiz` (with AI toggle enabled)
+
+**Features**:
+- Generate custom quiz questions using OpenAI GPT-4
+- Questions tailored to selected chapters and subjects
+- Adaptive difficulty based on performance history
+- Questions include detailed explanations
+- Generated questions stored in database for reuse
+
+**How it works**:
+- AI analyzes your recent quiz performance
+- Generates contextual, exam-focused questions
+- Adjusts difficulty automatically (or manual selection)
+- Creates 5-25 questions per quiz
+
+### 2. Adaptive Difficulty System
+**Automatic difficulty adjustment based on performance**
+
+**Logic**:
+- Analyzes last 10 quiz attempts
+- Average score ≥80%: Recommends Hard difficulty
+- Average score 60-79%: Recommends Medium difficulty
+- Average score <60%: Recommends Easy difficulty
+- New users default to Medium
+
+### 3. AI Recommendations
+**Location**: `/recommendations`
+
+**Features**:
+- Personalized study suggestions
+- Identifies weak and strong areas
+- Action-oriented recommendations
+- Priority-based ranking (1-10)
+- Suggests optimal difficulty level
+
+**Recommendation Types**:
+- Study plan suggestions
+- Topic-specific recommendations
+- Difficulty adjustments
+- Content to review
+
+### 4. AI Question Explanations
+**API Endpoint**: `POST /api/ai/explain`
+
+**Features**:
+- Context-aware explanations
+- Explains correct answers
+- Highlights common mistakes
+- Related concepts and examples
+- Friendly teaching tone
+
+### 5. Smart Content Recommendations
+**API Endpoint**: `GET /api/ai/content-suggestions`
+
+**Features**:
+- Suggests chapters to study next
+- Based on performance patterns
+- Prioritized study order
+- Estimated time for each topic
+- Subject-specific recommendations
+
 ## 🎯 Core Features
 
 ### 1. Landing Page
