@@ -1,4 +1,4 @@
-import { openai, isOpenAIConfigured } from "./openai";
+import { generateChatCompletion, isAnyAIConfigured } from "./ai-provider";
 import { prisma } from "./prisma";
 
 /**
@@ -11,8 +11,8 @@ export async function generateAIQuestions(params: {
   difficulty: "easy" | "medium" | "hard";
   userId: string;
 }) {
-  if (!isOpenAIConfigured()) {
-    throw new Error("OpenAI API key is not configured");
+  if (!isAnyAIConfigured()) {
+    throw new Error("No AI provider is configured. Please add OPENAI_API_KEY or GEMINI_API_KEY");
   }
 
   const { subjectName, chapterNames, questionCount, difficulty, userId } = params;
@@ -50,23 +50,12 @@ Return format (JSON array):
   }
 ]`;
 
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [
-      {
-        role: "system",
-        content: "You are an expert commerce education content creator specializing in Indian commerce curriculum. Always return valid JSON only.",
-      },
-      { role: "user", content: prompt },
-    ],
+  const content = await generateChatCompletion({
+    prompt,
+    systemPrompt: "You are an expert commerce education content creator specializing in Indian commerce curriculum. Always return valid JSON only.",
     temperature: 0.7,
-    response_format: { type: "json_object" },
+    jsonMode: true,
   });
-
-  const content = completion.choices[0].message.content;
-  if (!content) {
-    throw new Error("No response from AI");
-  }
 
   let parsed;
   try {
@@ -84,8 +73,8 @@ Return format (JSON array):
  * Analyze user performance and generate personalized recommendations
  */
 export async function generatePersonalizedRecommendations(userId: string) {
-  if (!isOpenAIConfigured()) {
-    throw new Error("OpenAI API key is not configured");
+  if (!isAnyAIConfigured()) {
+    throw new Error("No AI provider is configured. Please add OPENAI_API_KEY or GEMINI_API_KEY");
   }
 
   // Get user's performance data
@@ -155,23 +144,12 @@ Return ONLY valid JSON in this format:
   "suggestedDifficulty": "easy" | "medium" | "hard"
 }`;
 
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [
-      {
-        role: "system",
-        content: "You are an expert education advisor specializing in personalized learning strategies. Always return valid JSON only.",
-      },
-      { role: "user", content: prompt },
-    ],
+  const content = await generateChatCompletion({
+    prompt,
+    systemPrompt: "You are an expert education advisor specializing in personalized learning strategies. Always return valid JSON only.",
     temperature: 0.7,
-    response_format: { type: "json_object" },
+    jsonMode: true,
   });
-
-  const content = completion.choices[0].message.content;
-  if (!content) {
-    throw new Error("No response from AI");
-  }
 
   return JSON.parse(content);
 }
@@ -187,8 +165,8 @@ export async function generateQuestionExplanation(params: {
   subject: string;
   chapter: string;
 }) {
-  if (!isOpenAIConfigured()) {
-    throw new Error("OpenAI API key is not configured");
+  if (!isAnyAIConfigured()) {
+    throw new Error("No AI provider is configured. Please add OPENAI_API_KEY or GEMINI_API_KEY");
   }
 
   const { questionText, options, correctAnswer, userAnswer, subject, chapter } = params;
@@ -211,20 +189,12 @@ Provide:
 
 Keep it concise but thorough, in a friendly teaching tone.`;
 
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [
-      {
-        role: "system",
-        content: "You are a friendly and knowledgeable commerce teacher who explains concepts clearly.",
-      },
-      { role: "user", content: prompt },
-    ],
+  return await generateChatCompletion({
+    prompt,
+    systemPrompt: "You are a friendly and knowledgeable commerce teacher who explains concepts clearly.",
     temperature: 0.7,
-    max_tokens: 500,
+    maxTokens: 500,
   });
-
-  return completion.choices[0].message.content || "";
 }
 
 /**
@@ -263,8 +233,8 @@ export async function generateContentRecommendations(params: {
   userId: string;
   subjectId?: string;
 }) {
-  if (!isOpenAIConfigured()) {
-    throw new Error("OpenAI API key is not configured");
+  if (!isAnyAIConfigured()) {
+    throw new Error("No AI provider is configured. Please add OPENAI_API_KEY or GEMINI_API_KEY");
   }
 
   const { userId, subjectId } = params;
@@ -319,23 +289,12 @@ Return ONLY valid JSON:
   ]
 }`;
 
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [
-      {
-        role: "system",
-        content: "You are an education advisor providing study recommendations. Always return valid JSON only.",
-      },
-      { role: "user", content: prompt },
-    ],
+  const content = await generateChatCompletion({
+    prompt,
+    systemPrompt: "You are an education advisor providing study recommendations. Always return valid JSON only.",
     temperature: 0.7,
-    response_format: { type: "json_object" },
+    jsonMode: true,
   });
-
-  const content = completion.choices[0].message.content;
-  if (!content) {
-    throw new Error("No response from AI");
-  }
 
   return JSON.parse(content);
 }

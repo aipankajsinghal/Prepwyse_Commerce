@@ -24,6 +24,7 @@
   "license": "ISC",
   "dependencies": {
     "@clerk/nextjs": "^6.35.1",
+    "@google/generative-ai": "^0.24.1",
     "@prisma/client": "^6.19.0",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",
