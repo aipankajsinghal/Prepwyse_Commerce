@@ -2,7 +2,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
-import { BookOpen, Target, Trophy, TrendingUp } from "lucide-react";
+import { BookOpen, Target, Trophy, TrendingUp, Sparkles } from "lucide-react";
 
 export default async function DashboardPage() {
   const { userId } = await auth();
@@ -29,7 +29,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Quick Actions Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Link href="/quiz" className="group">
             <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition group-hover:border-primary-500 border-2 border-transparent">
               <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
@@ -37,7 +37,7 @@ export default async function DashboardPage() {
               </div>
               <h3 className="text-xl font-semibold mb-2">Practice Quiz</h3>
               <p className="text-gray-600">
-                Select chapters and start practicing with custom quizzes
+                AI-generated quizzes with adaptive difficulty
               </p>
             </div>
           </Link>
@@ -54,10 +54,25 @@ export default async function DashboardPage() {
             </div>
           </Link>
 
+          <Link href="/recommendations" className="group">
+            <div className="bg-gradient-to-br from-purple-50 to-blue-50 p-6 rounded-xl shadow-md hover:shadow-xl transition group-hover:border-purple-500 border-2 border-purple-200">
+              <div className="h-12 w-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                <Sparkles className="h-6 w-6 text-purple-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2 flex items-center">
+                AI Recommendations
+                <span className="ml-2 text-xs bg-purple-600 text-white px-2 py-1 rounded">NEW</span>
+              </h3>
+              <p className="text-gray-600">
+                Get personalized study suggestions powered by AI
+              </p>
+            </div>
+          </Link>
+
           <Link href="/results" className="group">
             <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition group-hover:border-primary-500 border-2 border-transparent">
-              <div className="h-12 w-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                <TrendingUp className="h-6 w-6 text-purple-600" />
+              <div className="h-12 w-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
+                <TrendingUp className="h-6 w-6 text-orange-600" />
               </div>
               <h3 className="text-xl font-semibold mb-2">View Results</h3>
               <p className="text-gray-600">

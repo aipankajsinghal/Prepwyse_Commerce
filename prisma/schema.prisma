@@ -11,15 +11,21 @@ datasource db {
 }
 
 model User {
-  id            String         @id @default(cuid())
-  clerkId       String         @unique
-  email         String         @unique
-  name          String?
-  grade         String?        // "11", "12", "CUET"
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  quizAttempts  QuizAttempt[]
-  mockTests     MockTestAttempt[]
+  id                    String         @id @default(cuid())
+  clerkId               String         @unique
+  email                 String         @unique
+  name                  String?
+  grade                 String?        // "11", "12", "CUET"
+  preferredDifficulty   String?        // AI-determined preferred difficulty level
+  weakAreas             Json?          // AI-tracked weak subject/chapter areas
+  strongAreas           Json?          // AI-tracked strong subject/chapter areas
+  learningStyle         String?        // AI-determined learning style
+  lastRecommendation    DateTime?      // Last time AI generated recommendations
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+  quizAttempts          QuizAttempt[]
+  mockTests             MockTestAttempt[]
+  recommendations       Recommendation[]
 }
 
 model Subject {
@@ -107,4 +113,18 @@ model MockTestAttempt {
   startedAt       DateTime  @default(now())
   completedAt     DateTime?
   timeSpent       Int?      // in seconds
+}
+
+model Recommendation {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type            String    // "study_plan", "topic", "difficulty_adjustment", "content"
+  title           String
+  description     String
+  content         Json      // AI-generated recommendation details
+  priority        Int       @default(5) // 1-10, higher is more important
+  isRead          Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  expiresAt       DateTime? // Optional expiry for time-sensitive recommendations
 }

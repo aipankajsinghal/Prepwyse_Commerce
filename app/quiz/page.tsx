@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
-import { BookOpen, CheckCircle2, Clock, Play } from "lucide-react";
+import { BookOpen, CheckCircle2, Clock, Play, Sparkles } from "lucide-react";
 
 // Mock data - In production, this would come from the database
 const subjects = [
@@ -46,6 +46,9 @@ export default function QuizPage() {
   const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
   const [questionCount, setQuestionCount] = useState(10);
   const [duration, setDuration] = useState(15);
+  const [useAI, setUseAI] = useState(true);
+  const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard" | "adaptive">("adaptive");
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const handleChapterToggle = (chapterId: string) => {
     setSelectedChapters((prev) =>
@@ -67,13 +70,62 @@ export default function QuizPage() {
     }
   };
 
-  const handleStartQuiz = () => {
+  const handleStartQuiz = async () => {
     if (selectedChapters.length === 0) {
       alert("Please select at least one chapter");
       return;
     }
-    // In production, this would create a quiz and navigate to the quiz page
-    alert(`Starting quiz with ${selectedChapters.length} chapters, ${questionCount} questions, ${duration} minutes`);
+
+    setIsGenerating(true);
+    
+    try {
+      if (useAI) {
+        // Use AI to generate quiz
+        const response = await fetch("/api/ai/generate-quiz", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            subjectId: selectedSubject,
+            chapterIds: selectedChapters,
+            questionCount,
+            difficulty: difficulty === "adaptive" ? null : difficulty,
+          }),
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || "Failed to generate AI quiz");
+        }
+
+        const data = await response.json();
+        alert(
+          `✨ ${data.message}\nAdaptive difficulty: ${data.adaptiveDifficulty}\n\nQuiz created successfully!`
+        );
+      } else {
+        // Use regular quiz creation
+        const response = await fetch("/api/quiz", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: `Quiz: ${currentSubject?.name}`,
+            subjectId: selectedSubject,
+            chapterIds: selectedChapters,
+            questionCount,
+            duration,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to create quiz");
+        }
+
+        alert("Quiz created successfully!");
+      }
+    } catch (error: any) {
+      alert(`Error: ${error.message}`);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const currentSubject = subjects.find((s) => s.id === selectedSubject);
@@ -165,6 +217,51 @@ export default function QuizPage() {
               <h2 className="text-xl font-semibold mb-4">Quiz Settings</h2>
 
               <div className="space-y-4">
+                {/* AI Toggle */}
+                <div className="p-4 bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-200 rounded-lg">
+                  <label className="flex items-center justify-between cursor-pointer">
+                    <div className="flex items-center">
+                      <Sparkles className="h-5 w-5 text-purple-600 mr-2" />
+                      <div>
+                        <span className="font-semibold text-gray-900">AI-Powered Quiz</span>
+                        <p className="text-xs text-gray-600 mt-1">
+                          Generate questions with AI based on your performance
+                        </p>
+                      </div>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={useAI}
+                      onChange={(e) => setUseAI(e.target.checked)}
+                      className="h-5 w-5 text-purple-600 rounded focus:ring-purple-500"
+                    />
+                  </label>
+                </div>
+
+                {/* Difficulty Selection (only shown when AI is enabled) */}
+                {useAI && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Difficulty Level
+                    </label>
+                    <select
+                      value={difficulty}
+                      onChange={(e) => setDifficulty(e.target.value as any)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    >
+                      <option value="adaptive">🎯 Adaptive (Recommended)</option>
+                      <option value="easy">😊 Easy</option>
+                      <option value="medium">😐 Medium</option>
+                      <option value="hard">😰 Hard</option>
+                    </select>
+                    {difficulty === "adaptive" && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        AI will adjust difficulty based on your recent performance
+                      </p>
+                    )}
+                  </div>
+                )}
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Number of Questions
@@ -182,28 +279,39 @@ export default function QuizPage() {
                   </select>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Duration
-                  </label>
-                  <select
-                    value={duration}
-                    onChange={(e) => setDuration(Number(e.target.value))}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  >
-                    <option value={10}>10 Minutes</option>
-                    <option value={15}>15 Minutes</option>
-                    <option value={20}>20 Minutes</option>
-                    <option value={30}>30 Minutes</option>
-                    <option value={45}>45 Minutes</option>
+                {!useAI && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Duration
+                    </label>
+                    <select
+                      value={duration}
+                      onChange={(e) => setDuration(Number(e.target.value))}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    >
+                      <option value={10}>10 Minutes</option>
+                      <option value={15}>15 Minutes</option>
+                      <option value={20}>20 Minutes</option>
+                      <option value={30}>30 Minutes</option>
+                      <option value={45}>45 Minutes</option>
                   </select>
                 </div>
+                )}
               </div>
             </div>
 
-            <div className="bg-primary-50 rounded-xl p-6 border-2 border-primary-200">
-              <h3 className="font-semibold mb-2">Quiz Summary</h3>
+            <div className={`rounded-xl p-6 border-2 ${useAI ? "bg-gradient-to-br from-purple-50 to-blue-50 border-purple-200" : "bg-primary-50 border-primary-200"}`}>
+              <h3 className="font-semibold mb-2 flex items-center">
+                {useAI && <Sparkles className="h-4 w-4 mr-2 text-purple-600" />}
+                Quiz Summary
+              </h3>
               <div className="space-y-2 text-sm">
+                {useAI && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Mode:</span>
+                    <span className="font-medium text-purple-700">✨ AI-Generated</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span className="text-gray-600">Subject:</span>
                   <span className="font-medium">
@@ -218,19 +326,40 @@ export default function QuizPage() {
                   <span className="text-gray-600">Questions:</span>
                   <span className="font-medium">{questionCount}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Duration:</span>
-                  <span className="font-medium">{duration} min</span>
-                </div>
+                {useAI && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Difficulty:</span>
+                    <span className="font-medium capitalize">{difficulty}</span>
+                  </div>
+                )}
+                {!useAI && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Duration:</span>
+                    <span className="font-medium">{duration} min</span>
+                  </div>
+                )}
               </div>
 
               <button
                 onClick={handleStartQuiz}
-                disabled={selectedChapters.length === 0}
-                className="w-full mt-4 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:bg-gray-300 disabled:cursor-not-allowed font-semibold flex items-center justify-center transition"
+                disabled={selectedChapters.length === 0 || isGenerating}
+                className={`w-full mt-4 px-6 py-3 text-white rounded-lg font-semibold flex items-center justify-center transition ${
+                  useAI
+                    ? "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                    : "bg-primary-600 hover:bg-primary-700"
+                } disabled:bg-gray-300 disabled:cursor-not-allowed`}
               >
-                <Play className="h-5 w-5 mr-2" />
-                Start Quiz
+                {isGenerating ? (
+                  <>
+                    <div className="animate-spin h-5 w-5 mr-2 border-2 border-white border-t-transparent rounded-full" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    {useAI ? <Sparkles className="h-5 w-5 mr-2" /> : <Play className="h-5 w-5 mr-2" />}
+                    {useAI ? "Generate AI Quiz" : "Start Quiz"}
+                  </>
+                )}
               </button>
             </div>
           </div>
