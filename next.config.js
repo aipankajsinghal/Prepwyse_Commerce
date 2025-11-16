@@ -5,9 +5,22 @@ const nextConfig = {
   },
   // Enable standalone output for Docker
   output: 'standalone',
-  // Image optimization
+  // Image optimization with remotePatterns (replaces deprecated domains)
   images: {
-    domains: ['img.clerk.com', 'images.clerk.dev'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'img.clerk.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.clerk.dev',
+        port: '',
+        pathname: '/**',
+      },
+    ],
     formats: ['image/avif', 'image/webp'],
   },
   // Compression

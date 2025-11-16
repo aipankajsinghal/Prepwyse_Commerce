@@ -5,19 +5,14 @@ const isPublicRoute = createRouteMatcher([
   "/sign-in(.*)",
   "/sign-up(.*)",
   "/api/webhook(.*)",
+  "/api/health",
 ]);
 
-export default clerkMiddleware(
-  async (auth, request) => {
-    if (!isPublicRoute(request)) {
-      await auth.protect();
-    }
-  },
-  {
-    // During build time, skip authentication checks
-    ignoredRoutes: process.env.NODE_ENV === "production" ? [] : ["(.*)"],
+export default clerkMiddleware(async (auth, request) => {
+  if (!isPublicRoute(request)) {
+    await auth.protect();
   }
-);
+});
 
 export const config = {
   matcher: [
