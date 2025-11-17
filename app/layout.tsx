@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { ToastProvider } from "@/components/ToastProvider";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
+import { OnboardingProvider } from "@/components/OnboardingProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -104,8 +105,10 @@ export default function RootLayout({
           >
             <ErrorBoundary>
               <ToastProvider>
-                {children}
-                <OfflineIndicator />
+                <OnboardingProvider>
+                  {children}
+                  <OfflineIndicator />
+                </OnboardingProvider>
               </ToastProvider>
             </ErrorBoundary>
           </ThemeProvider>
