@@ -4,26 +4,54 @@ This document outlines potential improvements and enhancements that can be made 
 
 ---
 
+> **Status Legend:** ⬜ Not started · ⏳ In progress · ✅ Completed  
+> This table is the single source of truth for implementation progress.
+
+## Current Implementation Status (Single Source of Truth)
+
+| ID | Feature                                                        | Status         | Phase  | Notes                                                                 |
+|----|----------------------------------------------------------------|----------------|--------|------------------------------------------------------------------------|
+| 1  | Real-Time Progress Tracking                                    | ⏳ In progress  | Phase A | Backend design complete; service + API added; frontend wiring in progress |
+| 2  | Offline Mode Support (PWA)                                     | ⬜ Not started  | Phase A |                                                                        |
+| 3  | Advanced Analytics Dashboard                                   | ⬜ Not started  | Phase A | Depends on event logging                                               |
+| 4  | Gamification System                                            | ⬜ Not started  | Phase B |                                                                        |
+| 5  | Smart Study Planner                                            | ⬜ Not started  | Phase B |                                                                        |
+| 6  | Smart Flashcards                                               | ⬜ Not started  | Phase B |                                                                        |
+| 7  | Multi-language Support (i18n)                                  | ⬜ Not started  | Phase B |                                                                        |
+| 8  | GDPR & compliance with Indian DPDP Act                         | ⬜ Not started  | Phase A | Foundations planned                                                    |
+| 9  | Onboarding Flow                                                | ⬜ Not started  | Phase A |                                                                        |
+| 10 | Personalization                                                | ⬜ Not started  | Phase B |                                                                        |
+| 11 | Subscription Plans (admin managed), Razorpay integration, no free plan, only 1 day free trial | ⬜ Not started | Phase C | Razorpay test mode will be used initially                              |
+| 12 | Referral Program                                               | ⬜ Not started  | Phase C |                                                                        |
+| 13 | Advanced Admin Dashboard                                       | ⬜ Not started  | Phase C |                                                                        |
+| 14 | Content Management System                                      | ⬜ Not started  | Phase C |                                                                        |
+| 15 | Adaptive Learning Path                                         | ⬜ Not started  | Phase E |                                                                        |
+| 16 | Automated Question Generation                                  | ⬜ Not started  | Phase E |                                                                        |
+
+*Note: Updates will be made here as features move through In Progress → Completed.*
+
+---
+
 ## 🎯 Immediate High-Impact Improvements
 
 ### 1. **Real-Time Progress Tracking**
 **Priority:** High  
 **Effort:** Medium
 
-**Description:**
+**Description:**  
 Implement real-time progress tracking for quizzes and mock tests with visual indicators.
 
-**Implementation:**
-- Add progress bars showing completion percentage
-- Display time remaining with countdown timer
-- Show question navigation grid (clickable bubbles)
-- Auto-save answers to prevent data loss
-- Add "Mark for Review" feature
+**Implementation:**  
+- Add progress bars showing completion percentage  
+- Display time remaining with countdown timer  
+- Show question navigation grid (clickable bubbles)  
+- Auto-save answers to prevent data loss  
+- Add "Mark for Review" feature  
 
-**Benefits:**
-- Better user engagement
-- Reduced anxiety during tests
-- Improved completion rates
+**Benefits:**  
+- Better user engagement  
+- Reduced anxiety during tests  
+- Improved completion rates  
 
 ---
 
@@ -31,21 +59,21 @@ Implement real-time progress tracking for quizzes and mock tests with visual ind
 **Priority:** High  
 **Effort:** Medium
 
-**Description:**
+**Description:**  
 Convert the application to a Progressive Web App (PWA) with offline capabilities.
 
-**Implementation:**
-- Add service worker for caching
-- Implement background sync for quiz submissions
-- Cache quiz questions for offline access
-- Add install prompts for mobile devices
-- Store user progress locally with IndexedDB
+**Implementation:**  
+- Add service worker for caching  
+- Implement background sync for quiz submissions  
+- Cache quiz questions for offline access  
+- Add install prompts for mobile devices  
+- Store user progress locally with IndexedDB  
 
-**Benefits:**
-- Works in low/no connectivity areas
-- Better mobile experience
-- Installable on devices
-- Reduced server load
+**Benefits:**  
+- Works in low/no connectivity areas  
+- Better mobile experience  
+- Installable on devices  
+- Reduced server load  
 
 **Files to Create:**
 ```
@@ -61,26 +89,26 @@ public/
 **Priority:** High  
 **Effort:** High
 
-**Description:**
+**Description:**  
 Create comprehensive analytics for students and teachers with visualizations.
 
-**Implementation:**
-- Performance trends over time (line charts)
-- Subject-wise strength/weakness heatmap
-- Time spent per chapter/topic
-- Comparison with peer average (anonymized)
-- Learning velocity metrics
-- Predicted exam scores using ML
+**Implementation:**  
+- Performance trends over time (line charts)  
+- Subject-wise strength/weakness heatmap  
+- Time spent per chapter/topic  
+- Comparison with peer average (anonymized)  
+- Learning velocity metrics  
+- Predicted exam scores using ML  
 
-**Technologies:**
-- Chart.js or Recharts for visualizations
-- D3.js for advanced charts
-- TensorFlow.js for ML predictions
+**Technologies:**  
+- Chart.js or Recharts for visualizations  
+- D3.js for advanced charts  
+- TensorFlow.js for ML predictions  
 
-**Benefits:**
-- Data-driven study decisions
-- Identify improvement areas quickly
-- Motivate with progress visualization
+**Benefits:**  
+- Data-driven study decisions  
+- Identify improvement areas quickly  
+- Motivate with progress visualization  
 
 ---
 
@@ -88,28 +116,28 @@ Create comprehensive analytics for students and teachers with visualizations.
 **Priority:** Medium  
 **Effort:** Medium
 
-**Description:**
+**Description:**  
 Add gamification elements to increase engagement and motivation.
 
-**Implementation:**
-- **Points System:** Earn points for quizzes, streaks, accuracy
-- **Badges:** Achievement unlocks (e.g., "Week Warrior", "Perfect Score")
-- **Leaderboards:** Daily, weekly, monthly rankings
-- **Levels:** Student levels (Beginner → Expert)
-- **Streaks:** Daily login and quiz streaks
-- **Challenges:** Weekly challenges with rewards
+**Implementation:**  
+- **Points System:** Earn points for quizzes, streaks, accuracy  
+- **Badges:** Achievement unlocks (e.g., "Week Warrior", "Perfect Score")  
+- **Leaderboards:** Daily, weekly, monthly rankings  
+- **Levels:** Student levels (Beginner → Expert)  
+- **Streaks:** Daily login and quiz streaks  
+- **Challenges:** Weekly challenges with rewards  
 
 **Database Schema Addition:**
 ```typescript
 model Achievement {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  type      String   // badge, milestone, streak
-  name      String
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  type        String   // badge, milestone, streak
+  name        String
   description String
-  icon      String
-  unlockedAt DateTime @default(now())
+  icon        String
+  unlockedAt  DateTime @default(now())
 }
 
 model Leaderboard {
@@ -123,10 +151,10 @@ model Leaderboard {
 }
 ```
 
-**Benefits:**
-- Increased daily active users
-- Higher engagement rates
-- Social motivation through competition
+**Benefits:**  
+- Increased daily active users  
+- Higher engagement rates  
+- Social motivation through competition  
 
 ---
 
@@ -134,47 +162,45 @@ model Leaderboard {
 **Priority:** Medium  
 **Effort:** High
 
-**Description:**
+**Description:**  
 AI-powered personalized study planner that creates optimal study schedules.
 
-**Implementation:**
-- Analyze user's performance and weak areas
-- Consider exam dates and available time
-- Generate daily/weekly study plans
-- Send notifications for study sessions
-- Adjust plan based on progress
-- Integrate with calendar (Google Calendar API)
+**Implementation:**  
+- Analyze user's performance and weak areas  
+- Consider exam dates and available time  
+- Generate daily/weekly study plans  
+- Send notifications for study sessions  
+- Adjust plan based on progress  
+- Integrate with calendar (Google Calendar API)  
 
-**Features:**
-- Spaced repetition algorithm
-- Pomodoro timer integration
-- Break reminders
-- Study session tracking
-- Plan adherence metrics
+**Features:**  
+- Spaced repetition algorithm  
+- Pomodoro timer integration  
+- Break reminders  
+- Study session tracking  
+- Plan adherence metrics  
 
-**Benefits:**
-- Structured learning approach
-- Better time management
-- Improved retention through spaced repetition
+**Benefits:**  
+- Structured learning approach  
+- Better time management  
+- Improved retention through spaced repetition  
 
 ---
-
-## 💡 Feature Enhancements
 
 ### 6. **Video Lessons Integration**
 **Priority:** Medium  
 **Effort:** High
 
-**Description:**
+**Description:**  
 Integrate video lessons for each chapter with synchronized quizzes.
 
-**Implementation:**
-- Embed YouTube or self-hosted videos
-- Video progress tracking
-- Interactive timestamps
-- Quiz after each video
-- Note-taking feature during videos
-- Speed control and subtitle support
+**Implementation:**  
+- Embed YouTube or self-hosted videos  
+- Video progress tracking  
+- Interactive timestamps  
+- Quiz after each video  
+- Note-taking feature during videos  
+- Speed control and subtitle support  
 
 **Database Schema:**
 ```typescript
@@ -192,21 +218,21 @@ model VideoLesson {
 }
 
 model VideoProgress {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  videoId     String
-  video       VideoLesson @relation(fields: [videoId], references: [id])
-  watchedSeconds Int   @default(0)
-  completed   Boolean  @default(false)
-  updatedAt   DateTime @updatedAt
+  id             String      @id @default(cuid())
+  userId         String
+  user           User        @relation(fields: [userId], references: [id])
+  videoId        String
+  video          VideoLesson @relation(fields: [videoId], references: [id])
+  watchedSeconds Int         @default(0)
+  completed      Boolean     @default(false)
+  updatedAt      DateTime    @updatedAt
 }
 ```
 
-**Technologies:**
-- Video.js or Plyr for custom player
-- AWS S3 + CloudFront for video hosting
-- HLS for adaptive streaming
+**Technologies:**  
+- Video.js or Plyr for custom player  
+- AWS S3 + CloudFront for video hosting  
+- HLS for adaptive streaming  
 
 ---
 
@@ -214,52 +240,52 @@ model VideoProgress {
 **Priority:** Medium  
 **Effort:** High
 
-**Description:**
+**Description:**  
 Create discussion forums for students to ask questions and help each other.
 
-**Implementation:**
-- Chapter-wise discussion threads
-- Question posting with rich text editor
-- Upvote/downvote system
-- Best answer marking
-- Moderator tools for admins
-- Notification system
+**Implementation:**  
+- Chapter-wise discussion threads  
+- Question posting with rich text editor  
+- Upvote/downvote system  
+- Best answer marking  
+- Moderator tools for admins  
+- Notification system  
 
 **Database Schema:**
 ```typescript
 model DiscussionThread {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   userId      String
-  user        User     @relation(fields: [userId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
   chapterId   String?
-  chapter     Chapter? @relation(fields: [chapterId], references: [id])
+  chapter     Chapter?  @relation(fields: [chapterId], references: [id])
   title       String
   content     String
-  upvotes     Int      @default(0)
-  views       Int      @default(0)
+  upvotes     Int       @default(0)
+  views       Int       @default(0)
   replies     DiscussionReply[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model DiscussionReply {
-  id          String   @id @default(cuid())
-  threadId    String
-  thread      DiscussionThread @relation(fields: [threadId], references: [id])
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  content     String
-  upvotes     Int      @default(0)
-  isBestAnswer Boolean @default(false)
-  createdAt   DateTime @default(now())
+  id           String           @id @default(cuid())
+  threadId     String
+  thread       DiscussionThread @relation(fields: [threadId], references: [id])
+  userId       String
+  user         User             @relation(fields: [userId], references: [id])
+  content      String
+  upvotes      Int              @default(0)
+  isBestAnswer Boolean          @default(false)
+  createdAt    DateTime         @default(now())
 }
 ```
 
-**Benefits:**
-- Peer-to-peer learning
-- Community building
-- Reduced support burden
-- Knowledge sharing
+**Benefits:**  
+- Peer-to-peer learning  
+- Community building  
+- Reduced support burden  
+- Knowledge sharing  
 
 ---
 
@@ -267,21 +293,21 @@ model DiscussionReply {
 **Priority:** Medium  
 **Effort:** Medium
 
-**Description:**
+**Description:**  
 AI-generated flashcards for quick revision with spaced repetition.
 
-**Implementation:**
-- Auto-generate flashcards from chapters
-- Flip animation for cards
-- Swipe gestures (know/don't know)
-- Spaced repetition algorithm (SM-2)
-- Progress tracking
-- Custom flashcard creation
+**Implementation:**  
+- Auto-generate flashcards from chapters  
+- Flip animation for cards  
+- Swipe gestures (know/don't know)  
+- Spaced repetition algorithm (SM-2)  
+- Progress tracking  
+- Custom flashcard creation  
 
-**Benefits:**
-- Quick revision tool
-- Better concept retention
-- Mobile-friendly
+**Benefits:**  
+- Quick revision tool  
+- Better concept retention  
+- Mobile-friendly  
 
 ---
 
@@ -289,52 +315,57 @@ AI-generated flashcards for quick revision with spaced repetition.
 **Priority:** Low  
 **Effort:** Very High
 
-**Description:**
+**Description:**  
 Integrate live class functionality with video conferencing.
 
-**Implementation:**
-- WebRTC-based video conferencing
-- Screen sharing
-- Chat and Q&A
-- Recording and playback
-- Attendance tracking
-- Interactive whiteboard
+**Implementation:**  
+- WebRTC-based video conferencing  
+- Screen sharing  
+- Chat and Q&A  
+- Recording and playback  
+- Attendance tracking  
+- Interactive whiteboard  
 
-**Technologies:**
-- Zoom API integration (easier)
-- Or self-hosted Jitsi Meet
-- Or Daily.co API
+**Technologies:**  
+- Zoom API integration (easier)  
+- Or self-hosted Jitsi Meet  
+- Or Daily.co API  
 
 **Database Schema:**
 ```typescript
 model LiveClass {
-  id          String   @id @default(cuid())
-  subjectId   String
-  subject     Subject  @relation(fields: [subjectId], references: [id])
-  title       String
-  description String?
-  teacherId   String
-  teacher     User     @relation(fields: [teacherId], references: [id])
-  scheduledAt DateTime
-  duration    Int      // in minutes
-  meetingUrl  String?
+  id           String   @id @default(cuid())
+  subjectId    String
+  subject      Subject  @relation(fields: [subjectId], references: [id])
+  title        String
+  description  String?
+  teacherId    String
+  teacher      User     @relation(fields: [teacherId], references: [id])
+  scheduledAt  DateTime
+  duration     Int      // in minutes
+  meetingUrl   String?
   recordingUrl String?
-  status      String   // scheduled, live, completed, cancelled
-  attendees   ClassAttendance[]
-  createdAt   DateTime @default(now())
+  status       String   // scheduled, live, completed, cancelled
+  attendees    ClassAttendance[]
+  createdAt    DateTime @default(now())
 }
 
 model ClassAttendance {
-  id          String   @id @default(cuid())
-  classId     String
-  class       LiveClass @relation(fields: [classId], references: [id])
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  joinedAt    DateTime?
-  leftAt      DateTime?
-  duration    Int?     // in minutes
+  id        String   @id @default(cuid())
+  classId   String
+  class     LiveClass @relation(fields: [classId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  joinedAt  DateTime?
+  leftAt    DateTime?
+  duration  Int?     // in minutes
 }
 ```
+
+**Benefits:**  
+- Immediate access to educators  
+- Interactive learning sessions  
+- Increased student participation  
 
 ---
 
@@ -344,20 +375,20 @@ model ClassAttendance {
 **Priority:** High  
 **Effort:** Medium
 
-**Actions:**
-- Implement React Server Components where applicable
-- Add lazy loading for images and components
-- Implement code splitting per route
-- Use Redis for caching frequently accessed data
-- Optimize database queries with proper indexing
-- Implement CDN for static assets
-- Add image optimization (WebP format)
-- Minimize bundle size with tree shaking
+**Actions:**  
+- Implement React Server Components where applicable  
+- Add lazy loading for images and components  
+- Implement code splitting per route  
+- Use Redis for caching frequently accessed data  
+- Optimize database queries with proper indexing  
+- Implement CDN for static assets  
+- Add image optimization (WebP format)  
+- Minimize bundle size with tree shaking  
 
-**Expected Results:**
-- 50% faster page loads
-- Better Lighthouse scores (95+)
-- Reduced server costs
+**Expected Results:**  
+- 50% faster page loads  
+- Better Lighthouse scores (95+)  
+- Reduced server costs  
 
 ---
 
@@ -365,13 +396,13 @@ model ClassAttendance {
 **Priority:** High  
 **Effort:** Low
 
-**Implementation:**
-- Add global error boundary
-- Implement toast notifications for errors
-- Add retry mechanisms for failed API calls
-- Detailed error logging with Sentry
-- User-friendly error messages
-- Offline detection and feedback
+**Implementation:**  
+- Add global error boundary  
+- Implement toast notifications for errors  
+- Add retry mechanisms for failed API calls  
+- Detailed error logging with Sentry  
+- User-friendly error messages  
+- Offline detection and feedback  
 
 ---
 
@@ -379,15 +410,15 @@ model ClassAttendance {
 **Priority:** High  
 **Effort:** High
 
-**Implementation:**
-- Unit tests with Jest
-- Integration tests with React Testing Library
-- E2E tests with Playwright or Cypress
-- API tests with Supertest
-- Performance tests with Lighthouse CI
-- Accessibility tests with Axe
+**Implementation:**  
+- Unit tests with Jest  
+- Integration tests with React Testing Library  
+- E2E tests with Playwright or Cypress  
+- API tests with Supertest  
+- Performance tests with Lighthouse CI  
+- Accessibility tests with Axe  
 
-**Target Coverage:** 80%+
+**Target Coverage:** 80%+  
 
 ---
 
@@ -395,17 +426,17 @@ model ClassAttendance {
 **Priority:** Medium  
 **Effort:** Medium
 
-**Implementation:**
-- next-intl for internationalization
-- Support Hindi, English initially
-- Add language selector in UI
-- Translate all static content
-- Support regional preferences
+**Implementation:**  
+- next-intl for internationalization  
+- Support Hindi, English initially  
+- Add language selector in UI  
+- Translate all static content  
+- Support regional preferences  
 
-**Benefits:**
-- Reach wider audience
-- Better accessibility
-- Competitive advantage
+**Benefits:**  
+- Reach wider audience  
+- Better accessibility  
+- Competitive advantage  
 
 ---
 
@@ -413,12 +444,12 @@ model ClassAttendance {
 **Priority:** Medium  
 **Effort:** Medium
 
-**Implementation:**
-- Full-text search with Algolia or Elasticsearch
-- Search questions, chapters, videos
-- Auto-complete suggestions
-- Search history
-- Filters and facets
+**Implementation:**  
+- Full-text search with Algolia or Elasticsearch  
+- Search questions, chapters, videos  
+- Auto-complete suggestions  
+- Search history  
+- Filters and facets  
 
 ---
 
@@ -426,17 +457,17 @@ model ClassAttendance {
 **Priority:** Medium  
 **Effort:** Very High
 
-**Description:**
+**Description:**  
 Create native mobile apps for iOS and Android using React Native.
 
-**Benefits:**
-- Better mobile experience
-- Push notifications
-- Offline support
-- App store presence
-- Better performance
+**Benefits:**  
+- Better mobile experience  
+- Push notifications  
+- Offline support  
+- App store presence  
+- Better performance  
 
-**Shared Codebase:** 70-80% with web app
+**Shared Codebase:** 70–80% with web app  
 
 ---
 
@@ -446,14 +477,14 @@ Create native mobile apps for iOS and Android using React Native.
 **Priority:** High  
 **Effort:** Medium
 
-**Improvements:**
-- Implement rate limiting per user (not just IP)
-- Add CAPTCHA for sensitive operations
-- Two-factor authentication (2FA)
-- Session management improvements
-- IP-based access restrictions for admin
-- Security headers (already done, maintain)
-- Regular security audits
+**Improvements:**  
+- Implement rate limiting per user (not just IP)  
+- Add CAPTCHA for sensitive operations  
+- Two-factor authentication (2FA)  
+- Session management improvements  
+- IP-based access restrictions for admin  
+- Security headers (already done, maintain)  
+- Regular security audits  
 
 ---
 
@@ -461,13 +492,13 @@ Create native mobile apps for iOS and Android using React Native.
 **Priority:** High  
 **Effort:** Medium
 
-**Implementation:**
-- Add privacy policy page
-- Cookie consent banner
-- Data export functionality
-- Account deletion with data purge
-- Anonymization of old data
-- Audit logs for data access
+**Implementation:**  
+- Add privacy policy page  
+- Cookie consent banner  
+- Data export functionality  
+- Account deletion with data purge  
+- Anonymization of old data  
+- Audit logs for data access  
 
 ---
 
@@ -475,12 +506,12 @@ Create native mobile apps for iOS and Android using React Native.
 **Priority:** Medium  
 **Effort:** Medium
 
-**For user-generated content (forums, comments):**
-- AI-powered content filtering
-- Report and flag system
-- Moderator dashboard
-- Automated profanity filter
-- Manual review queue
+**For user-generated content (forums, comments):**  
+- AI-powered content filtering  
+- Report and flag system  
+- Moderator dashboard  
+- Automated profanity filter  
+- Manual review queue  
 
 ---
 
@@ -490,12 +521,12 @@ Create native mobile apps for iOS and Android using React Native.
 **Priority:** High  
 **Effort:** Low
 
-**Implementation:**
-- Interactive tutorial on first login
-- Feature highlights with tooltips
-- Sample quiz walkthrough
-- Profile completion checklist
-- Goal setting wizard
+**Implementation:**  
+- Interactive tutorial on first login  
+- Feature highlights with tooltips  
+- Sample quiz walkthrough  
+- Profile completion checklist  
+- Goal setting wizard  
 
 ---
 
@@ -503,12 +534,12 @@ Create native mobile apps for iOS and Android using React Native.
 **Priority:** Medium  
 **Effort:** Medium
 
-**Features:**
-- Custom dashboard widgets
-- Saved preferences (quiz settings)
-- Favorite subjects/chapters
-- Custom notification preferences
-- Recommended content based on interests
+**Features:**  
+- Custom dashboard widgets  
+- Saved preferences (quiz settings)  
+- Favorite subjects/chapters  
+- Custom notification preferences  
+- Recommended content based on interests  
 
 ---
 
@@ -516,12 +547,12 @@ Create native mobile apps for iOS and Android using React Native.
 **Priority:** Low  
 **Effort:** Medium
 
-**Implementation:**
-- Friend system
-- Study groups
-- Share achievements
-- Compare progress with friends
-- Group challenges
+**Implementation:**  
+- Friend system  
+- Study groups  
+- Share achievements  
+- Compare progress with friends  
+- Group challenges  
 
 ---
 
@@ -529,15 +560,15 @@ Create native mobile apps for iOS and Android using React Native.
 **Priority:** High  
 **Effort:** Low
 
-**Actions:**
-- Keyboard navigation support
-- Screen reader optimization
-- High contrast mode
-- Text-to-speech for questions
-- Adjustable font sizes
-- Focus indicators
+**Actions:**  
+- Keyboard navigation support  
+- Screen reader optimization  
+- High contrast mode  
+- Text-to-speech for questions  
+- Adjustable font sizes  
+- Focus indicators  
 
-**Target:** WCAG 2.1 AA compliance
+**Target:** WCAG 2.1 AA compliance  
 
 ---
 
@@ -547,18 +578,18 @@ Create native mobile apps for iOS and Android using React Native.
 **Priority:** Medium  
 **Effort:** High
 
-**Implementation:**
-- Stripe or Razorpay integration
-- Free, Basic, Premium tiers
-- Trial period support
-- Subscription management
-- Invoice generation
-- Payment history
+**Implementation:**  
+- Stripe or Razorpay integration  
+- Free, Basic, Premium tiers  
+- Trial period support  
+- Subscription management  
+- Invoice generation  
+- Payment history  
 
-**Tiers Example:**
-- **Free:** 5 quizzes/day, basic analytics
-- **Basic:** Unlimited quizzes, video lessons
-- **Premium:** All features, AI tutor, live classes
+**Tiers Example:**  
+- **Free:** 5 quizzes/day, basic analytics  
+- **Basic:** Unlimited quizzes, video lessons  
+- **Premium:** All features, AI tutor, live classes  
 
 ---
 
@@ -566,11 +597,11 @@ Create native mobile apps for iOS and Android using React Native.
 **Priority:** Low  
 **Effort:** Medium
 
-**Features:**
-- Unique referral codes
-- Track referrals
-- Reward system (free premium days)
-- Referral leaderboard
+**Features:**  
+- Unique referral codes  
+- Track referrals  
+- Reward system (free premium days)  
+- Referral leaderboard  
 
 ---
 
@@ -580,13 +611,13 @@ Create native mobile apps for iOS and Android using React Native.
 **Priority:** Medium  
 **Effort:** High
 
-**Features:**
-- Real-time user activity
-- Revenue analytics
-- Content performance metrics
-- A/B testing dashboard
-- System health monitoring
-- Automated reports
+**Features:**  
+- Real-time user activity  
+- Revenue analytics  
+- Content performance metrics  
+- A/B testing dashboard  
+- System health monitoring  
+- Automated reports  
 
 ---
 
@@ -594,13 +625,13 @@ Create native mobile apps for iOS and Android using React Native.
 **Priority:** High  
 **Effort:** High
 
-**Features:**
-- Bulk question upload (CSV/Excel)
-- Question editor with preview
-- Version control for questions
-- Content scheduling
-- Tagging system
-- Difficulty calibration tools
+**Features:**  
+- Bulk question upload (CSV/Excel)  
+- Question editor with preview  
+- Version control for questions  
+- Content scheduling  
+- Tagging system  
+- Difficulty calibration tools  
 
 ---
 
@@ -610,20 +641,20 @@ Create native mobile apps for iOS and Android using React Native.
 **Priority:** High  
 **Effort:** Very High
 
-**Description:**
+**Description:**  
 ML model that adapts content difficulty and recommendations in real-time.
 
-**Implementation:**
-- Train model on user performance data
-- Predict optimal next question difficulty
-- Recommend personalized study path
-- Adjust based on response time and accuracy
-- Identify learning patterns
+**Implementation:**  
+- Train model on user performance data  
+- Predict optimal next question difficulty  
+- Recommend personalized study path  
+- Adjust based on response time and accuracy  
+- Identify learning patterns  
 
-**Technologies:**
-- TensorFlow.js or ONNX Runtime
-- Python backend for model training
-- API for predictions
+**Technologies:**  
+- TensorFlow.js or ONNX Runtime  
+- Python backend for model training  
+- API for predictions  
 
 ---
 
@@ -631,15 +662,15 @@ ML model that adapts content difficulty and recommendations in real-time.
 **Priority:** Medium  
 **Effort:** High
 
-**Description:**
+**Description:**  
 Generate unlimited practice questions using AI from textbook content.
 
-**Implementation:**
-- Upload chapter PDFs
-- Extract key concepts
-- Generate multiple question types
-- Validate with human review
-- Continuous improvement based on feedback
+**Implementation:**  
+- Upload chapter PDFs  
+- Extract key concepts  
+- Generate multiple question types  
+- Validate with human review  
+- Continuous improvement based on feedback  
 
 ---
 
@@ -647,15 +678,15 @@ Generate unlimited practice questions using AI from textbook content.
 **Priority:** Low  
 **Effort:** Very High
 
-**Description:**
+**Description:**  
 AI-powered grading for subjective questions with detailed feedback.
 
-**Implementation:**
-- NLP model for answer evaluation
-- Keyword extraction
-- Coherence analysis
-- Plagiarism detection
-- Constructive feedback generation
+**Implementation:**  
+- NLP model for answer evaluation  
+- Keyword extraction  
+- Coherence analysis  
+- Plagiarism detection  
+- Constructive feedback generation  
 
 ---
 
@@ -663,14 +694,14 @@ AI-powered grading for subjective questions with detailed feedback.
 **Priority:** Low  
 **Effort:** Medium
 
-**Description:**
+**Description:**  
 Take quizzes using voice commands for hands-free practice.
 
-**Implementation:**
-- Speech-to-text for answers
-- Text-to-speech for questions
-- Voice navigation
-- Accessibility feature
+**Implementation:**  
+- Speech-to-text for answers  
+- Text-to-speech for questions  
+- Voice navigation  
+- Accessibility feature  
 
 ---
 
@@ -680,12 +711,12 @@ Take quizzes using voice commands for hands-free practice.
 **Priority:** High  
 **Effort:** Medium
 
-**Implementation:**
-- Upload previous year exam papers
-- Organize by year and exam type
-- Same interface as mock tests
-- Solution explanations
-- Difficulty analysis
+**Implementation:**  
+- Upload previous year exam papers  
+- Organize by year and exam type  
+- Same interface as mock tests  
+- Solution explanations  
+- Difficulty analysis  
 
 ---
 
@@ -693,12 +724,12 @@ Take quizzes using voice commands for hands-free practice.
 **Priority:** Medium  
 **Effort:** Medium
 
-**Features:**
-- 1-on-1 doubt sessions with teachers
-- Scheduled or instant doubts
-- Video/text/image support
-- Rating system for teachers
-- Doubt history
+**Features:**  
+- 1-on-1 doubt sessions with teachers  
+- Scheduled or instant doubts  
+- Video/text/image support  
+- Rating system for teachers  
+- Doubt history  
 
 ---
 
@@ -706,12 +737,12 @@ Take quizzes using voice commands for hands-free practice.
 **Priority:** Medium  
 **Effort:** Medium
 
-**Features:**
-- Chapter-wise notes
-- AI-generated summaries
-- Student-contributed notes
-- Downloadable PDFs
-- Highlight and annotate
+**Features:**  
+- Chapter-wise notes  
+- AI-generated summaries  
+- Student-contributed notes  
+- Downloadable PDFs  
+- Highlight and annotate  
 
 ---
 
@@ -719,14 +750,14 @@ Take quizzes using voice commands for hands-free practice.
 **Priority:** Low  
 **Effort:** Low
 
-**Description:**
+**Description:**  
 Quick reference for formulas, concepts, and definitions.
 
-**Implementation:**
-- Searchable database
-- Subject and chapter-wise organization
-- Favorites and bookmarks
-- Quick access widget
+**Implementation:**  
+- Searchable database  
+- Subject and chapter-wise organization  
+- Favorites and bookmarks  
+- Quick access widget  
 
 ---
 
@@ -736,13 +767,13 @@ Quick reference for formulas, concepts, and definitions.
 **Priority:** Low  
 **Effort:** Variable
 
-**Integrations:**
-- Google Classroom
-- Microsoft Teams
-- Zoom
-- Google Calendar
-- WhatsApp notifications
-- Email campaigns (SendGrid/Mailchimp)
+**Integrations:**  
+- Google Classroom  
+- Microsoft Teams  
+- Zoom  
+- Google Calendar  
+- WhatsApp notifications  
+- Email campaigns (SendGrid/Mailchimp)  
 
 ---
 
@@ -750,15 +781,15 @@ Quick reference for formulas, concepts, and definitions.
 **Priority:** Low  
 **Effort:** High
 
-**Description:**
+**Description:**  
 RESTful API for third-party developers and integrations.
 
-**Features:**
-- API key management
-- Rate limiting
-- Documentation with Swagger
-- Webhooks
-- SDK for popular languages
+**Features:**  
+- API key management  
+- Rate limiting  
+- Documentation with Swagger  
+- Webhooks  
+- SDK for popular languages  
 
 ---
 
@@ -768,13 +799,13 @@ RESTful API for third-party developers and integrations.
 **Priority:** High  
 **Effort:** Medium
 
-**Actions:**
-- Blog section for content marketing
-- Case studies and success stories
-- FAQ pages
-- Rich snippets
-- XML sitemap
-- Structured data for all pages
+**Actions:**  
+- Blog section for content marketing  
+- Case studies and success stories  
+- FAQ pages  
+- Rich snippets  
+- XML sitemap  
+- Structured data for all pages  
 
 ---
 
@@ -782,12 +813,12 @@ RESTful API for third-party developers and integrations.
 **Priority:** Medium  
 **Effort:** Low
 
-**Features:**
-- Welcome email series
-- Weekly progress reports
-- Motivational emails
-- Re-engagement campaigns
-- Newsletter
+**Features:**  
+- Welcome email series  
+- Weekly progress reports  
+- Motivational emails  
+- Re-engagement campaigns  
+- Newsletter  
 
 ---
 
@@ -795,158 +826,156 @@ RESTful API for third-party developers and integrations.
 **Priority:** High  
 **Effort:** Low
 
-**Implementation:**
-- Google Analytics 4
-- Mixpanel for product analytics
-- Hotjar for heatmaps
-- User session recording
-- Conversion funnels
-- A/B testing framework
+**Implementation:**  
+- Google Analytics 4  
+- Mixpanel for product analytics  
+- Hotjar for heatmaps  
+- User session recording  
+- Conversion funnels  
+- A/B testing framework  
 
 ---
 
 ## 🎯 Priority Matrix
 
 ### Must Have (High Priority, Quick Wins)
-1. Real-Time Progress Tracking
-2. Enhanced Error Handling
-3. Onboarding Flow
-4. Advanced Analytics Dashboard
-5. Practice Papers
-6. Performance Optimization
+1. Real-Time Progress Tracking  
+2. Enhanced Error Handling  
+3. Onboarding Flow  
+4. Advanced Analytics Dashboard  
+5. Practice Papers  
+6. Performance Optimization  
 
 ### Should Have (Medium Priority)
-1. Offline Mode (PWA)
-2. Gamification
-3. Smart Study Planner
-4. Video Lessons
-5. Flashcards
-6. Multi-language Support
+1. Offline Mode (PWA)  
+2. Gamification  
+3. Smart Study Planner  
+4. Video Lessons  
+5. Flashcards  
+6. Multi-language Support  
 
 ### Nice to Have (Low Priority)
-1. Live Classes
-2. Mobile App
-3. Voice-Based Quiz
-4. Social Features
-5. Public API
+1. Live Classes  
+2. Mobile App  
+3. Voice-Based Quiz  
+4. Social Features  
+5. Public API  
 
 ---
 
 ## 📅 Suggested Implementation Timeline
 
-### Phase 1 (1-2 months)
-- Real-time progress tracking
-- Enhanced error handling
-- Onboarding flow
-- Performance optimization
-- Advanced analytics dashboard
+### Phase 1 (1–2 months)
+- Real-time progress tracking  
+- Enhanced error handling  
+- Onboarding flow  
+- Performance optimization  
+- Advanced analytics dashboard  
 
-### Phase 2 (2-3 months)
-- Offline mode (PWA)
-- Gamification system
-- Smart study planner
-- Practice papers
-- Video lessons integration
+### Phase 2 (2–3 months)
+- Offline mode (PWA)  
+- Gamification system  
+- Smart study planner  
+- Practice papers  
+- Video lessons integration  
 
-### Phase 3 (3-4 months)
-- Peer discussion forums
-- Flashcards
-- Multi-language support
-- Advanced admin dashboard
-- Subscription plans
+### Phase 3 (3–4 months)
+- Peer discussion forums  
+- Flashcards  
+- Multi-language support  
+- Advanced admin dashboard  
+- Subscription plans  
 
-### Phase 4 (4-6 months)
-- Adaptive learning path
-- Live classes
-- Mobile app (React Native)
-- Public API
-- Advanced AI features
+### Phase 4 (4–6 months)
+- Adaptive learning path  
+- Live classes  
+- Mobile app (React Native)  
+- Public API  
+- Advanced AI features  
 
 ---
 
 ## 🛠️ Technical Debt to Address
 
-1. **Add comprehensive testing** (unit, integration, E2E)
-2. **Implement proper logging** (structured logging with levels)
-3. **Add monitoring** (Sentry, New Relic, or Datadog)
-4. **Database optimization** (indexes, query optimization)
-5. **API rate limiting** (per user, not just IP)
-6. **Background job processing** (Bull/BullMQ for async tasks)
-7. **Caching layer** (Redis for frequently accessed data)
-8. **File storage** (S3 for user uploads instead of local storage)
+1. **Add comprehensive testing** (unit, integration, E2E)  
+2. **Implement proper logging** (structured logging with levels)  
+3. **Add monitoring** (Sentry, New Relic, or Datadog)  
+4. **Database optimization** (indexes, query optimization)  
+5. **API rate limiting** (per user, not just IP)  
+6. **Background job processing** (Bull/BullMQ for async tasks)  
+7. **Caching layer** (Redis for frequently accessed data)  
+8. **File storage** (S3 for user uploads instead of local storage)  
 
 ---
 
 ## 💰 Estimated Costs for Third-Party Services
 
 ### Monthly (at 10,000 users)
-- **Clerk Auth:** $25-200/month
-- **OpenAI API:** $50-500/month (depends on usage)
-- **Gemini API:** $0-300/month (free tier + usage)
-- **Database (Supabase/PlanetScale):** $25-100/month
-- **Hosting (Vercel/AWS):** $100-500/month
-- **CDN (Cloudflare/CloudFront):** $20-100/month
-- **Monitoring (Sentry):** $26/month
-- **Email (SendGrid):** $15-90/month
+- **Clerk Auth:** $25–200/month  
+- **OpenAI API:** $50–500/month (depends on usage)  
+- **Gemini API:** $0–300/month (free tier + usage)  
+- **Database (Supabase/PlanetScale):** $25–100/month  
+- **Hosting (Vercel/AWS):** $100–500/month  
+- **CDN (Cloudflare/CloudFront):** $20–100/month  
+- **Monitoring (Sentry):** $26/month  
+- **Email (SendGrid):** $15–90/month  
 
-**Total:** ~$250-2000/month
+**Total:** ~$250–2000/month  
 
 ---
 
 ## 🎯 Success Metrics to Track
 
-1. **User Engagement:**
-   - Daily Active Users (DAU)
-   - Session duration
-   - Quiz completion rate
-   - Return rate (7-day, 30-day)
+1. **User Engagement:**  
+   - Daily Active Users (DAU)  
+   - Session duration  
+   - Quiz completion rate  
+   - Return rate (7-day, 30-day)  
 
-2. **Learning Outcomes:**
-   - Average score improvement
-   - Completion rate of study plans
-   - Time to proficiency
+2. **Learning Outcomes:**  
+   - Average score improvement  
+   - Completion rate of study plans  
+   - Time to proficiency  
 
-3. **Business Metrics:**
-   - Sign-up rate
-   - Conversion to paid (if applicable)
-   - Customer Lifetime Value (LTV)
-   - Churn rate
+3. **Business Metrics:**  
+   - Sign-up rate  
+   - Conversion to paid  
+   - Customer Lifetime Value (LTV)  
+   - Churn rate  
 
-4. **Technical Metrics:**
-   - Page load time (< 2s)
-   - API response time (< 500ms)
-   - Error rate (< 0.1%)
-   - Uptime (99.9%+)
+4. **Technical Metrics:**  
+   - Page load time (< 2s)  
+   - API response time (< 500ms)  
+   - Error rate (< 0.1%)  
+   - Uptime (99.9%+)  
 
 ---
 
 ## 🚀 Getting Started with Improvements
 
 ### For Developers:
-
-1. **Pick a feature** from the high-priority list
-2. **Create a new branch** for the feature
-3. **Follow the existing code structure**
-4. **Add tests** for new functionality
-5. **Update documentation**
-6. **Submit PR** with detailed description
+1. **Pick a feature** from the high-priority list  
+2. **Create a new branch** for the feature  
+3. **Follow the existing code structure**  
+4. **Add tests** for new functionality  
+5. **Update documentation**  
+6. **Submit PR** with detailed description  
 
 ### For Product Managers:
-
-1. **Prioritize based on user feedback**
-2. **Create user stories** for each feature
-3. **Define acceptance criteria**
-4. **Track metrics** for impact measurement
+1. **Prioritize based on user feedback**  
+2. **Create user stories** for each feature  
+3. **Define acceptance criteria**  
+4. **Track metrics** for impact measurement  
 
 ---
 
 ## 📚 Resources
 
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Prisma Best Practices](https://www.prisma.io/docs/guides/performance-and-optimization)
-- [React Performance](https://react.dev/learn/render-and-commit)
-- [Web Vitals](https://web.dev/vitals/)
-- [WCAG Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
+- [Next.js Documentation](https://nextjs.org/docs)  
+- [Prisma Best Practices](https://www.prisma.io/docs/guides/performance-and-optimization)  
+- [React Performance](https://react.dev/learn/render-and-commit)  
+- [Web Vitals](https://web.dev/vitals/)  
+- [WCAG Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)  
 
 ---
 
