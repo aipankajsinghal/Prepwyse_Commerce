@@ -62,6 +62,7 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({
+      quizId: quiz.id,
       quizAttempt,
       questions,
     });

@@ -75,17 +75,21 @@ model Quiz {
 }
 
 model QuizAttempt {
-  id              String    @id @default(cuid())
-  userId          String
-  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  quizId          String
-  quiz            Quiz      @relation(fields: [quizId], references: [id], onDelete: Cascade)
-  answers         Json      // Array of {questionId, selectedAnswer}
-  score           Int       @default(0)
-  totalQuestions  Int
-  startedAt       DateTime  @default(now())
-  completedAt     DateTime?
-  timeSpent       Int?      // in seconds
+  id                    String    @id @default(cuid())
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quizId                String
+  quiz                  Quiz      @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  answers               Json      // Array of {questionId, selectedAnswer, markedForReview, answeredAt}
+  score                 Int       @default(0)
+  totalQuestions        Int
+  status                String    @default("IN_PROGRESS") // IN_PROGRESS, COMPLETED
+  currentQuestionIndex  Int       @default(0)
+  durationSeconds       Int?      // Total duration in seconds
+  timeRemaining         Int?      // Time remaining in seconds
+  startedAt             DateTime  @default(now())
+  completedAt           DateTime?
+  timeSpent             Int?      // in seconds
 }
 
 model MockTest {
