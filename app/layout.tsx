@@ -5,6 +5,8 @@ import { ToastProvider } from "@/components/ToastProvider";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { OnboardingProvider } from "@/components/OnboardingProvider";
+import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
+import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -94,6 +96,11 @@ export default function RootLayout({
           <link rel="icon" href="/favicon.ico" sizes="any" />
           <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
           <link rel="manifest" href="/manifest.json" />
+          <meta name="theme-color" content="#4f46e5" />
+          <meta name="mobile-web-app-capable" content="yes" />
+          <meta name="apple-mobile-web-app-capable" content="yes" />
+          <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+          <meta name="apple-mobile-web-app-title" content="PrepWyse" />
         </head>
         <body className="font-sans antialiased">
           <ThemeProvider
@@ -106,6 +113,8 @@ export default function RootLayout({
             <ErrorBoundary>
               <ToastProvider>
                 <OnboardingProvider>
+                  <ServiceWorkerRegistration />
+                  <PWAInstallPrompt />
                   {children}
                   <OfflineIndicator />
                 </OnboardingProvider>
