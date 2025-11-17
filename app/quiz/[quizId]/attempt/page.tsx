@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuizAttempt } from "@/lib/core/assessment/useQuizAttempt";
+import { useToast } from "@/components/ToastProvider";
 import Navbar from "@/components/Navbar";
 import { Clock, CheckCircle2, AlertCircle, ChevronLeft, ChevronRight, Flag } from "lucide-react";
+import { apiGet, apiPost, getErrorMessage } from "@/lib/api-client";
 
 type Question = {
   id: string;
@@ -36,6 +38,7 @@ type QuizAttempt = {
 export default function QuizAttemptPage() {
   const params = useParams();
   const router = useRouter();
+  const toast = useToast();
   const quizId = params.quizId as string;
 
   const [quiz, setQuiz] = useState<Quiz | null>(null);
@@ -61,27 +64,23 @@ export default function QuizAttemptPage() {
     const loadQuizAndAttempt = async () => {
       try {
         // Load quiz details
-        const quizRes = await fetch(`/api/quizzes/${quizId}`);
-        if (!quizRes.ok) throw new Error("Failed to load quiz");
-        const quizData = await quizRes.json();
+        const quizData = await apiGet<{ quiz: Quiz }>(`/api/quizzes/${quizId}`);
         setQuiz(quizData.quiz);
 
         // Load questions
-        const questionsRes = await fetch(`/api/quizzes/${quizId}/questions`);
-        if (!questionsRes.ok) throw new Error("Failed to load questions");
-        const questionsData = await questionsRes.json();
+        const questionsData = await apiGet<{ questions: Question[] }>(
+          `/api/quizzes/${quizId}/questions`
+        );
         setQuestions(questionsData.questions);
 
         // Create or resume attempt
-        const attemptRes = await fetch(`/api/quizzes/${quizId}/attempts`, {
-          method: "POST",
-        });
-        if (!attemptRes.ok) throw new Error("Failed to create attempt");
-        const attemptData = await attemptRes.json();
+        const attemptData = await apiPost<{ attempt: QuizAttempt }>(
+          `/api/quizzes/${quizId}/attempts`
+        );
         setAttempt(attemptData.attempt);
       } catch (error) {
         console.error("Error loading quiz:", error);
-        alert("Failed to load quiz. Redirecting to quiz page.");
+        toast.error(getErrorMessage(error));
         router.push("/quiz");
       } finally {
         setIsLoading(false);
@@ -89,7 +88,7 @@ export default function QuizAttemptPage() {
     };
 
     loadQuizAndAttempt();
-  }, [quizId, router]);
+  }, [quizId, router, toast]);
 
   // Show auto-save feedback
   useEffect(() => {
@@ -120,15 +119,12 @@ export default function QuizAttemptPage() {
 
     setIsSubmitting(true);
     try {
-      const res = await fetch(`/api/attempts/${attempt.id}/submit`, {
-        method: "POST",
-      });
-      if (!res.ok) throw new Error("Failed to submit quiz");
-      const data = await res.json();
+      await apiPost(`/api/attempts/${attempt.id}/submit`);
+      toast.success("Quiz submitted successfully!");
       router.push(`/results/${attempt.id}`);
     } catch (error) {
       console.error("Error submitting quiz:", error);
-      alert("Failed to submit quiz. Please try again.");
+      toast.error(getErrorMessage(error));
       setIsSubmitting(false);
     }
   };
