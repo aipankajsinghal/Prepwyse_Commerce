@@ -62,14 +62,14 @@ export function DashboardClient({ userName }: DashboardClientProps) {
             </div>
           </Link>
 
-          <Link href="/profile" className="group">
+          <Link href="/analytics" className="group">
             <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition group-hover:border-primary-500 border-2 border-transparent">
               <div className="h-12 w-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                <Target className="h-6 w-6 text-purple-600" />
+                <TrendingUp className="h-6 w-6 text-purple-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Set Goals</h3>
+              <h3 className="text-xl font-semibold mb-2">Analytics</h3>
               <p className="text-gray-600">
-                Define your study targets and timeline
+                Track performance and identify improvements
               </p>
             </div>
           </Link>
