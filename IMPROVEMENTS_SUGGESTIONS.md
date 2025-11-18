@@ -22,10 +22,10 @@ This document outlines potential improvements and enhancements that can be made 
 | 8  | GDPR & compliance with Indian DPDP Act                         | ✅ Completed    | Phase A | Privacy policy, terms, cookie consent, data export, account deletion implemented |
 | 9  | Onboarding Flow                                                | ✅ Completed    | Phase A | Interactive tutorial, profile checklist, 7-step guided tour implemented |
 | 10 | Personalization                                                | ✅ Completed    | Phase B | Language preferences, favorite subjects/chapters, dashboard layout, notification settings |
-| 11 | Subscription Plans (admin managed), Razorpay integration, no free plan, only 1 day free trial | ⬜ Not started | Phase C | Razorpay test mode will be used initially                              |
-| 12 | Referral Program                                               | ⬜ Not started  | Phase C |                                                                        |
-| 13 | Advanced Admin Dashboard                                       | ⬜ Not started  | Phase C |                                                                        |
-| 14 | Content Management System                                      | ⬜ Not started  | Phase C |                                                                        |
+| 11 | Subscription Plans (admin managed), Razorpay integration, no free plan, only 1 day free trial | ⏳ In Progress | Phase C | Core backend complete: 10 API endpoints, Razorpay integration, transaction logging. UI pending. |
+| 12 | Referral Program                                               | ⏳ In Progress  | Phase C | Core backend complete: 4 API endpoints, unique codes, rewards system. UI pending. |
+| 13 | Advanced Admin Dashboard                                       | ⏳ In Progress  | Phase C | Database models created, analytics endpoints pending. UI pending.      |
+| 14 | Content Management System                                      | ⏳ In Progress  | Phase C | Database models created (QuestionVersion, ContentSchedule). Implementation pending. |
 | 15 | Adaptive Learning Path                                         | ⬜ Not started  | Phase E |                                                                        |
 | 16 | Automated Question Generation                                  | ⬜ Not started  | Phase E |                                                                        |
 
