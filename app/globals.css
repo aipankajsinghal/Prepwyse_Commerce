@@ -1,41 +1,287 @@
+/* Import unique fonts - avoiding defaults */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Crimson+Pro:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  /* Light Theme (Default) */
+  /* Design System - Context-Aware Educational Theme */
+  /* 
+    Typography: 
+    - Space Grotesk: Display/Headings (modern, geometric, friendly)
+    - Crimson Pro: Body (readable, warm, academic)
+    
+    Color Philosophy:
+    - Warm terracotta as primary (earthy, supportive, Indian education)
+    - Deep teal as accent (trust, intelligence)
+    - Warm neutrals (paper-like, tactile)
+  */
+  
   :root {
-    --foreground-rgb: 15, 23, 42;
-    --background: 255, 255, 255;
+    /* Core Brand Colors */
+    --primary: 28 41 73; /* Deep Navy - authority, trust */
+    --primary-light: 45 64 107;
+    --primary-dark: 18 27 48;
+    
+    --accent-1: 183 73 50; /* Warm Terracotta - supportive, education */
+    --accent-1-light: 211 100 80;
+    --accent-1-dark: 140 56 38;
+    
+    --accent-2: 36 119 123; /* Deep Teal - intelligence, calm */
+    --accent-2-light: 55 162 167;
+    --accent-2-dark: 25 83 86;
+    
+    /* Surface Colors - Paper-like warmth */
+    --bg: 252 250 247; /* Warm off-white */
+    --surface: 255 253 250; /* Lighter surface */
+    --surface-elevated: 255 255 255; /* Pure white for cards */
+    
+    /* Text Colors */
+    --text-primary: 31 31 36; /* Near black with warmth */
+    --text-secondary: 84 84 91; /* Warm gray */
+    --text-muted: 142 142 151; /* Light gray for hints */
+    
+    /* Semantic Colors */
+    --success: 34 139 34; /* Forest green */
+    --warning: 217 119 6; /* Warm amber */
+    --error: 185 28 28; /* Deep red */
+    --info: 36 119 123; /* Teal */
+    
+    /* Shadows for depth */
+    --shadow-sm: 0 1px 3px rgba(28, 41, 73, 0.08);
+    --shadow-md: 0 4px 12px rgba(28, 41, 73, 0.12);
+    --shadow-lg: 0 12px 24px rgba(28, 41, 73, 0.15);
+    
+    /* Background textures */
+    --texture-opacity: 0.02;
+    --gradient-warm: linear-gradient(135deg, rgb(var(--bg)) 0%, rgb(var(--surface)) 100%);
   }
 
   /* Dark Theme */
   .dark {
-    --foreground-rgb: 241, 245, 249;
-    --background: 15, 23, 42;
+    --primary: 107 137 204; /* Lighter blue for dark */
+    --primary-light: 133 159 221;
+    --primary-dark: 84 114 179;
+    
+    --accent-1: 231 138 118; /* Softer terracotta */
+    --accent-1-light: 245 173 158;
+    --accent-1-dark: 207 107 86;
+    
+    --accent-2: 88 196 202; /* Bright teal */
+    --accent-2-light: 120 218 223;
+    --accent-2-dark: 67 168 173;
+    
+    --bg: 23 23 26; /* Deep warm black */
+    --surface: 31 31 36; /* Elevated surface */
+    --surface-elevated: 41 41 46; /* Cards */
+    
+    --text-primary: 248 248 250;
+    --text-secondary: 189 189 195;
+    --text-muted: 128 128 138;
+    
+    --success: 74 222 128;
+    --warning: 251 191 36;
+    --error: 248 113 113;
+    
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.5);
+    
+    --texture-opacity: 0.03;
   }
 
-  /* Ocean Theme */
+  /* Ocean Theme - Cool and Focused */
   .ocean {
-    --foreground-rgb: 224, 242, 254;
-    --background: 12, 74, 110;
+    --primary: 21 94 117;
+    --accent-1: 14 165 233;
+    --accent-2: 103 232 249;
+    --bg: 240 249 255;
+    --surface: 248 252 255;
+    --text-primary: 12 74 110;
   }
 
-  /* Forest Theme */
+  /* Forest Theme - Natural and Grounding */
   .forest {
-    --foreground-rgb: 220, 252, 231;
-    --background: 20, 83, 45;
+    --primary: 20 83 45;
+    --accent-1: 74 222 128;
+    --accent-2: 163 230 53;
+    --bg: 245 251 247;
+    --surface: 250 254 251;
+    --text-primary: 22 78 42;
   }
 
-  /* Sunset Theme */
+  /* Sunset Theme - Warm and Energetic */
   .sunset {
-    --foreground-rgb: 254, 243, 199;
-    --background: 124, 45, 18;
+    --primary: 124 45 18;
+    --accent-1: 249 115 22;
+    --accent-2: 251 191 36;
+    --bg: 254 249 245;
+    --surface: 255 252 248;
+    --text-primary: 92 35 15;
   }
 
+  /* Base Typography */
   body {
-    color: rgb(var(--foreground-rgb));
-    background: rgb(var(--background));
+    font-family: 'Crimson Pro', Georgia, serif;
+    color: rgb(var(--text-primary));
+    background: rgb(var(--bg));
+    line-height: 1.7;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-weight: 600;
+    line-height: 1.2;
+    color: rgb(var(--text-primary));
+  }
+  
+  /* Heading Scales */
+  h1 { font-size: 3rem; font-weight: 700; letter-spacing: -0.02em; }
+  h2 { font-size: 2.25rem; font-weight: 700; letter-spacing: -0.015em; }
+  h3 { font-size: 1.875rem; font-weight: 600; }
+  h4 { font-size: 1.5rem; font-weight: 600; }
+  h5 { font-size: 1.25rem; font-weight: 600; }
+  h6 { font-size: 1.125rem; font-weight: 600; }
+  
+  /* Responsive Typography */
+  @media (max-width: 768px) {
+    h1 { font-size: 2.25rem; }
+    h2 { font-size: 1.875rem; }
+    h3 { font-size: 1.5rem; }
+  }
+  
+  /* Paper-like background texture */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+      radial-gradient(circle at 20% 30%, rgba(var(--accent-1), 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(var(--accent-2), 0.03) 0%, transparent 50%),
+      url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h60v60H0z' fill='none'/%3E%3Cpath d='M30 30c0-5 5-5 5 0s-5 5-5 0' fill='rgba(0,0,0,0.01)'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: var(--texture-opacity);
+  }
+  
+  /* Ensure content is above texture */
+  body > * {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+@layer components {
+  /* Educational Card Component */
+  .edu-card {
+    background: rgb(var(--surface-elevated));
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(var(--text-primary), 0.06);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .edu-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
+  
+  /* Primary Button with Bloom Effect */
+  .btn-primary {
+    font-family: 'Space Grotesk', sans-serif;
+    background: rgb(var(--accent-1));
+    color: white;
+    padding: 0.875rem 2rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(var(--accent-1), 0.3);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .btn-primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 24px rgba(var(--accent-1), 0.4);
+  }
+  
+  .btn-primary:hover::before {
+    opacity: 1;
+    animation: bloom 0.6s ease-out;
+  }
+  
+  @keyframes bloom {
+    0% {
+      transform: scale(0);
+      opacity: 0.8;
+    }
+    100% {
+      transform: scale(2);
+      opacity: 0;
+    }
+  }
+  
+  /* Secondary Button */
+  .btn-secondary {
+    font-family: 'Space Grotesk', sans-serif;
+    background: transparent;
+    color: rgb(var(--accent-1));
+    padding: 0.875rem 2rem;
+    border-radius: 12px;
+    font-weight: 600;
+    border: 2px solid rgb(var(--accent-1));
+    transition: all 0.3s ease;
+  }
+  
+  .btn-secondary:hover {
+    background: rgb(var(--accent-1));
+    color: white;
+    transform: translateY(-2px);
+  }
+  
+  /* Text Styles */
+  .text-display {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-weight: 700;
+  }
+  
+  .text-body {
+    font-family: 'Crimson Pro', Georgia, serif;
+  }
+  
+  .text-accent {
+    color: rgb(var(--accent-1));
+  }
+  
+  /* Layered Background Pattern */
+  .bg-pattern {
+    background: 
+      linear-gradient(135deg, rgba(var(--accent-1), 0.02) 0%, rgba(var(--accent-2), 0.02) 100%),
+      url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h100v100H0z' fill='none'/%3E%3Ccircle cx='50' cy='50' r='1' fill='rgba(0,0,0,0.02)'/%3E%3C/svg%3E");
+  }
+  
+  /* Elevated surface with subtle shadow */
+  .surface-elevated {
+    background: rgb(var(--surface-elevated));
+    box-shadow: var(--shadow-sm);
   }
 }
 
@@ -44,8 +290,32 @@
     text-wrap: balance;
   }
 
+  /* Signature Motion: Staggered Reveal with Fade-Up */
+  .animate-reveal {
+    animation: reveal 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+  
+  @keyframes reveal {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Stagger delays for sequential reveals */
+  .delay-100 { animation-delay: 0.1s; }
+  .delay-200 { animation-delay: 0.2s; }
+  .delay-300 { animation-delay: 0.3s; }
+  .delay-400 { animation-delay: 0.4s; }
+  .delay-500 { animation-delay: 0.5s; }
+  
+  /* Gentle Float (for decorative elements) */
   .animate-float {
-    animation: float 3s ease-in-out infinite;
+    animation: float 4s ease-in-out infinite;
   }
 
   @keyframes float {
@@ -53,12 +323,27 @@
       transform: translateY(0px);
     }
     50% {
-      transform: translateY(-10px);
+      transform: translateY(-12px);
+    }
+  }
+  
+  /* Subtle Pulse (for CTAs) */
+  .animate-pulse-subtle {
+    animation: pulse-subtle 3s ease-in-out infinite;
+  }
+  
+  @keyframes pulse-subtle {
+    0%, 100% {
+      box-shadow: 0 4px 12px rgba(var(--accent-1), 0.3);
+    }
+    50% {
+      box-shadow: 0 4px 20px rgba(var(--accent-1), 0.45);
     }
   }
 
+  /* Slide In variants for modals/panels */
   .animate-slide-in-right {
-    animation: slide-in-right 0.3s ease-out;
+    animation: slide-in-right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   @keyframes slide-in-right {
@@ -73,32 +358,49 @@
   }
 
   .animate-slide-in-bottom {
-    animation: slide-in-bottom 0.3s ease-out;
+    animation: slide-in-bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   @keyframes slide-in-bottom {
     from {
-      transform: translate(-50%, 100%);
+      transform: translateY(100%);
       opacity: 0;
     }
     to {
-      transform: translate(-50%, 0);
+      transform: translateY(0);
       opacity: 1;
     }
   }
 
+  /* Scale and fade for cards/dialogs */
   .animate-scale-in {
-    animation: scale-in 0.3s ease-out;
+    animation: scale-in 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   @keyframes scale-in {
     from {
-      transform: scale(0.9);
+      transform: scale(0.95);
       opacity: 0;
     }
     to {
       transform: scale(1);
       opacity: 1;
+    }
+  }
+  
+  /* Reduced Motion Support */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+    
+    .animate-float,
+    .animate-pulse-subtle {
+      animation: none !important;
     }
   }
 }
