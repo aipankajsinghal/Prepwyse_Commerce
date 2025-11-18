@@ -71,17 +71,17 @@ export default function RecommendationsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[rgb(var(--bg))] bg-pattern">
       <Navbar />
 
       <main className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center">
-            <Sparkles className="h-8 w-8 mr-3 text-purple-600" />
+          <h1 className="text-3xl font-display font-bold text-primary mb-2 flex items-center">
+            <Sparkles className="h-8 w-8 mr-3 text-accent-1" />
             AI-Powered Recommendations
           </h1>
-          <p className="text-gray-600">
+          <p className="font-body text-text-secondary">
             Personalized study suggestions based on your performance and learning patterns
           </p>
         </div>
@@ -91,7 +91,7 @@ export default function RecommendationsPage() {
           <button
             onClick={fetchRecommendations}
             disabled={loading}
-            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-semibold flex items-center hover:from-purple-700 hover:to-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-3 bg-gradient-to-r from-accent-1-600 to-accent-2-600 text-white rounded-lg font-semibold flex items-center hover:from-accent-1-700 hover:to-accent-2-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <>
@@ -121,7 +121,7 @@ export default function RecommendationsPage() {
         {insights && (
           <div className="grid md:grid-cols-3 gap-6 mb-8">
             {/* Weak Areas */}
-            <div className="bg-white rounded-xl shadow-md p-6 border-2 border-orange-200">
+            <div className="edu-card p-6 border-2 border-orange-200">
               <h3 className="font-semibold text-lg mb-3 flex items-center text-orange-700">
                 <Target className="h-5 w-5 mr-2" />
                 Areas to Improve
@@ -129,7 +129,7 @@ export default function RecommendationsPage() {
               <ul className="space-y-2">
                 {insights.weakAreas.length > 0 ? (
                   insights.weakAreas.map((area, index) => (
-                    <li key={index} className="text-sm text-gray-700 flex items-start">
+                    <li key={index} className="text-sm text-text-primary flex items-start">
                       <span className="mr-2">•</span>
                       <span>{area}</span>
                     </li>
@@ -141,7 +141,7 @@ export default function RecommendationsPage() {
             </div>
 
             {/* Strong Areas */}
-            <div className="bg-white rounded-xl shadow-md p-6 border-2 border-green-200">
+            <div className="edu-card p-6 border-2 border-green-200">
               <h3 className="font-semibold text-lg mb-3 flex items-center text-green-700">
                 <TrendingUp className="h-5 w-5 mr-2" />
                 Your Strengths
@@ -149,7 +149,7 @@ export default function RecommendationsPage() {
               <ul className="space-y-2">
                 {insights.strongAreas.length > 0 ? (
                   insights.strongAreas.map((area, index) => (
-                    <li key={index} className="text-sm text-gray-700 flex items-start">
+                    <li key={index} className="text-sm text-text-primary flex items-start">
                       <span className="mr-2">•</span>
                       <span>{area}</span>
                     </li>
@@ -161,7 +161,7 @@ export default function RecommendationsPage() {
             </div>
 
             {/* Suggested Difficulty */}
-            <div className="bg-white rounded-xl shadow-md p-6 border-2 border-purple-200">
+            <div className="edu-card p-6 border-2 border-purple-200">
               <h3 className="font-semibold text-lg mb-3 flex items-center text-purple-700">
                 <Sparkles className="h-5 w-5 mr-2" />
                 Recommended Level
@@ -170,7 +170,7 @@ export default function RecommendationsPage() {
                 <p className="text-3xl font-bold text-purple-700 capitalize">
                   {insights.suggestedDifficulty}
                 </p>
-                <p className="text-sm text-gray-600 mt-2">
+                <p className="text-sm font-body text-text-secondary mt-2">
                   Based on your recent performance
                 </p>
               </div>
@@ -191,7 +191,7 @@ export default function RecommendationsPage() {
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center space-x-3">
-                      <div className="text-gray-700">{getTypeIcon(rec.type)}</div>
+                      <div className="text-text-primary">{getTypeIcon(rec.type)}</div>
                       <div>
                         <h3 className="font-semibold text-lg text-gray-900">{rec.title}</h3>
                         <p className="text-xs text-gray-500 capitalize">{rec.type.replace("_", " ")}</p>
@@ -204,14 +204,14 @@ export default function RecommendationsPage() {
                     </div>
                   </div>
                   
-                  <p className="text-gray-700 mb-3">{rec.description}</p>
+                  <p className="text-text-primary mb-3">{rec.description}</p>
                   
                   {Array.isArray(rec.content) && rec.content.length > 0 && (
                     <div className="mt-3 bg-white rounded-lg p-4">
-                      <p className="text-sm font-semibold text-gray-700 mb-2">Action Items:</p>
+                      <p className="text-sm font-semibold text-text-primary mb-2">Action Items:</p>
                       <ul className="space-y-1">
                         {rec.content.map((item, index) => (
-                          <li key={index} className="text-sm text-gray-600 flex items-start">
+                          <li key={index} className="text-sm font-body text-text-secondary flex items-start">
                             <span className="mr-2">✓</span>
                             <span>{item}</span>
                           </li>
@@ -223,10 +223,10 @@ export default function RecommendationsPage() {
               ))}
           </div>
         ) : !loading && !error && (
-          <div className="bg-white rounded-xl shadow-md p-12 text-center">
+          <div className="edu-card p-12 text-center">
             <Sparkles className="h-16 w-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-900 mb-2">No Recommendations Yet</h3>
-            <p className="text-gray-600 mb-6">
+            <p className="font-body text-text-secondary mb-6">
               Click "Generate New Recommendations" to get personalized study suggestions based on your performance.
             </p>
           </div>

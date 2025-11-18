@@ -15,13 +15,13 @@ export default async function StudyPlannerPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4">
+    <div className="min-h-screen bg-[rgb(var(--bg))] bg-pattern dark:bg-gray-900 py-8 px-4">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-3xl font-display font-bold text-primary dark:text-white mb-2">
             📅 Study Planner
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="font-body text-text-secondary dark:text-gray-400">
             Organize your study sessions with AI-powered scheduling
           </p>
         </div>
@@ -63,7 +63,7 @@ export default async function StudyPlannerPage() {
 
         {/* Create Plan Button */}
         <div className="mb-8 flex justify-end">
-          <button className="px-6 py-3 bg-purple-500 hover:bg-purple-600 text-white font-semibold rounded-lg shadow-lg transition-colors flex items-center gap-2">
+          <button className="px-6 py-3 bg-accent-2-500 hover:bg-accent-2-600 text-white font-semibold rounded-lg shadow-lg transition-colors flex items-center gap-2">
             <span>➕</span>
             <span>Create New Study Plan</span>
           </button>

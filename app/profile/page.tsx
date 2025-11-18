@@ -46,7 +46,7 @@ export default function ProfilePage() {
 
   if (!isLoaded) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-[rgb(var(--bg))] bg-pattern dark:bg-gray-900 flex items-center justify-center">
         <div className="animate-spin h-12 w-12 border-4 border-blue-600 border-t-transparent rounded-full" />
       </div>
     );
@@ -64,7 +64,7 @@ export default function ProfilePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-[rgb(var(--bg))] bg-pattern dark:bg-gray-900">
       <Navbar />
 
       <main className="container mx-auto px-4 py-8">
@@ -75,10 +75,10 @@ export default function ProfilePage() {
           className="mb-8"
         >
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">My Profile</h1>
+            <h1 className="text-3xl font-display font-bold text-primary dark:text-white">My Profile</h1>
             <ThemeSelector />
           </div>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="font-body text-text-secondary dark:text-gray-300">
             Manage your account settings and preferences
           </p>
         </motion.div>
@@ -98,14 +98,14 @@ export default function ProfilePage() {
                     alt={user.fullName || "User"}
                     className="w-32 h-32 rounded-full border-4 border-blue-100 dark:border-blue-900"
                   />
-                  <div className="absolute bottom-0 right-0 bg-green-500 w-6 h-6 rounded-full border-4 border-white dark:border-gray-800" />
+                  <div className="absolute bottom-0 right-0 bg-semantic-success-500 w-6 h-6 rounded-full border-4 border-white dark:border-gray-800" />
                 </div>
 
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                <h2 className="text-2xl font-display font-bold text-primary dark:text-white mb-2">
                   {user.fullName || user.firstName || "Student"}
                 </h2>
                 
-                <div className="flex items-center justify-center text-gray-600 dark:text-gray-300 mb-4">
+                <div className="flex items-center justify-center font-body text-text-secondary dark:text-gray-300 mb-4">
                   <Mail className="h-4 w-4 mr-2" />
                   <span className="text-sm">{user.primaryEmailAddress?.emailAddress}</span>
                 </div>
@@ -149,7 +149,7 @@ export default function ProfilePage() {
                     <div className="flex space-x-2">
                       <button
                         onClick={handleSave}
-                        className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center justify-center space-x-2"
+                        className="flex-1 px-4 py-2 bg-accent-1-600 text-white rounded-lg hover:bg-accent-1-700 transition flex items-center justify-center space-x-2"
                       >
                         <Save className="h-4 w-4" />
                         <span>Save</span>
@@ -167,17 +167,17 @@ export default function ProfilePage() {
                   <>
                     <div className="text-left space-y-3 mb-6">
                       {grade && (
-                        <div className="flex items-center text-gray-600 dark:text-gray-300">
+                        <div className="flex items-center font-body text-text-secondary dark:text-gray-300">
                           <BookOpen className="h-4 w-4 mr-2" />
                           <span>{grade === "CUET" ? "CUET Preparation" : `Class ${grade}`}</span>
                         </div>
                       )}
                       {bio && (
-                        <p className="text-sm text-gray-600 dark:text-gray-300 italic">
+                        <p className="text-sm font-body text-text-secondary dark:text-gray-300 italic">
                           {bio}
                         </p>
                       )}
-                      <div className="flex items-center text-gray-600 dark:text-gray-300">
+                      <div className="flex items-center font-body text-text-secondary dark:text-gray-300">
                         <Calendar className="h-4 w-4 mr-2" />
                         <span className="text-sm">
                           Joined {new Date(user.createdAt!).toLocaleDateString("en-US", {
@@ -189,7 +189,7 @@ export default function ProfilePage() {
                     </div>
                     <button
                       onClick={() => setIsEditing(true)}
-                      className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center justify-center space-x-2"
+                      className="w-full px-4 py-2 bg-accent-1-600 text-white rounded-lg hover:bg-accent-1-700 transition flex items-center justify-center space-x-2"
                     >
                       <Edit2 className="h-4 w-4" />
                       <span>Edit Profile</span>
@@ -224,11 +224,11 @@ export default function ProfilePage() {
                       <div className={`h-12 w-12 bg-${stat.color}-100 dark:bg-${stat.color}-900/30 rounded-xl flex items-center justify-center`}>
                         <stat.icon className={`h-6 w-6 text-${stat.color}-600 dark:text-${stat.color}-400`} />
                       </div>
-                      <span className="text-3xl font-bold text-gray-900 dark:text-white">
+                      <span className="text-3xl font-display font-bold text-primary dark:text-white">
                         {stat.value}
                       </span>
                     </div>
-                    <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                    <p className="text-sm font-medium font-body text-text-secondary dark:text-gray-300">
                       {stat.label}
                     </p>
                   </motion.div>
@@ -268,20 +268,20 @@ export default function ProfilePage() {
                       className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition"
                     >
                       <div className="flex items-center space-x-4">
-                        <div className="h-10 w-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-                          <activity.icon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                        <div className="h-10 w-10 bg-accent-1-100 dark:bg-accent-1-900/30 rounded-lg flex items-center justify-center">
+                          <activity.icon className="h-5 w-5 text-accent-1 dark:text-blue-400" />
                         </div>
                         <div>
                           <p className="font-semibold text-gray-900 dark:text-white">
                             {activity.title}
                           </p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                          <p className="text-sm font-body text-text-secondary dark:text-gray-400">
                             {activity.date}
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-lg font-bold text-green-600 dark:text-green-400">
+                        <p className="text-lg font-bold text-semantic-success dark:text-green-400">
                           {activity.score}
                         </p>
                       </div>
@@ -318,7 +318,7 @@ export default function ProfilePage() {
                       {achievement.title}
                     </p>
                     {achievement.unlocked && (
-                      <p className="text-xs text-green-600 dark:text-green-400 mt-1">
+                      <p className="text-xs text-semantic-success dark:text-green-400 mt-1">
                         Unlocked
                       </p>
                     )}

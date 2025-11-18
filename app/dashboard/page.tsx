@@ -14,10 +14,9 @@ export default async function DashboardPage() {
   const userName = user?.firstName || user?.emailAddresses[0].emailAddress || "Student";
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[rgb(var(--bg))] bg-pattern">
       <Navbar />
       <DashboardClient userName={userName} />
-
     </div>
   );
 }

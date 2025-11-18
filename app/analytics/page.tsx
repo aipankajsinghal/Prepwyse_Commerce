@@ -56,14 +56,14 @@ export default function AnalyticsPage() {
   const improvement = 12; // Mock improvement percentage
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[rgb(var(--bg))] bg-pattern">
       <Navbar />
       
       <main className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Analytics Dashboard</h1>
-          <p className="text-gray-600">
+          <h1 className="text-3xl font-display font-bold text-primary mb-2">Analytics Dashboard</h1>
+          <p className="font-body text-text-secondary">
             Track your performance and identify areas for improvement
           </p>
         </div>
@@ -87,54 +87,54 @@ export default function AnalyticsPage() {
 
         {/* Summary Cards */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="edu-card p-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-gray-600 font-medium">Average Score</h3>
+              <h3 className="font-body text-text-secondary font-medium">Average Score</h3>
               <Target className="h-5 w-5 text-primary-600" />
             </div>
-            <p className="text-3xl font-bold text-gray-900">{avgScore}%</p>
-            <div className="flex items-center gap-1 mt-2 text-green-600 text-sm">
+            <p className="text-3xl font-display font-bold text-primary">{avgScore}%</p>
+            <div className="flex items-center gap-1 mt-2 text-semantic-success text-sm">
               <TrendingUp className="h-4 w-4" />
               <span>+{improvement}% this week</span>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="edu-card p-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-gray-600 font-medium">Total Quizzes</h3>
-              <BarChart3 className="h-5 w-5 text-blue-600" />
+              <h3 className="font-body text-text-secondary font-medium">Total Quizzes</h3>
+              <BarChart3 className="h-5 w-5 text-accent-1" />
             </div>
-            <p className="text-3xl font-bold text-gray-900">{totalQuizzes}</p>
-            <p className="text-sm text-gray-600 mt-2">Across all subjects</p>
+            <p className="text-3xl font-display font-bold text-primary">{totalQuizzes}</p>
+            <p className="text-sm font-body text-text-secondary mt-2">Across all subjects</p>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="edu-card p-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-gray-600 font-medium">Study Time</h3>
-              <Clock className="h-5 w-5 text-purple-600" />
+              <h3 className="font-body text-text-secondary font-medium">Study Time</h3>
+              <Clock className="h-5 w-5 text-accent-2" />
             </div>
-            <p className="text-3xl font-bold text-gray-900">12.5h</p>
-            <p className="text-sm text-gray-600 mt-2">This week</p>
+            <p className="text-3xl font-display font-bold text-primary">12.5h</p>
+            <p className="text-sm font-body text-text-secondary mt-2">This week</p>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="edu-card p-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-gray-600 font-medium">Rank</h3>
+              <h3 className="font-body text-text-secondary font-medium">Rank</h3>
               <Award className="h-5 w-5 text-yellow-600" />
             </div>
-            <p className="text-3xl font-bold text-gray-900">Top 15%</p>
-            <p className="text-sm text-gray-600 mt-2">Among peers</p>
+            <p className="text-3xl font-display font-bold text-primary">Top 15%</p>
+            <p className="text-sm font-body text-text-secondary mt-2">Among peers</p>
           </div>
         </div>
 
         {/* Performance Trend Chart */}
-        <div className="bg-white rounded-xl shadow-md p-6 mb-8">
+        <div className="edu-card p-6 mb-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
               <Activity className="h-5 w-5 text-primary-600" />
               Performance Trend
             </h2>
-            <span className="text-sm text-gray-600">Last 7 days</span>
+            <span className="text-sm font-body text-text-secondary">Last 7 days</span>
           </div>
           
           {/* Simple bar chart */}
@@ -151,7 +151,7 @@ export default function AnalyticsPage() {
                     </span>
                   </div>
                 </div>
-                <span className="text-sm text-gray-600 font-medium">{day.date}</span>
+                <span className="text-sm font-body text-text-secondary font-medium">{day.date}</span>
               </div>
             ))}
           </div>
@@ -159,7 +159,7 @@ export default function AnalyticsPage() {
 
         <div className="grid lg:grid-cols-2 gap-6 mb-8">
           {/* Subject-wise Performance */}
-          <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="edu-card p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
               <PieChart className="h-5 w-5 text-primary-600" />
               Subject-wise Performance
@@ -170,7 +170,7 @@ export default function AnalyticsPage() {
                   <div className="flex justify-between items-center">
                     <span className="font-medium text-gray-900">{subject.subject}</span>
                     <div className="flex items-center gap-4 text-sm">
-                      <span className="text-gray-600">{subject.quizzes} quizzes</span>
+                      <span className="font-body text-text-secondary">{subject.quizzes} quizzes</span>
                       <span className="font-semibold text-gray-900">{subject.score}%</span>
                     </div>
                   </div>
@@ -192,7 +192,7 @@ export default function AnalyticsPage() {
           </div>
 
           {/* Weak Areas */}
-          <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="edu-card p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
               <TrendingDown className="h-5 w-5 text-red-600" />
               Areas Needing Attention
@@ -205,7 +205,7 @@ export default function AnalyticsPage() {
                 >
                   <div>
                     <h3 className="font-semibold text-gray-900">{area.topic}</h3>
-                    <p className="text-sm text-gray-600">{area.chapter}</p>
+                    <p className="text-sm font-body text-text-secondary">{area.chapter}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-2xl font-bold text-red-600">{area.score}%</p>
@@ -220,7 +220,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Chapter-wise Accuracy */}
-        <div className="bg-white rounded-xl shadow-md p-6">
+        <div className="edu-card p-6">
           <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
             <BarChart3 className="h-5 w-5 text-primary-600" />
             Chapter-wise Accuracy
@@ -231,7 +231,7 @@ export default function AnalyticsPage() {
                 <div className="flex-1">
                   <div className="flex justify-between items-center mb-1">
                     <span className="text-sm font-medium text-gray-900">{chapter.chapter}</span>
-                    <span className="text-sm text-gray-600">{chapter.attempts} attempts</span>
+                    <span className="text-sm font-body text-text-secondary">{chapter.attempts} attempts</span>
                   </div>
                   <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                     <div
@@ -270,11 +270,11 @@ export default function AnalyticsPage() {
               <span>Focus more on <strong>Cost Accounting</strong> - your score here is below average.</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-green-600 font-bold">•</span>
+              <span className="text-semantic-success font-bold">•</span>
               <span>You're improving consistently! Your scores have increased by <strong>12%</strong> this week.</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-blue-600 font-bold">•</span>
+              <span className="text-accent-1 font-bold">•</span>
               <span>Predicted exam score based on current performance: <strong>78-82%</strong></span>
             </li>
           </ul>
