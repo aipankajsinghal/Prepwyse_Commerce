@@ -1,4 +1,4 @@
-import { auth } from '@clerk/nextjs';
+import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import StudyCalendar from '@/components/study-planner/StudyCalendar';
 
@@ -8,7 +8,7 @@ export const metadata = {
 };
 
 export default async function StudyPlannerPage() {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   if (!userId) {
     redirect('/sign-in');

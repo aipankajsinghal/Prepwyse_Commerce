@@ -1,4 +1,4 @@
-import { auth } from '@clerk/nextjs';
+import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import FlashcardReview from '@/components/flashcards/FlashcardReview';
 
@@ -8,7 +8,7 @@ export const metadata = {
 };
 
 export default async function FlashcardsPage() {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   if (!userId) {
     redirect('/sign-in');
