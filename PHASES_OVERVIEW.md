@@ -95,22 +95,31 @@ Phase C is production-ready!
 
 ## 🎓 Phase D: Advanced Features (0% ⬜)
 
-**Theme:** Video, Forums, Practice  
+**Theme:** Core Content & Search  
 **Status:** NOT STARTED
 
-| # | Feature | Status | Effort |
-|---|---------|--------|--------|
-| 1 | Video Lessons | ⬜ | 7-10 days |
-| 2 | Discussion Forums | ⬜ | 7-10 days |
-| 3 | Practice Papers | ⬜ | 4-5 days |
-| 4 | Doubt Resolution | ⬜ | 5-7 days |
-| 5 | Study Notes | ⬜ | 4-5 days |
-| 6 | Advanced Search | ⬜ | 4-5 days |
-| 7 | Mobile App | ⬜ | 30-45 days |
+### Pre-Launch Priority (Focus Now) 🎯
 
-**Total Estimated:** 61-87 days
+| # | Feature | Status | Effort | Priority |
+|---|---------|--------|--------|----------|
+| 1 | Practice Papers | ⬜ | 4-5 days | **PRE-LAUNCH** 🔴 |
+| 2 | Study Notes | ⬜ | 4-5 days | **PRE-LAUNCH** 🔴 |
+| 3 | Advanced Search | ⬜ | 4-5 days | **PRE-LAUNCH** 🔴 |
 
-**Priority:** Ready to start (Phase C complete!)
+**Pre-Launch Total:** 12-15 days
+
+### Post-Launch (Deferred) 📅
+
+| # | Feature | Status | Effort | Timeline |
+|---|---------|--------|--------|----------|
+| 4 | Video Lessons | ⬜ | 7-10 days | Post-Launch |
+| 5 | Discussion Forums | ⬜ | 7-10 days | Post-Launch |
+| 6 | Doubt Resolution | ⬜ | 5-7 days | Post-Launch |
+| 7 | Mobile App | ⬜ | 30-45 days | After MVP Launch |
+
+**Post-Launch Total:** 49-72 days
+
+**Current Focus:** Pre-launch features only (12-15 days)
 
 ---
 
@@ -138,7 +147,7 @@ Phase C is production-ready!
 
 ---
 
-## 🚨 Next Steps (Phase D)
+## 🚨 Next Steps (Phase D - Pre-Launch Focus)
 
 ### ✅ Phase C Complete!
 
@@ -148,31 +157,54 @@ All monetization features are now live:
 - ✅ Admin dashboard
 - ✅ Content management
 
-### 🎯 Focus Now: Phase D Advanced Features
+### 🎯 Pre-Launch Focus (2-3 Weeks) 🔴
 
-**Recommended Priority:**
+**Goal:** Complete essential features before launch
 
-### Month 1-2: Quick Wins 🟢 HIGH ROI
-**Goal:** Add high-value features with low effort
-- [ ] Practice Papers (4-5 days) - Reuses existing quiz infrastructure
-- [ ] Study Notes (4-5 days) - Simple CRUD with AI summaries
-- [ ] Advanced Search (4-5 days) - Enhanced discoverability
+#### Week 1: Practice Papers (4-5 days)
+- [ ] Database model for practice papers
+- [ ] Upload previous year papers
+- [ ] Practice paper interface (reuses quiz UI)
+- [ ] Solution explanations
+- [ ] Difficulty analysis
 
-**Deliverable:** 3 new features, high user value
+**Deliverable:** Previous year papers available for students
 
-### Month 3-4: Educational Enhancement 🟡 MEDIUM
-**Goal:** Rich learning experience
-- [ ] Video Lessons (7-10 days) - Video integration + progress tracking
-- [ ] Doubt Resolution (5-7 days) - Student-teacher communication
+#### Week 2: Study Notes (4-5 days)
+- [ ] Database model for study notes
+- [ ] Chapter-wise notes interface
+- [ ] AI-generated summaries integration
+- [ ] Download as PDF
+- [ ] Bookmarking and favorites
 
-**Deliverable:** Enhanced learning content
+**Deliverable:** Comprehensive study notes for all chapters
 
-### Month 5-6: Community Features 🔵 LONG TERM
-**Goal:** Social learning
-- [ ] Discussion Forums (7-10 days) - Peer learning
-- [ ] Mobile App (30-45 days) - iOS & Android apps
+#### Week 3: Advanced Search (4-5 days)
+- [ ] Search implementation (Algolia/built-in)
+- [ ] Search across questions, chapters, notes, papers
+- [ ] Auto-complete suggestions
+- [ ] Filters and sorting
+- [ ] Search history
 
-**Deliverable:** Community engagement
+**Deliverable:** Enhanced discoverability across platform
+
+**Total Pre-Launch Time:** 12-15 days
+
+---
+
+### 📅 Post-Launch Features (Deferred)
+
+These will be implemented after successful launch:
+
+#### Post-Launch Phase 1 (Month 2-3)
+- [ ] Video Lessons (7-10 days)
+- [ ] Doubt Resolution (5-7 days)
+
+#### Post-Launch Phase 2 (Month 3-4)
+- [ ] Discussion Forums (7-10 days)
+
+#### Long Term
+- [ ] Mobile App (30-45 days) - After platform stability
 
 ---
 
@@ -292,6 +324,7 @@ Phase C completion criteria:
 
 **Quick Summary:**
 - ✅ Phases A, B, C, E are 100% complete (20/23 features)
-- ⬜ Phase D is 0% complete (7 features remaining)
+- ⬜ Phase D: 0% complete (3 pre-launch + 4 post-launch features)
 - 🎯 Overall: 87% project completion
-- 🚀 Next focus: Phase D features (Quick wins: Practice Papers, Study Notes, Search)
+- 🔴 Pre-Launch Focus: Practice Papers, Study Notes, Advanced Search (12-15 days)
+- 📅 Post-Launch: Video Lessons, Forums, Doubt Resolution, Mobile App (49-72 days)
