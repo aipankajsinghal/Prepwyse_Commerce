@@ -41,12 +41,7 @@ export async function DELETE(request: Request) {
         where: { userId: user.id },
       });
 
-      // 2. Delete quizzes created by user
-      await tx.quiz.deleteMany({
-        where: { createdBy: user.id },
-      });
-
-      // 3. Delete user record
+      // 2. Delete user record (quizzes are system-generated and not user-specific)
       await tx.user.delete({
         where: { id: user.id },
       });

@@ -26,32 +26,21 @@ export async function GET() {
     }
 
     // Gather all user data
-    const [quizAttempts, quizzes] = await Promise.all([
-      prisma.quizAttempt.findMany({
-        where: { userId: user.id },
-        include: {
-          quiz: {
-            select: {
-              title: true,
-              description: true,
-              questionCount: true,
-              duration: true,
-            },
+    const quizAttempts = await prisma.quizAttempt.findMany({
+      where: { userId: user.id },
+      include: {
+        quiz: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            questionCount: true,
+            duration: true,
+            createdAt: true,
           },
         },
-      }),
-      prisma.quiz.findMany({
-        where: { createdBy: user.id },
-        select: {
-          id: true,
-          title: true,
-          description: true,
-          questionCount: true,
-          duration: true,
-          createdAt: true,
-        },
-      }),
-    ]);
+      },
+    });
 
     // Compile comprehensive data export
     const exportData = {
@@ -66,11 +55,11 @@ export async function GET() {
         updatedAt: user.updatedAt,
       },
       statistics: {
-        totalQuizzes: quizzes.length,
+        totalQuizzesTaken: new Set(quizAttempts.map((a) => a.quizId)).size,
         totalAttempts: quizAttempts.length,
         completedAttempts: quizAttempts.filter((a) => a.status === "COMPLETED").length,
       },
-      quizzes: quizzes.map((q) => ({
+      quizzes: Array.from(new Set(quizAttempts.map((a) => a.quiz))).map((q) => ({
         id: q.id,
         title: q.title,
         description: q.description,
