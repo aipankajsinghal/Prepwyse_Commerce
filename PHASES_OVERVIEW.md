@@ -13,9 +13,12 @@ Phase B: ████████████████████ 100% ✅ C
 Phase C: ████████████████████ 100% ✅ COMPLETE
 Phase D: ░░░░░░░░░░░░░░░░░░░░   0% ⬜ NOT STARTED
 Phase E: ████████████████████ 100% ✅ COMPLETE
+Phase G: ░░░░░░░░░░░░░░░░░░░░   0% ⬜ DEFERRED
+Phase H: ░░░░░░░░░░░░░░░░░░░░   0% ⬜ SCALE-REQUIRED
 ```
 
-**Overall Project Completion:** 87% (20 of 23 major features complete)
+**Overall Project Completion:** 87% (20 of 23 major features complete)  
+**Note:** Phase F is reserved for future use
 
 ---
 
@@ -108,18 +111,9 @@ Phase C is production-ready!
 
 **Pre-Launch Total:** 12-15 days
 
-### Post-Launch (Deferred) 📅
-
-| # | Feature | Status | Effort | Timeline |
-|---|---------|--------|--------|----------|
-| 4 | Video Lessons | ⬜ | 7-10 days | Post-Launch |
-| 5 | Discussion Forums | ⬜ | 7-10 days | Post-Launch |
-| 6 | Doubt Resolution | ⬜ | 5-7 days | Post-Launch |
-| 7 | Mobile App | ⬜ | 30-45 days | After MVP Launch |
-
-**Post-Launch Total:** 49-72 days
-
 **Current Focus:** Pre-launch features only (12-15 days)
+
+**Note:** Video Lessons, Discussion Forums, and Doubt Resolution have been moved to Phase G (Deferred/Long-term). Mobile App remains a long-term goal.
 
 ---
 
@@ -194,17 +188,69 @@ All monetization features are now live:
 
 ### 📅 Post-Launch Features (Deferred)
 
-These will be implemented after successful launch:
+These features have been reorganized into Phase G (Deferred/Long-term) and Phase H (Scale-Required Items). See sections below for details.
 
-#### Post-Launch Phase 1 (Month 2-3)
-- [ ] Video Lessons (7-10 days)
-- [ ] Doubt Resolution (5-7 days)
+---
 
-#### Post-Launch Phase 2 (Month 3-4)
-- [ ] Discussion Forums (7-10 days)
+## 🎯 Phase G: Deferred / Long-term Features (0% ⬜)
 
-#### Long Term
-- [ ] Mobile App (30-45 days) - After platform stability
+**Theme:** Content Expansion and Community Features  
+**Status:** NOT STARTED - To be implemented post-launch based on user feedback and platform growth
+
+### Features
+
+| # | Feature | Status | Effort | Notes |
+|---|---------|--------|--------|-------|
+| 1 | Video Lessons | ⬜ | 7-10 days | High-quality video content for visual learners |
+| 2 | Discussion Forums | ⬜ | 7-10 days | **Initial Approach:** Hosted Discourse (SaaS) with SSO integration<br>**Migration Plan:** Move to self-hosted Discourse when scaled (see Phase H) |
+| 3 | Doubt Resolution | ⬜ | 5-7 days | Real-time doubt clearing system with AI assistance |
+
+**Total Effort:** 19-27 days
+
+### Discussion Forums Implementation Strategy
+
+**Phase 1 (Initial Implementation):**
+- Use hosted Discourse (SaaS) with SSO integration
+- Leverages Clerk authentication for seamless user experience
+- Minimal infrastructure overhead
+- Quick time-to-market
+
+**Phase 2 (Post-Scale Migration):**
+- Migration to self-hosted Discourse (open-source)
+- Full control over data and customization
+- Integrated with platform's infrastructure
+- See Phase H for migration details
+
+### Additional Deferred Features
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Mobile App | ⬜ | 30-45 days effort, planned after platform stability |
+| Public API | ⬜ | Deferred, will be implemented on-request basis |
+| Third-party Integrations | ⬜ | Deferred, will be implemented on-request basis |
+
+---
+
+## 🚀 Phase H: Scale-Required Items (0% ⬜)
+
+**Theme:** Infrastructure Hardening and Scaling Operations  
+**Status:** NOT STARTED - To be implemented when platform reaches scale
+
+### Features
+
+| # | Task | Status | Notes |
+|---|------|--------|-------|
+| 1 | Forum Migration | ⬜ | Migrate from hosted Discourse (SaaS) to self-hosted Discourse (open-source). Includes:<br>• SSO configuration and testing<br>• User data and post migration<br>• Attachment migration to S3<br>• Backup and disaster recovery setup<br>• Performance optimization and scaling |
+| 2 | S3 Migration | ⬜ | Migrate media assets and attachments to S3 for better scalability and performance |
+| 3 | CDN Implementation | ⬜ | Set up CDN for static assets and media content |
+| 4 | Database Scaling | ⬜ | Implement read replicas and connection pooling |
+| 5 | Monitoring & Observability | ⬜ | Enhanced logging, metrics, and alerting infrastructure |
+
+**Trigger:** These items should be prioritized when:
+- User base exceeds 10,000 active users
+- Forum activity reaches significant volume
+- Infrastructure costs justify self-hosting
+- Performance optimization becomes critical
 
 ---
 
@@ -215,9 +261,11 @@ These will be implemented after successful launch:
 | Phase A | 6 features | 6 features | 0 | 100% |
 | Phase B | 5 features | 5 features | 0 | 100% |
 | Phase C | 4 features | 4 features | 0 | 100% |
-| Phase D | 61-87 days | 0 days | 61-87 days | 0% |
+| Phase D | 3 features | 0 features | 3 features | 0% |
 | Phase E | 2 features | 2 features | 0 | 100% |
-| **Total** | **23 features** | **20 features** | **7 features** | **87%** |
+| Phase G | 3 features | 0 features | 3 features (deferred) | 0% |
+| Phase H | 5 tasks | 0 tasks | 5 tasks (scale-required) | 0% |
+| **Total** | **23 features** | **20 features** | **3 active** | **87%** |
 
 ---
 
@@ -240,19 +288,21 @@ These will be implemented after successful launch:
 
 **Impact:** HIGH | **Effort:** Low | **Timeline:** 2-3 weeks
 
-### 🟢 MEDIUM (Phase D Continued)
+### 🔵 DEFERRED (Phase G - Long-term)
 10. Video lessons
-11. Doubt resolution
-12. Advanced analytics
+11. Discussion forums (Hosted Discourse → Self-hosted migration in Phase H)
+12. Doubt resolution
+13. Mobile app
 
-**Impact:** Medium | **Effort:** Medium | **Timeline:** 4-6 weeks
+**Impact:** Medium-High | **Effort:** High | **Timeline:** Post-launch, based on user feedback
 
-### 🔵 LOW (Future)
-10. Discussion forums
-11. Mobile app
-12. Advanced search
+### 🟣 SCALE-REQUIRED (Phase H)
+14. Forum migration (Hosted → Self-hosted Discourse)
+15. S3 migration
+16. CDN implementation
+17. Database scaling
 
-**Impact:** Medium | **Effort:** Very High | **Timeline:** 4-6 months
+**Impact:** High | **Effort:** High | **Trigger:** 10,000+ active users or significant scale needs
 
 ---
 
@@ -262,9 +312,13 @@ These will be implemented after successful launch:
 Phase A (Foundation) ──┐
                        ├─→ Phase B (Engagement) ──┐
 Phase E (AI) ─────────┘                           ├─→ Phase C (Monetization) ✅ ──→ Phase D (Advanced) 🎯
+                                                                                     │
+                                                                                     ├─→ Phase G (Deferred) 📅
+                                                                                     │
+                                                                                     └─→ Phase H (Scale) 🚀
 ```
 
-**Status:** Phase C complete! Phase D ready to begin.
+**Status:** Phase C complete! Phase D ready to begin. Phases G and H deferred for post-launch.
 
 ---
 
@@ -324,7 +378,9 @@ Phase C completion criteria:
 
 **Quick Summary:**
 - ✅ Phases A, B, C, E are 100% complete (20/23 features)
-- ⬜ Phase D: 0% complete (3 pre-launch + 4 post-launch features)
+- ⬜ Phase D: 0% complete (3 pre-launch features only)
+- 📅 Phase G (Deferred): Video Lessons, Discussion Forums (hosted Discourse with SSO), Doubt Resolution
+- 🚀 Phase H (Scale-Required): Forum migration to self-hosted Discourse, S3 migration, infrastructure scaling
 - 🎯 Overall: 87% project completion
 - 🔴 Pre-Launch Focus: Practice Papers, Study Notes, Advanced Search (12-15 days)
-- 📅 Post-Launch: Video Lessons, Forums, Doubt Resolution, Mobile App (49-72 days)
+- 📝 Note: Public API and third-party integrations are deferred (on-request basis)
