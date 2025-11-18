@@ -42,6 +42,13 @@ model User {
   leaderboardEntries    Leaderboard[]
   studyPlans            StudyPlan[]
   flashcardProgress     FlashcardProgress[]
+  // Phase C: Subscription fields
+  subscription          Subscription?
+  referralCode          String?          @unique
+  referredBy            String?          // Referral code used to sign up
+  referrals             Referral[]       @relation("ReferrerUser")
+  referralRewards       ReferralReward[]
+  transactions          Transaction[]
 }
 
 model Subject {
@@ -256,4 +263,143 @@ model FlashcardProgress {
   
   @@unique([userId, flashcardId])
   @@index([userId, nextReviewDate])
+}
+
+// Phase C: Subscription System Models
+model SubscriptionPlan {
+  id              String         @id @default(cuid())
+  name            String         @unique // "Basic", "Premium", "Pro"
+  displayName     String
+  description     String
+  price           Decimal        @db.Decimal(10, 2) // Monthly price in INR
+  durationDays    Int            // Duration in days
+  features        Json           // Array of features
+  isActive        Boolean        @default(true)
+  order           Int            @default(0) // Display order
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  subscriptions   Subscription[]
+}
+
+model Subscription {
+  id                  String           @id @default(cuid())
+  userId              String           @unique
+  user                User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planId              String
+  plan                SubscriptionPlan @relation(fields: [planId], references: [id])
+  status              String           @default("trial") // "trial", "active", "cancelled", "expired"
+  razorpayOrderId     String?
+  razorpayPaymentId   String?
+  razorpaySignature   String?
+  trialEndsAt         DateTime?
+  startDate           DateTime         @default(now())
+  endDate             DateTime
+  autoRenew           Boolean          @default(true)
+  cancelledAt         DateTime?
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+  
+  @@index([status, endDate])
+}
+
+model Transaction {
+  id                  String   @id @default(cuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type                String   // "subscription", "referral_bonus"
+  amount              Decimal  @db.Decimal(10, 2)
+  currency            String   @default("INR")
+  status              String   // "pending", "completed", "failed", "refunded"
+  razorpayOrderId     String?
+  razorpayPaymentId   String?
+  razorpaySignature   String?
+  description         String?
+  metadata            Json?    // Additional transaction details
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  
+  @@index([userId, createdAt])
+  @@index([status])
+}
+
+// Phase C: Referral System Models
+model Referral {
+  id              String    @id @default(cuid())
+  referrerId      String
+  referrer        User      @relation("ReferrerUser", fields: [referrerId], references: [id], onDelete: Cascade)
+  refereeEmail    String
+  refereeUserId   String?   // Set when referee signs up
+  status          String    @default("pending") // "pending", "signed_up", "subscribed"
+  subscribedAt    DateTime? // When referee subscribed
+  createdAt       DateTime  @default(now())
+  
+  @@index([referrerId, status])
+}
+
+model ReferralReward {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  referralId      String?
+  type            String   // "referral_signup", "referral_subscription"
+  rewardType      String   // "premium_days", "points", "discount"
+  rewardValue     Int      // Number of days, points, or percentage
+  description     String
+  applied         Boolean  @default(false)
+  appliedAt       DateTime?
+  expiresAt       DateTime?
+  createdAt       DateTime @default(now())
+  
+  @@index([userId, applied])
+}
+
+// Phase C: Content Management Models
+model QuestionVersion {
+  id              String   @id @default(cuid())
+  questionId      String
+  versionNumber   Int      @default(1)
+  questionText    String
+  options         Json
+  correctAnswer   String
+  explanation     String?
+  difficulty      String
+  tags            Json?    // Array of tags
+  changedBy       String   // User/admin who made the change
+  changeReason    String?
+  createdAt       DateTime @default(now())
+  
+  @@unique([questionId, versionNumber])
+  @@index([questionId])
+}
+
+model ContentSchedule {
+  id              String   @id @default(cuid())
+  contentType     String   // "question", "chapter", "quiz", "flashcard"
+  contentId       String
+  scheduledFor    DateTime
+  action          String   // "publish", "unpublish", "update"
+  status          String   @default("pending") // "pending", "executed", "cancelled"
+  executedAt      DateTime?
+  metadata        Json?    // Additional scheduling metadata
+  createdBy       String   // Admin user ID
+  createdAt       DateTime @default(now())
+  
+  @@index([status, scheduledFor])
+}
+
+model AdminActivity {
+  id              String   @id @default(cuid())
+  adminId         String   // Clerk user ID of admin
+  adminName       String
+  action          String   // "create", "update", "delete", "bulk_upload"
+  resourceType    String   // "question", "user", "subscription_plan"
+  resourceId      String?
+  description     String
+  metadata        Json?    // Additional activity details
+  ipAddress       String?
+  userAgent       String?
+  createdAt       DateTime @default(now())
+  
+  @@index([adminId, createdAt])
+  @@index([resourceType, createdAt])
 }
