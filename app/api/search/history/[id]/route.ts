@@ -1,17 +1,24 @@
-import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs";
-import prisma from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
+import { prisma } from "@/lib/prisma";
+
+
+type RouteParams = {
+  params: Promise<{ id: string }>;
+};
 
 // DELETE /api/search/history/[id] - Delete a search history item
 export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: RouteParams
 ) {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const { id } = await params;
 
     // Get user from database
     const user = await prisma.user.findUnique({
@@ -24,7 +31,7 @@ export async function DELETE(
 
     // Check if history item exists and belongs to user
     const historyItem = await prisma.searchHistory.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!historyItem) {
@@ -40,7 +47,7 @@ export async function DELETE(
 
     // Delete history item
     await prisma.searchHistory.delete({
-      where: { id: params.id },
+      where: { id: id },
     });
 
     return NextResponse.json({

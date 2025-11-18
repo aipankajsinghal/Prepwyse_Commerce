@@ -1,14 +1,19 @@
-import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs";
-import prisma from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
+import { prisma } from "@/lib/prisma";
+
+
+type RouteParams = {
+  params: Promise<{ id: string }>;
+};
 
 // GET /api/study-notes/[id] - Get a specific study note
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: RouteParams
 ) {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -22,9 +27,11 @@ export async function GET(
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    const { id } = await params;
+
     // Get note
     const note = await prisma.studyNote.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         bookmarks: {
           where: { userId: user.id },
@@ -49,7 +56,7 @@ export async function GET(
 
     // Increment views
     await prisma.studyNote.update({
-      where: { id: params.id },
+      where: { id },
       data: { views: { increment: 1 } },
     });
 

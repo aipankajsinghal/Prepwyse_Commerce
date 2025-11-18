@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs";
-import prisma from "@/lib/prisma";
+import { auth } from "@clerk/nextjs/server";
+import { prisma } from "@/lib/prisma";
 
 // GET /api/search/suggestions - Get search suggestions for auto-complete
 export async function GET(request: Request) {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

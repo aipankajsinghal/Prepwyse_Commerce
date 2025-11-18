@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs";
-import prisma from "@/lib/prisma";
+import { auth } from "@clerk/nextjs/server";
+import { prisma } from "@/lib/prisma";
 import OpenAI from "openai";
 
 // Helper to check if user is admin
@@ -15,7 +15,7 @@ async function isAdmin(userId: string): Promise<boolean> {
 // POST /api/admin/study-notes/generate - AI generate study note (admin only)
 export async function POST(request: Request) {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

@@ -1,14 +1,19 @@
-import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs";
-import prisma from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
+import { prisma } from "@/lib/prisma";
+
+
+type RouteParams = {
+  params: Promise<{ chapterId: string }>;
+};
 
 // GET /api/study-notes/chapters/[chapterId] - List notes for a chapter
 export async function GET(
-  request: Request,
-  { params }: { params: { chapterId: string } }
+  request: NextRequest,
+  { params }: RouteParams
 ) {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -17,6 +22,8 @@ export async function GET(
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "10");
     const skip = (page - 1) * limit;
+
+    const { chapterId } = await params;
 
     // Get user from database
     const user = await prisma.user.findUnique({
@@ -31,7 +38,7 @@ export async function GET(
     const [notes, total] = await Promise.all([
       prisma.studyNote.findMany({
         where: {
-          chapterId: params.chapterId,
+          chapterId,
           isPublished: true,
         },
         skip,
@@ -56,7 +63,7 @@ export async function GET(
       }),
       prisma.studyNote.count({
         where: {
-          chapterId: params.chapterId,
+          chapterId: chapterId,
           isPublished: true,
         },
       }),

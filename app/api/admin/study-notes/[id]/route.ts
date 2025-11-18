@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs";
-import prisma from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
+import { prisma } from "@/lib/prisma";
 
 // Helper to check if user is admin
 async function isAdmin(userId: string): Promise<boolean> {
@@ -11,13 +11,18 @@ async function isAdmin(userId: string): Promise<boolean> {
   return user ? adminEmails.includes(user.email) : false;
 }
 
+
+type RouteParams = {
+  params: Promise<{ id: string }>;
+};
+
 // PATCH /api/admin/study-notes/[id] - Update study note (admin only)
 export async function PATCH(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: RouteParams
 ) {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -26,6 +31,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const { id } = await params;
     const data = await request.json();
     const {
       title,
@@ -40,7 +46,7 @@ export async function PATCH(
 
     // Check if note exists
     const existingNote = await prisma.studyNote.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!existingNote) {
@@ -52,7 +58,7 @@ export async function PATCH(
 
     // Update study note
     const note = await prisma.studyNote.update({
-      where: { id: params.id },
+      where: { id: id },
       data: {
         ...(title && { title }),
         ...(content && { content }),
@@ -77,11 +83,11 @@ export async function PATCH(
 
 // DELETE /api/admin/study-notes/[id] - Delete study note (admin only)
 export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: RouteParams
 ) {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -90,9 +96,11 @@ export async function DELETE(
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const { id } = await params;
+
     // Check if note exists
     const existingNote = await prisma.studyNote.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!existingNote) {
@@ -104,7 +112,7 @@ export async function DELETE(
 
     // Delete study note (cascade will delete bookmarks)
     await prisma.studyNote.delete({
-      where: { id: params.id },
+      where: { id: id },
     });
 
     return NextResponse.json({ message: "Study note deleted successfully" });

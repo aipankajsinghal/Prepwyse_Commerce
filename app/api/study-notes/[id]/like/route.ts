@@ -1,17 +1,24 @@
-import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs";
-import prisma from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
+import { prisma } from "@/lib/prisma";
+
+
+type RouteParams = {
+  params: Promise<{ id: string }>;
+};
 
 // POST /api/study-notes/[id]/like - Like/unlike a study note
 export async function POST(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: RouteParams
 ) {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const { id } = await params;
 
     // Get user from database
     const user = await prisma.user.findUnique({
@@ -24,7 +31,7 @@ export async function POST(
 
     // Check if note exists
     const note = await prisma.studyNote.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!note) {
@@ -37,7 +44,7 @@ export async function POST(
     // For simplicity, we'll just increment the likes count
     // In a production app, you might want to track who liked what
     const updatedNote = await prisma.studyNote.update({
-      where: { id: params.id },
+      where: { id: id },
       data: { likes: { increment: 1 } },
     });
 

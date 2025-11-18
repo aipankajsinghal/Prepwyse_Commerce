@@ -1,20 +1,25 @@
-import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs";
-import prisma from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
+import { prisma } from "@/lib/prisma";
+
+type RouteParams = {
+  params: Promise<{ id: string }>;
+};
 
 // GET /api/practice-papers/[id] - Get practice paper details
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: RouteParams
 ) {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { id } = await params;
     const paper = await prisma.practicePaper.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         _count: {
           select: { attempts: true },
