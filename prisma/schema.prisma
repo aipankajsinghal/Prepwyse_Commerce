@@ -21,11 +21,27 @@ model User {
   strongAreas           Json?          // AI-tracked strong subject/chapter areas
   learningStyle         String?        // AI-determined learning style
   lastRecommendation    DateTime?      // Last time AI generated recommendations
+  // Gamification fields
+  points                Int            @default(0)
+  level                 Int            @default(1)
+  currentStreak         Int            @default(0)
+  longestStreak         Int            @default(0)
+  lastActivityDate      DateTime?
+  // Personalization fields
+  preferredLanguage     String         @default("en") // "en", "hi"
+  favoriteSubjects      Json?          // Array of subject IDs
+  favoriteChapters      Json?          // Array of chapter IDs
+  dashboardLayout       Json?          // Custom dashboard widget preferences
+  notificationPrefs     Json?          // Notification preferences
   createdAt             DateTime       @default(now())
   updatedAt             DateTime       @updatedAt
   quizAttempts          QuizAttempt[]
   mockTests             MockTestAttempt[]
   recommendations       Recommendation[]
+  achievements          Achievement[]
+  leaderboardEntries    Leaderboard[]
+  studyPlans            StudyPlan[]
+  flashcardProgress     FlashcardProgress[]
 }
 
 model Subject {
@@ -46,6 +62,7 @@ model Chapter {
   order           Int       @default(0)
   createdAt       DateTime  @default(now())
   questions       Question[]
+  flashcards      Flashcard[]
   
   @@unique([subjectId, name])
 }
@@ -131,4 +148,112 @@ model Recommendation {
   isRead          Boolean   @default(false)
   createdAt       DateTime  @default(now())
   expiresAt       DateTime? // Optional expiry for time-sensitive recommendations
+}
+
+// Phase B: Gamification System Models
+model Achievement {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type        String   // "badge", "milestone", "streak", "perfect_score", "challenge"
+  name        String
+  description String
+  icon        String
+  category    String   // "quiz", "study", "social", "streak"
+  points      Int      @default(0) // Points awarded for this achievement
+  unlockedAt  DateTime @default(now())
+}
+
+model Leaderboard {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  points    Int      @default(0)
+  rank      Int
+  period    String   // "daily", "weekly", "monthly", "all_time"
+  periodKey String   // e.g., "2025-W47" for weekly, "2025-11" for monthly
+  updatedAt DateTime @updatedAt
+  
+  @@unique([userId, period, periodKey])
+  @@index([period, periodKey, points])
+}
+
+model Challenge {
+  id            String   @id @default(cuid())
+  title         String
+  description   String
+  type          String   // "quiz_count", "accuracy", "streak", "speed"
+  requirement   Json     // Challenge requirements
+  reward        Int      // Points awarded
+  startDate     DateTime
+  endDate       DateTime
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+}
+
+// Phase B: Smart Study Planner Models
+model StudyPlan {
+  id               String        @id @default(cuid())
+  userId           String
+  user             User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title            String
+  description      String?
+  examDate         DateTime?
+  targetScore      Int?
+  weeklyHours      Int           // Hours available per week
+  preferredTime    Json?         // Preferred study time slots
+  isActive         Boolean       @default(true)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  sessions         StudySession[]
+}
+
+model StudySession {
+  id              String    @id @default(cuid())
+  planId          String
+  plan            StudyPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  chapterId       String
+  title           String
+  description     String?
+  type            String    // "video", "quiz", "flashcard", "revision"
+  scheduledDate   DateTime
+  duration        Int       // in minutes
+  completed       Boolean   @default(false)
+  completedAt     DateTime?
+  notes           String?
+  createdAt       DateTime  @default(now())
+  
+  @@index([planId, scheduledDate])
+}
+
+// Phase B: Smart Flashcards Models
+model Flashcard {
+  id          String              @id @default(cuid())
+  chapterId   String
+  chapter     Chapter             @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  front       String              // Question/Term
+  back        String              // Answer/Definition
+  difficulty  String              @default("medium") // "easy", "medium", "hard"
+  tags        Json?               // Array of tags
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  progress    FlashcardProgress[]
+}
+
+model FlashcardProgress {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  flashcardId     String
+  flashcard       Flashcard @relation(fields: [flashcardId], references: [id], onDelete: Cascade)
+  easeFactor      Float     @default(2.5) // SM-2 algorithm: ease factor
+  interval        Int       @default(0)   // SM-2 algorithm: interval in days
+  repetitions     Int       @default(0)   // SM-2 algorithm: number of repetitions
+  nextReviewDate  DateTime  @default(now())
+  lastReviewedAt  DateTime?
+  quality         Int?      // Last review quality (0-5)
+  reviewCount     Int       @default(0)
+  
+  @@unique([userId, flashcardId])
+  @@index([userId, nextReviewDate])
 }
