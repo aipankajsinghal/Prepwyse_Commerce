@@ -225,6 +225,113 @@ async function main() {
 
   console.log("Mock tests created");
 
+  // Phase C: Create Subscription Plans
+  console.log("Creating subscription plans...");
+
+  const basicPlan = await prisma.subscriptionPlan.upsert({
+    where: { name: "basic" },
+    update: {},
+    create: {
+      name: "basic",
+      displayName: "Basic Plan",
+      description: "Perfect for students starting their CUET Commerce preparation",
+      price: 299.00,
+      durationDays: 30,
+      features: JSON.stringify([
+        "Unlimited quizzes",
+        "AI-generated questions",
+        "Basic performance analytics",
+        "Subject-wise practice",
+        "Mobile access",
+        "Email support"
+      ]),
+      isActive: true,
+      order: 1,
+    },
+  });
+
+  const premiumPlan = await prisma.subscriptionPlan.upsert({
+    where: { name: "premium" },
+    update: {},
+    create: {
+      name: "premium",
+      displayName: "Premium Plan",
+      description: "Most popular! Complete preparation toolkit with advanced features",
+      price: 499.00,
+      durationDays: 30,
+      features: JSON.stringify([
+        "Everything in Basic",
+        "Full-length mock tests",
+        "AI study planner",
+        "Smart flashcards with spaced repetition",
+        "Advanced analytics & insights",
+        "Personalized recommendations",
+        "Gamification with leaderboards",
+        "Priority email support",
+        "Ad-free experience"
+      ]),
+      isActive: true,
+      order: 2,
+    },
+  });
+
+  const proPlan = await prisma.subscriptionPlan.upsert({
+    where: { name: "pro" },
+    update: {},
+    create: {
+      name: "pro",
+      displayName: "Pro Plan (3 Months)",
+      description: "Best value! Extended access for serious exam preparation",
+      price: 1199.00,
+      durationDays: 90,
+      features: JSON.stringify([
+        "Everything in Premium",
+        "3 months unlimited access",
+        "Exclusive video lessons (coming soon)",
+        "Live doubt resolution sessions (coming soon)",
+        "Previous year papers with solutions",
+        "Downloadable study materials",
+        "Performance prediction AI",
+        "24/7 priority support",
+        "Certificate of completion"
+      ]),
+      isActive: true,
+      order: 3,
+    },
+  });
+
+  const annualPlan = await prisma.subscriptionPlan.upsert({
+    where: { name: "annual" },
+    update: {},
+    create: {
+      name: "annual",
+      displayName: "Annual Plan",
+      description: "Maximum savings! Full year access with all premium features",
+      price: 3999.00,
+      durationDays: 365,
+      features: JSON.stringify([
+        "Everything in Pro",
+        "Full year unlimited access",
+        "Maximum cost savings (67% off monthly rate)",
+        "All future feature updates included",
+        "Lifetime access to study materials",
+        "Priority feature requests",
+        "Dedicated account manager",
+        "Early access to new features",
+        "One-on-one mentorship sessions (quarterly)"
+      ]),
+      isActive: true,
+      order: 4,
+    },
+  });
+
+  console.log("Subscription plans created:", {
+    basic: basicPlan.name,
+    premium: premiumPlan.name,
+    pro: proPlan.name,
+    annual: annualPlan.name,
+  });
+
   console.log("Database seed completed successfully!");
 }
 
