@@ -13,12 +13,15 @@ An enterprise-grade, AI-powered EdTech platform designed for commerce students i
 - [⚡ Quick Start Guide](./QUICKSTART.md) - 5-minute local setup
 - [🔒 Security Documentation](./SECURITY.md) - Security practices and policies
 - [🤝 Contributing Guide](./CONTRIBUTING.md) - How to contribute
+- [🎯 Phase E Documentation](./PHASE_E_DOCUMENTATION.md) - Adaptive Learning & Question Generation ✨ NEW
 
 ## ✨ Features
 
 ### 🤖 AI-Powered Learning
 - **AI-Generated Quizzes**: OpenAI GPT-4 generates contextual questions tailored to selected chapters
 - **Adaptive Difficulty**: Automatic difficulty adjustment based on last 10 quiz performances
+- **Adaptive Learning Paths** ✨ NEW: ML-based personalized learning journeys with performance pattern detection
+- **Automated Question Generation** ✨ NEW: Bulk AI-powered question creation with quality validation
 - **Personalized Recommendations**: AI analyzes performance patterns and suggests study plans
 - **Smart Explanations**: Context-aware, detailed explanations for every question
 - **Content Suggestions**: AI recommends optimal chapter sequence based on progress
