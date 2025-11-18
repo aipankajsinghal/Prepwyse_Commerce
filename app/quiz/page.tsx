@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import { BookOpen, CheckCircle2, Clock, Play, Sparkles } from "lucide-react";
 
@@ -42,6 +43,7 @@ const subjects = [
 ];
 
 export default function QuizPage() {
+  const router = useRouter();
   const [selectedSubject, setSelectedSubject] = useState("");
   const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
   const [questionCount, setQuestionCount] = useState(10);
@@ -98,9 +100,14 @@ export default function QuizPage() {
         }
 
         const data = await response.json();
-        alert(
-          `✨ ${data.message}\nAdaptive difficulty: ${data.adaptiveDifficulty}\n\nQuiz created successfully!`
-        );
+        // Redirect to quiz attempt page
+        if (data.quizId) {
+          router.push(`/quiz/${data.quizId}/attempt`);
+        } else {
+          alert(
+            `✨ ${data.message}\nAdaptive difficulty: ${data.adaptiveDifficulty}\n\nQuiz created successfully!`
+          );
+        }
       } else {
         // Use regular quiz creation
         const response = await fetch("/api/quiz", {
@@ -119,7 +126,13 @@ export default function QuizPage() {
           throw new Error("Failed to create quiz");
         }
 
-        alert("Quiz created successfully!");
+        const data = await response.json();
+        // Redirect to quiz attempt page
+        if (data.quizId) {
+          router.push(`/quiz/${data.quizId}/attempt`);
+        } else {
+          alert("Quiz created successfully!");
+        }
       }
     } catch (error: any) {
       alert(`Error: ${error.message}`);
