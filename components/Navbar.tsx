@@ -2,17 +2,28 @@
 
 import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
-import { BookOpen, Home, FileText, Trophy, BarChart, User, Shield } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { BookOpen, Home, FileText, Trophy, BarChart, User, Shield, Search, GraduationCap } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 import ThemeSelector from "./ThemeSelector";
 import { useUser } from "@clerk/nextjs";
+import { useState } from "react";
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { user } = useUser();
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const isActive = (path: string) => pathname === path;
+  const isActive = (path: string) => pathname === path || pathname.startsWith(path + "/");
   const isAdmin = user?.publicMetadata?.role === "admin" || user?.primaryEmailAddress?.emailAddress?.includes("admin");
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+      setSearchQuery("");
+    }
+  };
 
   return (
     <nav className="bg-surface-elevated shadow-md border-b border-text-primary/10">
@@ -74,6 +85,30 @@ export default function Navbar() {
               </Link>
 
               <Link
+                href="/practice-papers"
+                className={`px-4 py-2 rounded-lg flex items-center space-x-2 font-display transition ${
+                  isActive("/practice-papers")
+                    ? "bg-accent-1/10 text-accent-1"
+                    : "text-text-secondary hover:bg-accent-1/5 hover:text-accent-1"
+                }`}
+              >
+                <FileText className="h-4 w-4" />
+                <span>Papers</span>
+              </Link>
+
+              <Link
+                href="/study-notes"
+                className={`px-4 py-2 rounded-lg flex items-center space-x-2 font-display transition ${
+                  isActive("/study-notes")
+                    ? "bg-accent-1/10 text-accent-1"
+                    : "text-text-secondary hover:bg-accent-1/5 hover:text-accent-1"
+                }`}
+              >
+                <GraduationCap className="h-4 w-4" />
+                <span>Notes</span>
+              </Link>
+
+              <Link
                 href="/profile"
                 data-onboarding="profile-link"
                 className={`px-4 py-2 rounded-lg flex items-center space-x-2 font-display transition ${
@@ -103,6 +138,28 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center space-x-4">
+            {/* Search Bar */}
+            <form onSubmit={handleSearch} className="hidden lg:block">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-secondary w-4 h-4" />
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9 pr-4 py-2 w-64 border border-text-primary/20 rounded-lg bg-surface text-text-primary placeholder-text-secondary focus:ring-2 focus:ring-accent-1 focus:border-transparent text-sm"
+                />
+              </div>
+            </form>
+
+            {/* Mobile Search Button */}
+            <Link
+              href="/search"
+              className="lg:hidden p-2 rounded-lg text-text-secondary hover:bg-accent-1/5 hover:text-accent-1 transition"
+            >
+              <Search className="h-5 w-5" />
+            </Link>
+
             <ThemeSelector />
             <UserButton 
               afterSignOutUrl="/"
