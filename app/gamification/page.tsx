@@ -16,13 +16,13 @@ export default async function GamificationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4">
+    <div className="min-h-screen bg-[rgb(var(--bg))] bg-pattern dark:bg-gray-900 py-8 px-4">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-3xl font-display font-bold text-primary dark:text-white mb-2">
             🎮 Gamification Dashboard
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="font-body text-text-secondary dark:text-gray-400">
             Track your progress, earn achievements, and compete with others!
           </p>
         </div>
@@ -50,7 +50,7 @@ export default async function GamificationPage() {
                   <p className="font-semibold text-gray-900 dark:text-white">
                     First Quiz Complete
                   </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm font-body text-text-secondary dark:text-gray-400">
                     Completed your first quiz!
                   </p>
                 </div>
@@ -61,7 +61,7 @@ export default async function GamificationPage() {
                   <p className="font-semibold text-gray-900 dark:text-white">
                     3-Day Streak
                   </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm font-body text-text-secondary dark:text-gray-400">
                     Maintained a 3-day learning streak!
                   </p>
                 </div>
@@ -72,13 +72,13 @@ export default async function GamificationPage() {
                   <p className="font-semibold text-gray-900 dark:text-white">
                     Level 2 Reached
                   </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm font-body text-text-secondary dark:text-gray-400">
                     Leveled up to Level 2!
                   </p>
                 </div>
               </div>
             </div>
-            <button className="mt-4 w-full py-2 bg-purple-500 hover:bg-purple-600 text-white font-semibold rounded-lg transition-colors">
+            <button className="mt-4 w-full py-2 bg-accent-2-500 hover:bg-accent-2-600 text-white font-semibold rounded-lg transition-colors">
               View All Achievements
             </button>
           </div>

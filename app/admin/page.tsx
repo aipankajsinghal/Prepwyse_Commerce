@@ -30,7 +30,7 @@ export default function AdminPanel() {
 
   if (!isLoaded) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-[rgb(var(--bg))] bg-pattern dark:bg-gray-900 flex items-center justify-center">
         <div className="animate-spin h-12 w-12 border-4 border-blue-600 border-t-transparent rounded-full" />
       </div>
     );
@@ -38,18 +38,18 @@ export default function AdminPanel() {
 
   if (!user || !isAdmin) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-[rgb(var(--bg))] bg-pattern dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <Shield className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-2xl font-display font-bold text-primary dark:text-white mb-2">
             Access Denied
           </h1>
-          <p className="text-gray-600 dark:text-gray-300 mb-6">
+          <p className="font-body text-text-secondary dark:text-gray-300 mb-6">
             You don't have permission to access the admin panel
           </p>
           <a
             href="/dashboard"
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            className="px-6 py-3 bg-accent-1-600 text-white rounded-lg hover:bg-accent-1-700 transition"
           >
             Go to Dashboard
           </a>
@@ -88,7 +88,7 @@ export default function AdminPanel() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-[rgb(var(--bg))] bg-pattern dark:bg-gray-900">
       <Navbar />
 
       <main className="container mx-auto px-4 py-8">
@@ -99,10 +99,10 @@ export default function AdminPanel() {
           className="mb-8"
         >
           <div className="flex items-center space-x-3 mb-4">
-            <Shield className="h-8 w-8 text-blue-600" />
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Admin Panel</h1>
+            <Shield className="h-8 w-8 text-accent-1" />
+            <h1 className="text-3xl font-display font-bold text-primary dark:text-white">Admin Panel</h1>
           </div>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="font-body text-text-secondary dark:text-gray-300">
             Manage users, content, and platform settings
           </p>
         </motion.div>
@@ -118,8 +118,8 @@ export default function AdminPanel() {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-medium transition ${
                     activeTab === tab.id
-                      ? "bg-blue-600 text-white"
-                      : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      ? "bg-accent-1-600 text-white"
+                      : "font-body text-text-secondary dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                   }`}
                 >
                   <Icon className="h-5 w-5" />
@@ -147,12 +147,12 @@ export default function AdminPanel() {
                     <div className={`h-12 w-12 bg-${stat.color}-100 dark:bg-${stat.color}-900/30 rounded-xl flex items-center justify-center`}>
                       <stat.icon className={`h-6 w-6 text-${stat.color}-600 dark:text-${stat.color}-400`} />
                     </div>
-                    <span className="text-sm font-semibold text-green-600 dark:text-green-400">
+                    <span className="text-sm font-semibold text-semantic-success dark:text-green-400">
                       {stat.change}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">{stat.label}</p>
-                  <p className="text-3xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
+                  <p className="text-sm font-body text-text-secondary dark:text-gray-300 mb-1">{stat.label}</p>
+                  <p className="text-3xl font-display font-bold text-primary dark:text-white">{stat.value}</p>
                 </motion.div>
               ))}
             </div>
@@ -216,13 +216,13 @@ export default function AdminPanel() {
                         {question.text}
                       </p>
                       <div className="flex items-center space-x-3 text-sm">
-                        <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded">
+                        <span className="px-2 py-1 bg-accent-1-100 dark:bg-accent-1-900 text-blue-700 dark:text-blue-300 rounded">
                           {question.subject}
                         </span>
-                        <span className="text-gray-600 dark:text-gray-400">{question.chapter}</span>
+                        <span className="font-body text-text-secondary dark:text-gray-400">{question.chapter}</span>
                         <span className={`px-2 py-1 rounded ${
                           question.difficulty === "Easy"
-                            ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+                            ? "bg-semantic-success-100 text-green-700 dark:bg-semantic-success-900 dark:text-green-300"
                             : question.difficulty === "Medium"
                             ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300"
                             : "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
@@ -293,7 +293,7 @@ export default function AdminPanel() {
                         <td className="px-6 py-4">
                           <span className={`px-2 py-1 text-xs rounded-full ${
                             user.status === "active"
-                              ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+                              ? "bg-semantic-success-100 text-green-700 dark:bg-semantic-success-900 dark:text-green-300"
                               : "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
                           }`}>
                             {user.status}
@@ -301,7 +301,7 @@ export default function AdminPanel() {
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex space-x-2">
-                            <button className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition">
+                            <button className="p-2 text-accent-1 hover:bg-accent-1-50 dark:hover:bg-accent-1-900/30 rounded-lg transition">
                               <Edit className="h-4 w-4" />
                             </button>
                             <button className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition">
@@ -326,7 +326,7 @@ export default function AdminPanel() {
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                   Content Management
                 </h3>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center space-x-2">
+                <button className="px-4 py-2 bg-accent-1-600 text-white rounded-lg hover:bg-accent-1-700 transition flex items-center space-x-2">
                   <Plus className="h-5 w-5" />
                   <span>Add Content</span>
                 </button>
@@ -335,11 +335,11 @@ export default function AdminPanel() {
               <div className="grid md:grid-cols-3 gap-4">
                 {["Business Studies", "Accountancy", "Economics"].map((subject, index) => (
                   <div key={index} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
-                    <BookOpen className="h-8 w-8 text-blue-600 dark:text-blue-400 mb-3" />
+                    <BookOpen className="h-8 w-8 text-accent-1 dark:text-blue-400 mb-3" />
                     <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                       {subject}
                     </h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                    <p className="text-sm font-body text-text-secondary dark:text-gray-400 mb-4">
                       23 chapters • 1,200 questions
                     </p>
                     <button className="w-full px-4 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
@@ -355,7 +355,7 @@ export default function AdminPanel() {
         {/* Placeholder for other tabs */}
         {activeTab !== "overview" && activeTab !== "users" && activeTab !== "content" && (
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-12 text-center">
-            <p className="text-gray-600 dark:text-gray-300 text-lg">
+            <p className="font-body text-text-secondary dark:text-gray-300 text-lg">
               {tabs.find((t) => t.id === activeTab)?.label} management coming soon...
             </p>
           </div>

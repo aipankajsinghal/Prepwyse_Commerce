@@ -20,25 +20,25 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 text-center">
+    <div className="min-h-screen bg-[rgb(var(--bg))] bg-pattern flex items-center justify-center p-4">
+      <div className="max-w-md w-full edu-card p-8 text-center">
         <div className="flex justify-center mb-4">
-          <div className="bg-red-100 rounded-full p-4">
-            <AlertTriangle className="h-12 w-12 text-red-600" />
+          <div className="bg-semantic-error/10 rounded-full p-4">
+            <AlertTriangle className="h-12 w-12 text-semantic-error" />
           </div>
         </div>
         
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+        <h1 className="text-2xl font-display font-bold text-primary mb-2">
           Something went wrong!
         </h1>
         
-        <p className="text-gray-600 mb-6">
+        <p className="font-body text-text-secondary mb-6">
           We encountered an unexpected error. Your progress has been saved. Please try again.
         </p>
 
         {process.env.NODE_ENV === "development" && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-left">
-            <p className="text-sm font-mono text-red-800 break-words">
+          <div className="mb-6 p-4 bg-semantic-error/10 border border-semantic-error/20 rounded-lg text-left">
+            <p className="text-sm font-mono text-semantic-error break-words">
               {error.message}
             </p>
           </div>
@@ -47,7 +47,7 @@ export default function Error({
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <button
             onClick={reset}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition"
+            className="btn-primary flex items-center justify-center gap-2"
           >
             <RefreshCw className="h-5 w-5" />
             Try Again
@@ -55,7 +55,7 @@ export default function Error({
           
           <Link
             href="/"
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition"
+            className="btn-secondary flex items-center justify-center gap-2"
           >
             <Home className="h-5 w-5" />
             Go Home

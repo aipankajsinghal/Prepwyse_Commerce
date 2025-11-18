@@ -39,72 +39,72 @@ const recentAttempts = [
 
 export default function ResultsPage() {
   const getScoreColor = (percentage: number) => {
-    if (percentage >= 80) return "text-green-600";
-    if (percentage >= 60) return "text-yellow-600";
-    return "text-red-600";
+    if (percentage >= 80) return "text-semantic-success";
+    if (percentage >= 60) return "text-semantic-warning";
+    return "text-semantic-error";
   };
 
   const getBgColor = (percentage: number) => {
-    if (percentage >= 80) return "bg-green-50 border-green-200";
-    if (percentage >= 60) return "bg-yellow-50 border-yellow-200";
-    return "bg-red-50 border-red-200";
+    if (percentage >= 80) return "bg-semantic-success/10 border-semantic-success/20";
+    if (percentage >= 60) return "bg-semantic-warning/10 border-semantic-warning/20";
+    return "bg-semantic-error/10 border-semantic-error/20";
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[rgb(var(--bg))] bg-pattern">
       <Navbar />
 
       <main className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Your Results</h1>
-          <p className="text-gray-600">
+        <div className="mb-8 animate-reveal">
+          <h1 className="text-3xl font-display font-bold text-primary mb-2">Your Results</h1>
+          <p className="font-body text-text-secondary">
             Track your performance and identify areas for improvement
           </p>
         </div>
 
         {/* Overall Stats */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="edu-card animate-reveal delay-100">
             <div className="flex items-center justify-between mb-2">
-              <h4 className="text-gray-600 font-medium">Total Attempts</h4>
-              <FileText className="h-5 w-5 text-gray-400" />
+              <h4 className="font-display text-text-secondary font-medium">Total Attempts</h4>
+              <FileText className="h-5 w-5 text-accent-1" />
             </div>
-            <p className="text-3xl font-bold text-gray-900">{recentAttempts.length}</p>
+            <p className="text-3xl font-display font-bold text-primary">{recentAttempts.length}</p>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="edu-card animate-reveal delay-200">
             <div className="flex items-center justify-between mb-2">
-              <h4 className="text-gray-600 font-medium">Average Score</h4>
-              <TrendingUp className="h-5 w-5 text-gray-400" />
+              <h4 className="font-display text-text-secondary font-medium">Average Score</h4>
+              <TrendingUp className="h-5 w-5 text-accent-2" />
             </div>
-            <p className="text-3xl font-bold text-gray-900">72%</p>
+            <p className="text-3xl font-display font-bold text-primary">72%</p>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="edu-card animate-reveal delay-300">
             <div className="flex items-center justify-between mb-2">
-              <h4 className="text-gray-600 font-medium">Best Score</h4>
-              <Award className="h-5 w-5 text-gray-400" />
+              <h4 className="font-display text-text-secondary font-medium">Best Score</h4>
+              <Award className="h-5 w-5 text-accent-1" />
             </div>
-            <p className="text-3xl font-bold text-gray-900">80%</p>
+            <p className="text-3xl font-display font-bold text-primary">80%</p>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="edu-card animate-reveal delay-300">
             <div className="flex items-center justify-between mb-2">
-              <h4 className="text-gray-600 font-medium">Study Time</h4>
-              <Clock className="h-5 w-5 text-gray-400" />
+              <h4 className="font-display text-text-secondary font-medium">Study Time</h4>
+              <Clock className="h-5 w-5 text-accent-1" />
             </div>
-            <p className="text-3xl font-bold text-gray-900">2.4h</p>
+            <p className="text-3xl font-display font-bold text-primary">2.4h</p>
           </div>
         </div>
 
         {/* Recent Attempts */}
-        <div className="bg-white rounded-xl shadow-md p-6">
+        <div className="edu-card animate-reveal delay-300">
           <h2 className="text-2xl font-bold mb-6">Recent Attempts</h2>
 
           {recentAttempts.length === 0 ? (
             <div className="text-center py-12">
               <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-600 text-lg">No attempts yet</p>
+              <p className="font-body text-text-secondary text-lg">No attempts yet</p>
               <p className="text-gray-500 text-sm mt-2">
                 Start practicing to see your results here
               </p>
@@ -122,7 +122,7 @@ export default function ResultsPage() {
                         <span className="px-2 py-1 bg-white rounded text-xs font-semibold text-gray-700">
                           {attempt.type}
                         </span>
-                        <div className="flex items-center text-sm text-gray-600">
+                        <div className="flex items-center text-sm font-body text-text-secondary">
                           <Calendar className="h-4 w-4 mr-1" />
                           {new Date(attempt.date).toLocaleDateString("en-US", {
                             month: "short",
@@ -134,7 +134,7 @@ export default function ResultsPage() {
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">
                         {attempt.title}
                       </h3>
-                      <div className="flex items-center space-x-4 text-sm text-gray-600">
+                      <div className="flex items-center space-x-4 text-sm font-body text-text-secondary">
                         <div className="flex items-center">
                           <FileText className="h-4 w-4 mr-1" />
                           {attempt.score}/{attempt.totalQuestions} correct
@@ -164,13 +164,13 @@ export default function ResultsPage() {
         </div>
 
         {/* Performance Analysis */}
-        <div className="mt-8 bg-white rounded-xl shadow-md p-6">
+        <div className="mt-8 edu-card animate-reveal delay-300">
           <h2 className="text-2xl font-bold mb-4">Subject-wise Performance</h2>
           <div className="space-y-4">
             <div>
               <div className="flex justify-between mb-2">
                 <span className="text-gray-700 font-medium">Business Studies</span>
-                <span className="text-gray-600">78%</span>
+                <span className="font-body text-text-secondary">78%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div className="bg-green-500 h-2 rounded-full" style={{ width: "78%" }}></div>
@@ -180,7 +180,7 @@ export default function ResultsPage() {
             <div>
               <div className="flex justify-between mb-2">
                 <span className="text-gray-700 font-medium">Accountancy</span>
-                <span className="text-gray-600">65%</span>
+                <span className="font-body text-text-secondary">65%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div className="bg-yellow-500 h-2 rounded-full" style={{ width: "65%" }}></div>
@@ -190,7 +190,7 @@ export default function ResultsPage() {
             <div>
               <div className="flex justify-between mb-2">
                 <span className="text-gray-700 font-medium">Economics</span>
-                <span className="text-gray-600">72%</span>
+                <span className="font-body text-text-secondary">72%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div className="bg-green-500 h-2 rounded-full" style={{ width: "72%" }}></div>

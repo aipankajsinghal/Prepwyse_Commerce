@@ -4,11 +4,11 @@ import Link from "next/link";
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[rgb(var(--bg))] bg-pattern">
       <Navbar />
       
       <main className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="bg-white rounded-xl shadow-md p-8">
+        <div className="edu-card p-8">
           {/* Header */}
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-4">
@@ -16,11 +16,11 @@ export default function PrivacyPolicyPage() {
                 <Shield className="h-8 w-8 text-primary-600" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">Privacy Policy</h1>
-                <p className="text-sm text-gray-600 mt-1">Last updated: November 18, 2024</p>
+                <h1 className="text-3xl font-display font-bold text-primary">Privacy Policy</h1>
+                <p className="text-sm font-body text-text-secondary mt-1">Last updated: November 18, 2024</p>
               </div>
             </div>
-            <p className="text-gray-700 leading-relaxed">
+            <p className="font-body text-text-primary leading-relaxed">
               At PrepWyse Commerce, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, store, and protect your data in compliance with GDPR, Indian DPDP Act 2023, and other applicable data protection laws.
             </p>
           </div>
@@ -40,11 +40,11 @@ export default function PrivacyPolicyPage() {
 
           {/* Section 1: Information We Collect */}
           <section id="information-we-collect" className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <h2 className="text-2xl font-display font-bold text-primary mb-4 flex items-center gap-2">
               <Eye className="h-6 w-6 text-primary-600" />
               1. Information We Collect
             </h2>
-            <div className="space-y-4 text-gray-700">
+            <div className="space-y-4 font-body text-text-primary">
               <div>
                 <h3 className="font-semibold text-gray-900 mb-2">1.1 Information You Provide</h3>
                 <ul className="list-disc pl-6 space-y-1">
@@ -77,11 +77,11 @@ export default function PrivacyPolicyPage() {
 
           {/* Section 2: How We Use Your Data */}
           <section id="how-we-use-data" className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <h2 className="text-2xl font-display font-bold text-primary mb-4 flex items-center gap-2">
               <FileText className="h-6 w-6 text-primary-600" />
               2. How We Use Your Data
             </h2>
-            <div className="space-y-3 text-gray-700">
+            <div className="space-y-3 font-body text-text-primary">
               <p>We use your personal information for the following purposes:</p>
               <ul className="list-disc pl-6 space-y-2">
                 <li><strong>Provide Services:</strong> Deliver quiz content, track progress, generate personalized recommendations</li>
@@ -106,11 +106,11 @@ export default function PrivacyPolicyPage() {
 
           {/* Section 3: Data Storage & Security */}
           <section id="data-storage" className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <h2 className="text-2xl font-display font-bold text-primary mb-4 flex items-center gap-2">
               <Lock className="h-6 w-6 text-primary-600" />
               3. Data Storage & Security
             </h2>
-            <div className="space-y-3 text-gray-700">
+            <div className="space-y-3 font-body text-text-primary">
               <div>
                 <h3 className="font-semibold text-gray-900 mb-2">3.1 Data Storage</h3>
                 <ul className="list-disc pl-6 space-y-1">
@@ -146,11 +146,11 @@ export default function PrivacyPolicyPage() {
 
           {/* Section 4: Your Rights */}
           <section id="your-rights" className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <h2 className="text-2xl font-display font-bold text-primary mb-4 flex items-center gap-2">
               <Download className="h-6 w-6 text-primary-600" />
               4. Your Rights
             </h2>
-            <div className="space-y-3 text-gray-700">
+            <div className="space-y-3 font-body text-text-primary">
               <p>Under GDPR and Indian DPDP Act, you have the following rights:</p>
               
               <div className="grid md:grid-cols-2 gap-4 mt-4">
@@ -199,8 +199,8 @@ export default function PrivacyPolicyPage() {
 
           {/* Section 5: Cookies */}
           <section id="cookies" className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">5. Cookies & Tracking Technologies</h2>
-            <div className="space-y-3 text-gray-700">
+            <h2 className="text-2xl font-display font-bold text-primary mb-4">5. Cookies & Tracking Technologies</h2>
+            <div className="space-y-3 font-body text-text-primary">
               <p>We use cookies and similar technologies to enhance your experience:</p>
               
               <div className="space-y-3">
@@ -228,8 +228,8 @@ export default function PrivacyPolicyPage() {
 
           {/* Section 6: Children's Privacy */}
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">6. Children's Privacy</h2>
-            <div className="space-y-3 text-gray-700">
+            <h2 className="text-2xl font-display font-bold text-primary mb-4">6. Children's Privacy</h2>
+            <div className="space-y-3 font-body text-text-primary">
               <p>
                 PrepWyse Commerce is designed for students aged 13 and above. We do not knowingly collect personal information from children under 13 without parental consent. If we become aware of such collection, we will delete the information immediately.
               </p>
@@ -241,8 +241,8 @@ export default function PrivacyPolicyPage() {
 
           {/* Section 7: Changes to Policy */}
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">7. Changes to This Policy</h2>
-            <div className="space-y-3 text-gray-700">
+            <h2 className="text-2xl font-display font-bold text-primary mb-4">7. Changes to This Policy</h2>
+            <div className="space-y-3 font-body text-text-primary">
               <p>
                 We may update this Privacy Policy periodically to reflect changes in our practices or legal requirements. We will notify you of significant changes via email or prominent notice on the platform.
               </p>
@@ -254,8 +254,8 @@ export default function PrivacyPolicyPage() {
 
           {/* Contact Section */}
           <section id="contact" className="bg-gradient-to-r from-primary-50 to-blue-50 border-2 border-primary-200 rounded-xl p-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">8. Contact Us</h2>
-            <div className="text-gray-700 space-y-2">
+            <h2 className="text-2xl font-display font-bold text-primary mb-4">8. Contact Us</h2>
+            <div className="font-body text-text-primary space-y-2">
               <p>
                 If you have questions about this Privacy Policy or wish to exercise your rights, please contact us:
               </p>

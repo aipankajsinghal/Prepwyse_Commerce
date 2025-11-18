@@ -4,11 +4,11 @@ import Link from "next/link";
 
 export default function TermsOfServicePage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[rgb(var(--bg))] bg-pattern">
       <Navbar />
       
       <main className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="bg-white rounded-xl shadow-md p-8">
+        <div className="edu-card p-8">
           {/* Header */}
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-4">
@@ -16,11 +16,11 @@ export default function TermsOfServicePage() {
                 <FileText className="h-8 w-8 text-primary-600" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">Terms of Service</h1>
-                <p className="text-sm text-gray-600 mt-1">Last updated: November 18, 2024</p>
+                <h1 className="text-3xl font-display font-bold text-primary">Terms of Service</h1>
+                <p className="text-sm font-body text-text-secondary mt-1">Last updated: November 18, 2024</p>
               </div>
             </div>
-            <p className="text-gray-700 leading-relaxed">
+            <p className="font-body text-text-primary leading-relaxed">
               Please read these Terms of Service carefully before using PrepWyse Commerce. By accessing or using our platform, you agree to be bound by these terms.
             </p>
           </div>
@@ -37,8 +37,8 @@ export default function TermsOfServicePage() {
 
           {/* Section 1: Acceptance */}
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">1. Acceptance of Terms</h2>
-            <div className="space-y-3 text-gray-700">
+            <h2 className="text-2xl font-display font-bold text-primary mb-4">1. Acceptance of Terms</h2>
+            <div className="space-y-3 font-body text-text-primary">
               <p>
                 By creating an account, accessing, or using PrepWyse Commerce ("Service", "Platform"), you agree to:
               </p>
@@ -53,11 +53,11 @@ export default function TermsOfServicePage() {
 
           {/* Section 2: User Accounts */}
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <h2 className="text-2xl font-display font-bold text-primary mb-4 flex items-center gap-2">
               <UserCheck className="h-6 w-6 text-primary-600" />
               2. User Accounts
             </h2>
-            <div className="space-y-3 text-gray-700">
+            <div className="space-y-3 font-body text-text-primary">
               <div>
                 <h3 className="font-semibold text-gray-900 mb-2">2.1 Account Registration</h3>
                 <ul className="list-disc pl-6 space-y-1">
@@ -91,8 +91,8 @@ export default function TermsOfServicePage() {
 
           {/* Section 3: Use of Services */}
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">3. Use of Services</h2>
-            <div className="space-y-3 text-gray-700">
+            <h2 className="text-2xl font-display font-bold text-primary mb-4">3. Use of Services</h2>
+            <div className="space-y-3 font-body text-text-primary">
               <div>
                 <h3 className="font-semibold text-gray-900 mb-2">3.1 Permitted Use</h3>
                 <p>You may use PrepWyse Commerce for:</p>
@@ -123,8 +123,8 @@ export default function TermsOfServicePage() {
 
           {/* Section 4: Content */}
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">4. Content & Intellectual Property</h2>
-            <div className="space-y-3 text-gray-700">
+            <h2 className="text-2xl font-display font-bold text-primary mb-4">4. Content & Intellectual Property</h2>
+            <div className="space-y-3 font-body text-text-primary">
               <div>
                 <h3 className="font-semibold text-gray-900 mb-2">4.1 Our Content</h3>
                 <p>
@@ -155,8 +155,8 @@ export default function TermsOfServicePage() {
 
           {/* Section 5: Subscription & Payment */}
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">5. Subscription & Payment Terms</h2>
-            <div className="space-y-3 text-gray-700">
+            <h2 className="text-2xl font-display font-bold text-primary mb-4">5. Subscription & Payment Terms</h2>
+            <div className="space-y-3 font-body text-text-primary">
               <div>
                 <h3 className="font-semibold text-gray-900 mb-2">5.1 Free Trial</h3>
                 <ul className="list-disc pl-6 space-y-1">
@@ -189,11 +189,11 @@ export default function TermsOfServicePage() {
 
           {/* Section 6: Disclaimers */}
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <h2 className="text-2xl font-display font-bold text-primary mb-4 flex items-center gap-2">
               <Shield className="h-6 w-6 text-primary-600" />
               6. Disclaimers & Limitations
             </h2>
-            <div className="space-y-3 text-gray-700">
+            <div className="space-y-3 font-body text-text-primary">
               <div>
                 <h3 className="font-semibold text-gray-900 mb-2">6.1 Service "As Is"</h3>
                 <p>
@@ -230,8 +230,8 @@ export default function TermsOfServicePage() {
 
           {/* Section 7: Changes to Terms */}
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">7. Changes to Terms</h2>
-            <div className="space-y-3 text-gray-700">
+            <h2 className="text-2xl font-display font-bold text-primary mb-4">7. Changes to Terms</h2>
+            <div className="space-y-3 font-body text-text-primary">
               <p>
                 We may update these Terms of Service to reflect changes in our practices or legal requirements. Material changes will be communicated via:
               </p>
@@ -248,8 +248,8 @@ export default function TermsOfServicePage() {
 
           {/* Section 8: Governing Law */}
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">8. Governing Law & Dispute Resolution</h2>
-            <div className="space-y-3 text-gray-700">
+            <h2 className="text-2xl font-display font-bold text-primary mb-4">8. Governing Law & Dispute Resolution</h2>
+            <div className="space-y-3 font-body text-text-primary">
               <p>
                 These terms are governed by the laws of India. Any disputes shall be resolved through:
               </p>
@@ -263,8 +263,8 @@ export default function TermsOfServicePage() {
 
           {/* Contact Section */}
           <section className="bg-gradient-to-r from-primary-50 to-blue-50 border-2 border-primary-200 rounded-xl p-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">9. Contact Us</h2>
-            <div className="text-gray-700 space-y-2">
+            <h2 className="text-2xl font-display font-bold text-primary mb-4">9. Contact Us</h2>
+            <div className="font-body text-text-primary space-y-2">
               <p>
                 Questions about these Terms of Service? Contact us:
               </p>
