@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "postinstall": "prisma generate",
     "seed": "ts-node --compiler-options {\\\"module\\\":\\\"CommonJS\\\"} prisma/seed.ts"
   },
@@ -47,6 +47,8 @@
   },
   "devDependencies": {
     "@types/papaparse": "^5.5.0",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.2.0",
     "prisma": "^6.19.0",
     "ts-node": "^10.9.2"
   }

@@ -151,8 +151,11 @@ export async function queueAttemptForSync(attempt: any) {
     });
 
     // Request background sync if available
-    if ("sync" in registration) {
-      await (registration as any).sync.register("sync-quiz-attempts");
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      const reg = await navigator.serviceWorker.ready;
+      if ('sync' in reg) {
+        await (reg as any).sync.register("sync-quiz-attempts");
+      }
     }
 
     console.log("[IndexedDB] Queued attempt for sync:", attempt.id);
