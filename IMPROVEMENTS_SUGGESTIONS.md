@@ -22,12 +22,19 @@ This document outlines potential improvements and enhancements that can be made 
 | 8  | GDPR & compliance with Indian DPDP Act                         | ✅ Completed    | Phase A | Privacy policy, terms, cookie consent, data export, account deletion implemented |
 | 9  | Onboarding Flow                                                | ✅ Completed    | Phase A | Interactive tutorial, profile checklist, 7-step guided tour implemented |
 | 10 | Personalization                                                | ✅ Completed    | Phase B | Language preferences, favorite subjects/chapters, dashboard layout, notification settings |
-| 11 | Subscription Plans (admin managed), Razorpay integration, no free plan, only 1 day free trial | ⏳ In Progress | Phase C | Core backend complete: 10 API endpoints, Razorpay integration, transaction logging. UI pending. |
-| 12 | Referral Program                                               | ⏳ In Progress  | Phase C | Core backend complete: 4 API endpoints, unique codes, rewards system. UI pending. |
-| 13 | Advanced Admin Dashboard                                       | ⏳ In Progress  | Phase C | Database models created, analytics endpoints pending. UI pending.      |
-| 14 | Content Management System                                      | ⏳ In Progress  | Phase C | Database models created (QuestionVersion, ContentSchedule). Implementation pending. |
+| 11 | Subscription Plans (admin managed), Razorpay integration, no free plan, only 1 day free trial | ✅ Completed | Phase C | Full implementation: 10 API endpoints, Razorpay integration, transaction logging, complete UI (351 lines). |
+| 12 | Referral Program                                               | ✅ Completed  | Phase C | Full implementation: 4 API endpoints, unique codes, rewards system, complete UI (509 lines). |
+| 13 | Advanced Admin Dashboard                                       | ✅ Completed  | Phase C | Complete admin panel with tabs, user management, content management (366 lines).      |
+| 14 | Content Management System                                      | ✅ Completed  | Phase C | Database models, AI question generation page, admin content management interface. |
 | 15 | Adaptive Learning Path                                         | ✅ Completed    | Phase E | ML-based personalized learning paths with performance pattern detection |
 | 16 | Automated Question Generation                                  | ✅ Completed    | Phase E | AI-powered bulk question generation with quality validation and review workflow |
+| 17 | Video Lessons Integration                                      | ⬜ Not Started  | Phase D | Video upload/embed, progress tracking, interactive timestamps, quiz integration |
+| 18 | Peer Discussion Forums                                         | ⬜ Not Started  | Phase D | Chapter-wise threads, upvote/downvote, best answer, moderation tools |
+| 19 | Practice Papers & Previous Years                               | ⬜ Not Started  | Phase D | Upload previous year papers, organize by year/exam type, solution explanations |
+| 20 | Doubt Resolution System                                        | ⬜ Not Started  | Phase D | 1-on-1 doubt sessions, scheduled/instant, video/text/image support, rating system |
+| 21 | Study Notes & Summaries                                        | ⬜ Not Started  | Phase D | Chapter-wise notes, AI-generated summaries, downloadable PDFs |
+| 22 | Advanced Search (Algolia/Elasticsearch)                        | ⬜ Not Started  | Phase D | Full-text search, auto-complete, search history, filters and facets |
+| 23 | Mobile App (React Native)                                      | ⬜ Not Started  | Phase D | iOS and Android apps, push notifications, offline support, 70-80% shared code |
 
 *Note: Updates will be made here as features move through In Progress → Completed.*
 
