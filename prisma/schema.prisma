@@ -556,3 +556,89 @@ model QuestionValidation {
   @@index([questionId, questionType])
   @@index([validationType, status])
 }
+
+// Phase D: Practice Papers Models
+model PracticePaper {
+  id              String                @id @default(cuid())
+  year            Int
+  examType        String                // "CUET", "Class11", "Class12"
+  title           String
+  description     String?
+  duration        Int                   // in minutes
+  totalMarks      Int
+  subjectId       String?               // Optional: subject filter
+  questions       Json                  // Array of question IDs or embedded questions
+  solutions       Json?                 // Solutions and explanations
+  difficulty      String                @default("medium") // "easy", "medium", "hard"
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+  attempts        PracticePaperAttempt[]
+  
+  @@index([examType, year])
+  @@index([createdAt])
+}
+
+model PracticePaperAttempt {
+  id              String        @id @default(cuid())
+  userId          String
+  paperId         String
+  paper           PracticePaper @relation(fields: [paperId], references: [id], onDelete: Cascade)
+  answers         Json          // Array of {questionId, selectedAnswer}
+  score           Int           @default(0)
+  totalQuestions  Int
+  totalMarks      Int
+  obtainedMarks   Int           @default(0)
+  accuracy        Float?        // Percentage
+  timeSpent       Int?          // in seconds
+  startedAt       DateTime      @default(now())
+  completedAt     DateTime?
+  
+  @@index([userId, completedAt])
+  @@index([paperId])
+}
+
+// Phase D: Study Notes Models
+model StudyNote {
+  id          String          @id @default(cuid())
+  chapterId   String
+  title       String
+  content     String          @db.Text
+  summary     String?         @db.Text // AI-generated summary
+  type        String          @default("official") // "official", "student", "ai_generated"
+  authorId    String?         // Admin or user who created it
+  difficulty  String          @default("medium") // "easy", "medium", "hard"
+  tags        Json?           // Array of tags
+  pdfUrl      String?
+  views       Int             @default(0)
+  likes       Int             @default(0)
+  isPublished Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  bookmarks   NoteBookmark[]
+  
+  @@index([chapterId, isPublished])
+  @@index([createdAt])
+}
+
+model NoteBookmark {
+  id        String    @id @default(cuid())
+  userId    String
+  noteId    String
+  note      StudyNote @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  
+  @@unique([userId, noteId])
+  @@index([userId])
+}
+
+// Phase D: Advanced Search Models
+model SearchHistory {
+  id          String   @id @default(cuid())
+  userId      String
+  query       String
+  resultCount Int      @default(0)
+  filters     Json?    // Search filters applied
+  createdAt   DateTime @default(now())
+  
+  @@index([userId, createdAt])
+}
