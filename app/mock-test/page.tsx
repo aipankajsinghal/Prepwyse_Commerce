@@ -53,59 +53,59 @@ export default function MockTestPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[rgb(var(--bg))] bg-pattern">
       <Navbar />
 
       <main className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Mock Tests</h1>
-          <p className="text-gray-600">
+        <div className="mb-8 animate-reveal">
+          <h1 className="text-3xl font-display font-bold text-primary mb-2">Mock Tests</h1>
+          <p className="font-body text-text-secondary">
             Take full-length mock tests designed as per actual exam patterns
           </p>
         </div>
 
         {/* Mock Tests Grid */}
         <div className="grid lg:grid-cols-2 gap-6 mb-8">
-          {mockTests.map((test) => (
-            <div key={test.id} className="bg-white rounded-xl shadow-md overflow-hidden">
+          {mockTests.map((test, index) => (
+            <div key={test.id} className={`edu-card animate-reveal delay-${(index + 1) * 100}`}>
               <div className="p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <div className="flex items-center space-x-2 mb-2">
-                      <Trophy className="h-5 w-5 text-primary-600" />
-                      <span className="text-sm font-semibold text-primary-600 uppercase">
+                      <Trophy className="h-5 w-5 text-accent-1" />
+                      <span className="text-sm font-display font-semibold text-accent-1 uppercase">
                         {test.examType}
                       </span>
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900">{test.title}</h3>
+                    <h3 className="text-xl font-display font-bold text-text-primary">{test.title}</h3>
                   </div>
                 </div>
 
-                <p className="text-gray-600 mb-4">{test.description}</p>
+                <p className="font-body text-text-secondary mb-4">{test.description}</p>
 
                 {/* Test Info */}
                 <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div className="flex items-center space-x-2 text-gray-600">
-                    <Clock className="h-4 w-4" />
-                    <span className="text-sm">{test.duration} minutes</span>
+                  <div className="flex items-center space-x-2 text-text-secondary">
+                    <Clock className="h-4 w-4 text-accent-2" />
+                    <span className="text-sm font-body">{test.duration} minutes</span>
                   </div>
-                  <div className="flex items-center space-x-2 text-gray-600">
-                    <FileText className="h-4 w-4" />
-                    <span className="text-sm">{test.totalQuestions} questions</span>
+                  <div className="flex items-center space-x-2 text-text-secondary">
+                    <FileText className="h-4 w-4 text-accent-2" />
+                    <span className="text-sm font-body">{test.totalQuestions} questions</span>
                   </div>
                 </div>
 
                 {/* Sections */}
                 <div className="mb-4">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-2">Sections:</h4>
+                  <h4 className="text-sm font-display font-semibold text-text-primary mb-2">Sections:</h4>
                   <div className="space-y-1">
                     {test.sections.map((section, index) => (
                       <div
                         key={index}
-                        className="flex justify-between text-sm bg-gray-50 p-2 rounded"
+                        className="flex justify-between text-sm font-body bg-accent-2/5 p-2 rounded"
                       >
-                        <span className="text-gray-700">{section.name}</span>
-                        <span className="text-gray-600">{section.questions} Qs</span>
+                        <span className="text-text-primary">{section.name}</span>
+                        <span className="text-text-secondary">{section.questions} Qs</span>
                       </div>
                     ))}
                   </div>
@@ -113,7 +113,7 @@ export default function MockTestPage() {
 
                 <button
                   onClick={() => handleStartTest(test.id)}
-                  className="w-full px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 font-semibold flex items-center justify-center transition"
+                  className="w-full btn-primary flex items-center justify-center"
                 >
                   <Play className="h-5 w-5 mr-2" />
                   Start Mock Test
@@ -124,29 +124,29 @@ export default function MockTestPage() {
         </div>
 
         {/* Instructions Card */}
-        <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">
+        <div className="edu-card bg-gradient-to-br from-accent-2/10 to-accent-1/10 border-2 border-accent-2/20">
+          <h2 className="text-xl font-display font-bold text-primary mb-4">
             Instructions for Mock Tests
           </h2>
-          <ul className="space-y-2 text-gray-700">
+          <ul className="space-y-2 font-body text-text-secondary">
             <li className="flex items-start">
-              <span className="mr-2">•</span>
+              <span className="mr-2 text-accent-1">•</span>
               <span>Make sure you have a stable internet connection before starting</span>
             </li>
             <li className="flex items-start">
-              <span className="mr-2">•</span>
+              <span className="mr-2 text-accent-1">•</span>
               <span>The test will auto-submit when time runs out</span>
             </li>
             <li className="flex items-start">
-              <span className="mr-2">•</span>
+              <span className="mr-2 text-accent-1">•</span>
               <span>You can navigate between questions and mark them for review</span>
             </li>
             <li className="flex items-start">
-              <span className="mr-2">•</span>
+              <span className="mr-2 text-accent-1">•</span>
               <span>Your progress is saved automatically after each answer</span>
             </li>
             <li className="flex items-start">
-              <span className="mr-2">•</span>
+              <span className="mr-2 text-accent-1">•</span>
               <span>You can view detailed results and solutions after submission</span>
             </li>
           </ul>
