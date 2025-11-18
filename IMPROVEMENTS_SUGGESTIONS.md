@@ -26,8 +26,8 @@ This document outlines potential improvements and enhancements that can be made 
 | 12 | Referral Program                                               | ⏳ In Progress  | Phase C | Core backend complete: 4 API endpoints, unique codes, rewards system. UI pending. |
 | 13 | Advanced Admin Dashboard                                       | ⏳ In Progress  | Phase C | Database models created, analytics endpoints pending. UI pending.      |
 | 14 | Content Management System                                      | ⏳ In Progress  | Phase C | Database models created (QuestionVersion, ContentSchedule). Implementation pending. |
-| 15 | Adaptive Learning Path                                         | ⬜ Not started  | Phase E |                                                                        |
-| 16 | Automated Question Generation                                  | ⬜ Not started  | Phase E |                                                                        |
+| 15 | Adaptive Learning Path                                         | ✅ Completed    | Phase E | ML-based personalized learning paths with performance pattern detection |
+| 16 | Automated Question Generation                                  | ✅ Completed    | Phase E | AI-powered bulk question generation with quality validation and review workflow |
 
 *Note: Updates will be made here as features move through In Progress → Completed.*
 

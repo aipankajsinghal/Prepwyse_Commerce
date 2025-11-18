@@ -49,6 +49,8 @@ model User {
   referrals             Referral[]       @relation("ReferrerUser")
   referralRewards       ReferralReward[]
   transactions          Transaction[]
+  // Phase E: Adaptive Learning
+  learningPaths         LearningPath[]   @relation("UserLearningPaths")
 }
 
 model Subject {
@@ -402,4 +404,155 @@ model AdminActivity {
   
   @@index([adminId, createdAt])
   @@index([resourceType, createdAt])
+}
+
+// Phase E: Adaptive Learning Path Models
+model LearningPath {
+  id                  String               @id @default(cuid())
+  userId              String
+  user                User                 @relation("UserLearningPaths", fields: [userId], references: [id], onDelete: Cascade)
+  title               String
+  description         String?
+  subjectId           String?              // Optional: specific to a subject
+  goalType            String               // "exam_prep", "chapter_mastery", "skill_improvement"
+  targetDate          DateTime?            // Goal completion date
+  difficulty          String               @default("medium") // "easy", "medium", "hard"
+  estimatedHours      Int?                 // Total estimated hours
+  status              String               @default("active") // "active", "completed", "paused"
+  completionPercent   Int                  @default(0)
+  isAIGenerated       Boolean              @default(true)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  nodes               LearningPathNode[]
+  progress            LearningPathProgress[]
+  
+  @@index([userId, status])
+}
+
+model LearningPathNode {
+  id                  String           @id @default(cuid())
+  pathId              String
+  path                LearningPath     @relation(fields: [pathId], references: [id], onDelete: Cascade)
+  chapterId           String
+  order               Int              // Sequence in learning path
+  nodeType            String           // "prerequisite", "core", "advanced", "revision"
+  estimatedMinutes    Int              // Time to complete
+  difficulty          String           // "easy", "medium", "hard"
+  description         String?
+  resources           Json?            // Links to videos, articles, etc.
+  requiredAccuracy    Int              @default(70) // Required accuracy % to proceed
+  isUnlocked          Boolean          @default(false)
+  isCompleted         Boolean          @default(false)
+  createdAt           DateTime         @default(now())
+  
+  @@index([pathId, order])
+  @@unique([pathId, chapterId])
+}
+
+model LearningPathProgress {
+  id                  String       @id @default(cuid())
+  pathId              String
+  path                LearningPath @relation(fields: [pathId], references: [id], onDelete: Cascade)
+  nodeId              String
+  userId              String
+  chapterId           String
+  status              String       @default("not_started") // "not_started", "in_progress", "completed", "skipped"
+  attemptCount        Int          @default(0)
+  bestScore           Int?         // Best score percentage
+  timeSpentMinutes    Int          @default(0)
+  lastAttemptAt       DateTime?
+  completedAt         DateTime?
+  notes               String?
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+  
+  @@unique([pathId, nodeId, userId])
+  @@index([userId, pathId])
+}
+
+model PerformancePattern {
+  id                  String   @id @default(cuid())
+  userId              String
+  patternType         String   // "strength", "weakness", "improvement", "decline"
+  subjectId           String?
+  chapterId           String?
+  topicTag            String?  // For more granular tracking
+  metric              String   // "accuracy", "speed", "consistency"
+  value               Float    // Metric value
+  trend               String   // "improving", "declining", "stable"
+  confidence          Float    @default(0.5) // AI confidence in pattern (0-1)
+  detectedAt          DateTime @default(now())
+  validUntil          DateTime? // Pattern may become stale
+  metadata            Json?    // Additional pattern data
+  
+  @@index([userId, patternType, detectedAt])
+  @@index([userId, subjectId, chapterId])
+}
+
+// Phase E: Automated Question Generation Models
+model QuestionGenerationJob {
+  id                  String                @id @default(cuid())
+  adminId             String                // Clerk user ID
+  adminName           String
+  subjectId           String?
+  chapterIds          Json?                 // Array of chapter IDs
+  questionCount       Int
+  difficulty          String?               // null = mixed difficulty
+  sourceType          String                // "ai", "upload", "manual"
+  sourceContent       String?               // Content to generate from (for AI)
+  status              String                @default("pending") // "pending", "processing", "completed", "failed"
+  progress            Int                   @default(0) // 0-100
+  errorMessage        String?
+  totalGenerated      Int                   @default(0)
+  totalApproved       Int                   @default(0)
+  totalRejected       Int                   @default(0)
+  startedAt           DateTime?
+  completedAt         DateTime?
+  createdAt           DateTime              @default(now())
+  questions           GeneratedQuestion[]
+  
+  @@index([adminId, status])
+  @@index([status, createdAt])
+}
+
+model GeneratedQuestion {
+  id                  String                @id @default(cuid())
+  jobId               String
+  job                 QuestionGenerationJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  chapterId           String
+  questionText        String
+  options             Json                  // Array of options
+  correctAnswer       String
+  explanation         String?
+  difficulty          String                @default("medium")
+  tags                Json?                 // Array of topic tags
+  status              String                @default("pending_review") // "pending_review", "approved", "rejected", "needs_revision"
+  qualityScore        Float?                // AI-generated quality score (0-1)
+  reviewNotes         String?               // Reviewer feedback
+  reviewedBy          String?               // Admin ID
+  reviewedAt          DateTime?
+  approvedAt          DateTime?
+  finalQuestionId     String?               // If approved and added to Question table
+  createdAt           DateTime              @default(now())
+  
+  @@index([jobId, status])
+  @@index([chapterId, status])
+  @@index([status, createdAt])
+}
+
+model QuestionValidation {
+  id                  String   @id @default(cuid())
+  questionId          String   // References GeneratedQuestion or Question
+  questionType        String   // "generated", "existing"
+  validationType      String   // "ai_check", "duplicate_check", "quality_check", "manual_review"
+  status              String   // "passed", "failed", "warning"
+  score               Float?   // Validation score (0-1)
+  issues              Json?    // Array of identified issues
+  suggestions         Json?    // Array of improvement suggestions
+  validatedBy         String?  // "ai" or admin ID
+  validatedAt         DateTime @default(now())
+  metadata            Json?
+  
+  @@index([questionId, questionType])
+  @@index([validationType, status])
 }
