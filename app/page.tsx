@@ -31,7 +31,7 @@ const staggerContainer = {
 
 export default function LandingPage() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-blue-900 dark:to-indigo-900">
+    <main className="min-h-screen bg-[rgb(var(--bg))] bg-pattern">
       {/* Header */}
       <motion.header
         initial={{ opacity: 0, y: -20 }}
@@ -39,26 +39,26 @@ export default function LandingPage() {
         transition={{ duration: 0.6 }}
         className="container mx-auto px-4 py-6"
       >
-        <nav className="flex justify-between items-center backdrop-blur-sm bg-white/70 dark:bg-slate-900/70 rounded-2xl px-6 py-4 shadow-lg">
+        <nav className="flex justify-between items-center backdrop-blur-sm bg-surface-elevated/70 rounded-2xl px-6 py-4 shadow-md border border-text-primary/10">
           <Link href="/" className="flex items-center space-x-3 group">
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition" />
-              <BookOpen className="h-8 w-8 text-blue-600 dark:text-blue-400 relative" />
+              <div className="absolute inset-0 bg-accent-1 rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition" />
+              <BookOpen className="h-8 w-8 text-accent-1 relative" />
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">
+            <span className="text-2xl font-display font-bold text-primary">
               PrepWyse Commerce
             </span>
           </Link>
           <div className="flex items-center space-x-4">
             <Link
               href="/sign-in"
-              className="px-5 py-2.5 text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors"
+              className="px-5 py-2.5 text-text-secondary hover:text-accent-1 font-medium font-display transition-colors"
             >
               Sign In
             </Link>
             <Link
               href="/sign-up"
-              className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 font-semibold transition-all transform hover:scale-105 shadow-lg hover:shadow-xl"
+              className="btn-primary"
             >
               Get Started
             </Link>
@@ -74,33 +74,25 @@ export default function LandingPage() {
           transition={{ duration: 0.7, delay: 0.2 }}
           className="relative"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-400 blur-3xl opacity-20 animate-pulse" />
+          <div className="absolute inset-0 bg-gradient-to-r from-accent-1/10 to-accent-2/10 blur-3xl opacity-50" />
           
           <motion.div
-            animate={{
-              y: [0, -10, 0],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-            className="relative inline-block mb-6"
+            className="relative inline-block mb-6 animate-float"
           >
-            <Sparkles className="h-16 w-16 text-yellow-500 mx-auto" />
+            <Sparkles className="h-16 w-16 text-accent-1 mx-auto" />
           </motion.div>
 
-          <h1 className="text-6xl md:text-7xl font-extrabold mb-6 relative">
-            <span className="bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 dark:from-white dark:via-blue-100 dark:to-indigo-100 bg-clip-text text-transparent">
+          <h1 className="text-6xl md:text-7xl font-display font-bold mb-6 relative animate-reveal">
+            <span className="text-primary">
               Master Commerce
             </span>
             <br />
-            <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="text-accent-1">
               with AI-Powered Learning
             </span>
           </h1>
 
-          <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-10 max-w-4xl mx-auto leading-relaxed">
+          <p className="text-xl md:text-2xl font-body text-text-secondary mb-10 max-w-4xl mx-auto leading-relaxed animate-reveal delay-100">
             Transform your exam preparation with intelligent, adaptive learning.
             Personalized for Class 11, Class 12, and CUET Commerce students across India.
           </p>
@@ -109,16 +101,16 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+            className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-reveal delay-200"
           >
             <Link
               href="/sign-up"
-              className="group px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-lg rounded-xl font-bold transition-all transform hover:scale-105 shadow-2xl hover:shadow-blue-500/50 flex items-center space-x-2"
+              className="group btn-primary flex items-center space-x-2"
             >
               <span>Start Learning Free</span>
               <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <button className="px-8 py-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm text-gray-900 dark:text-white text-lg rounded-xl font-semibold hover:bg-white dark:hover:bg-slate-800 transition-all shadow-lg flex items-center space-x-2">
+            <button className="btn-secondary flex items-center space-x-2">
               <Play className="h-5 w-5" />
               <span>Watch Demo</span>
             </button>
@@ -143,12 +135,12 @@ export default function LandingPage() {
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.9 + index * 0.1 }}
-              className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-2xl p-6 shadow-lg"
+              className="edu-card"
             >
-              <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              <div className="text-3xl font-display font-bold text-accent-1">
                 {stat.value}
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-300 mt-2">
+              <div className="text-sm font-body text-text-secondary mt-2">
                 {stat.label}
               </div>
             </motion.div>
@@ -167,13 +159,13 @@ export default function LandingPage() {
         >
           <motion.h2
             variants={fadeInUp}
-            className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-slate-900 to-blue-900 dark:from-white dark:to-blue-100 bg-clip-text text-transparent"
+            className="text-4xl md:text-5xl font-display font-bold mb-4 text-primary"
           >
             Everything You Need to Excel
           </motion.h2>
           <motion.p
             variants={fadeInUp}
-            className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto"
+            className="text-xl font-body text-text-secondary max-w-2xl mx-auto"
           >
             Powered by advanced AI to adapt to your learning style and pace
           </motion.p>
@@ -191,52 +183,52 @@ export default function LandingPage() {
               icon: Sparkles,
               title: "AI-Generated Quizzes",
               description: "Smart questions tailored to your performance and learning gaps",
-              color: "from-purple-500 to-pink-500",
+              color: "accent-1",
             },
             {
               icon: Target,
               title: "Adaptive Difficulty",
               description: "Automatically adjusts to challenge you at the right level",
-              color: "from-blue-500 to-cyan-500",
+              color: "accent-2",
             },
             {
               icon: Trophy,
               title: "Mock Tests",
               description: "Full-length exams matching CUET and board exam patterns",
-              color: "from-yellow-500 to-orange-500",
+              color: "accent-1",
             },
             {
               icon: TrendingUp,
               title: "Performance Analytics",
               description: "Detailed insights into your strengths and improvement areas",
-              color: "from-green-500 to-emerald-500",
+              color: "accent-2",
             },
             {
               icon: Award,
               title: "Personalized Recommendations",
               description: "AI-powered study plans based on your unique learning journey",
-              color: "from-indigo-500 to-purple-500",
+              color: "accent-1",
             },
             {
               icon: Users,
               title: "Multi-Platform Access",
               description: "Study seamlessly across mobile, tablet, and desktop devices",
-              color: "from-pink-500 to-rose-500",
+              color: "accent-2",
             },
           ].map((feature, index) => (
             <motion.div
               key={index}
               variants={fadeInUp}
               whileHover={{ scale: 1.05, y: -5 }}
-              className="group bg-white/70 dark:bg-slate-800/70 backdrop-blur-lg p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all border border-gray-200/50 dark:border-gray-700/50"
+              className="group edu-card"
             >
-              <div className={`h-14 w-14 bg-gradient-to-br ${feature.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-lg`}>
+              <div className={`h-14 w-14 bg-${feature.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-lg`}>
                 <feature.icon className="h-7 w-7 text-white" />
               </div>
-              <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">
+              <h3 className="text-xl font-display font-semibold mb-3 text-text-primary">
                 {feature.title}
               </h3>
-              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+              <p className="font-body text-text-secondary leading-relaxed">
                 {feature.description}
               </p>
             </motion.div>
@@ -252,10 +244,10 @@ export default function LandingPage() {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
+          <h2 className="text-4xl font-display font-bold mb-4 text-primary">
             Comprehensive Coverage
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300">
+          <p className="text-xl font-body text-text-secondary">
             Master all core commerce subjects
           </p>
         </motion.div>
@@ -273,16 +265,16 @@ export default function LandingPage() {
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
               whileHover={{ scale: 1.03 }}
-              className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-lg p-8 rounded-2xl shadow-lg border-2 border-blue-200 dark:border-blue-700"
+              className="edu-card border-2 border-accent-1/20"
             >
-              <subject.icon className="h-12 w-12 text-blue-600 dark:text-blue-400 mb-4" />
-              <h3 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">
+              <subject.icon className="h-12 w-12 text-accent-1 mb-4" />
+              <h3 className="text-2xl font-display font-bold mb-2 text-text-primary">
                 {subject.name}
               </h3>
-              <p className="text-gray-600 dark:text-gray-300">
+              <p className="font-body text-text-secondary">
                 {subject.chapters} comprehensive chapters
               </p>
-              <div className="mt-4 flex items-center text-sm font-semibold text-blue-600 dark:text-blue-400">
+              <div className="mt-4 flex items-center text-sm font-display font-semibold text-accent-2">
                 <CheckCircle className="h-4 w-4 mr-2" />
                 Full syllabus coverage
               </div>
@@ -297,21 +289,21 @@ export default function LandingPage() {
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          className="relative bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-3xl p-12 md:p-20 text-center overflow-hidden"
+          className="relative bg-gradient-to-r from-accent-1 to-accent-2 rounded-3xl p-12 md:p-20 text-center overflow-hidden animate-pulse-subtle"
         >
           <div className="absolute inset-0 opacity-10">
             <div className="absolute inset-0" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)', backgroundSize: '50px 50px' }} />
           </div>
           <div className="relative z-10">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            <h2 className="text-4xl md:text-5xl font-display font-bold text-white mb-6">
               Ready to Transform Your Learning?
             </h2>
-            <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
+            <p className="text-xl font-body text-white/90 mb-10 max-w-2xl mx-auto">
               Join thousands of students already excelling with AI-powered preparation
             </p>
             <Link
               href="/sign-up"
-              className="inline-flex items-center space-x-2 px-10 py-5 bg-white text-blue-600 text-lg rounded-xl font-bold hover:bg-gray-50 transition-all transform hover:scale-105 shadow-2xl"
+              className="inline-flex items-center space-x-2 px-10 py-5 bg-surface-elevated text-accent-1 text-lg rounded-xl font-display font-bold hover:bg-white transition-all transform hover:scale-105 shadow-2xl"
             >
               <span>Start Your Free Journey</span>
               <ArrowRight className="h-5 w-5" />
@@ -321,43 +313,43 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-slate-900 dark:bg-slate-950 text-white py-12">
+      <footer className="bg-primary text-white py-12">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <BookOpen className="h-6 w-6" />
-                <span className="text-xl font-bold">PrepWyse</span>
+                <BookOpen className="h-6 w-6 text-accent-1" />
+                <span className="text-xl font-display font-bold">PrepWyse</span>
               </div>
-              <p className="text-gray-400">
+              <p className="font-body text-white/70">
                 AI-powered learning for commerce students
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Product</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link href="/quiz" className="hover:text-white transition">Quizzes</Link></li>
-                <li><Link href="/mock-test" className="hover:text-white transition">Mock Tests</Link></li>
-                <li><Link href="/recommendations" className="hover:text-white transition">AI Recommendations</Link></li>
+              <h4 className="font-display font-semibold mb-4">Product</h4>
+              <ul className="space-y-2 font-body text-white/70">
+                <li><Link href="/quiz" className="hover:text-accent-1 transition">Quizzes</Link></li>
+                <li><Link href="/mock-test" className="hover:text-accent-1 transition">Mock Tests</Link></li>
+                <li><Link href="/recommendations" className="hover:text-accent-1 transition">AI Recommendations</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Company</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link href="/about" className="hover:text-white transition">About</Link></li>
-                <li><Link href="/contact" className="hover:text-white transition">Contact</Link></li>
-                <li><Link href="/careers" className="hover:text-white transition">Careers</Link></li>
+              <h4 className="font-display font-semibold mb-4">Company</h4>
+              <ul className="space-y-2 font-body text-white/70">
+                <li><Link href="/about" className="hover:text-accent-1 transition">About</Link></li>
+                <li><Link href="/contact" className="hover:text-accent-1 transition">Contact</Link></li>
+                <li><Link href="/careers" className="hover:text-accent-1 transition">Careers</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Legal</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link href="/privacy" className="hover:text-white transition">Privacy Policy</Link></li>
-                <li><Link href="/terms" className="hover:text-white transition">Terms of Service</Link></li>
+              <h4 className="font-display font-semibold mb-4">Legal</h4>
+              <ul className="space-y-2 font-body text-white/70">
+                <li><Link href="/privacy" className="hover:text-accent-1 transition">Privacy Policy</Link></li>
+                <li><Link href="/terms" className="hover:text-accent-1 transition">Terms of Service</Link></li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
+          <div className="border-t border-white/20 pt-8 text-center font-body text-white/70">
             <p>© 2024 PrepWyse Commerce. All rights reserved.</p>
           </div>
         </div>

@@ -15,22 +15,22 @@ export default function Navbar() {
   const isAdmin = user?.publicMetadata?.role === "admin" || user?.primaryEmailAddress?.emailAddress?.includes("admin");
 
   return (
-    <nav className="bg-white dark:bg-gray-800 shadow-md border-b border-gray-200 dark:border-gray-700">
+    <nav className="bg-surface-elevated shadow-md border-b border-text-primary/10">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-8">
             <Link href="/dashboard" className="flex items-center space-x-2 group">
-              <BookOpen className="h-6 w-6 text-primary-600 dark:text-primary-400 group-hover:scale-110 transition-transform" />
-              <span className="text-xl font-bold text-gray-900 dark:text-white">PrepWyse</span>
+              <BookOpen className="h-6 w-6 text-accent-1 group-hover:scale-110 transition-transform" />
+              <span className="text-xl font-display font-bold text-primary">PrepWyse</span>
             </Link>
 
             <div className="hidden md:flex space-x-1">
               <Link
                 href="/dashboard"
-                className={`px-4 py-2 rounded-lg flex items-center space-x-2 transition ${
+                className={`px-4 py-2 rounded-lg flex items-center space-x-2 font-display transition ${
                   isActive("/dashboard")
-                    ? "bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300"
-                    : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    ? "bg-accent-1/10 text-accent-1"
+                    : "text-text-secondary hover:bg-accent-1/5 hover:text-accent-1"
                 }`}
               >
                 <Home className="h-4 w-4" />
@@ -39,10 +39,10 @@ export default function Navbar() {
 
               <Link
                 href="/quiz"
-                className={`px-4 py-2 rounded-lg flex items-center space-x-2 transition ${
+                className={`px-4 py-2 rounded-lg flex items-center space-x-2 font-display transition ${
                   isActive("/quiz")
-                    ? "bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300"
-                    : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    ? "bg-accent-1/10 text-accent-1"
+                    : "text-text-secondary hover:bg-accent-1/5 hover:text-accent-1"
                 }`}
               >
                 <FileText className="h-4 w-4" />
@@ -51,10 +51,10 @@ export default function Navbar() {
 
               <Link
                 href="/mock-test"
-                className={`px-4 py-2 rounded-lg flex items-center space-x-2 transition ${
+                className={`px-4 py-2 rounded-lg flex items-center space-x-2 font-display transition ${
                   isActive("/mock-test")
-                    ? "bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300"
-                    : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    ? "bg-accent-1/10 text-accent-1"
+                    : "text-text-secondary hover:bg-accent-1/5 hover:text-accent-1"
                 }`}
               >
                 <Trophy className="h-4 w-4" />
@@ -63,10 +63,10 @@ export default function Navbar() {
 
               <Link
                 href="/analytics"
-                className={`px-4 py-2 rounded-lg flex items-center space-x-2 transition ${
+                className={`px-4 py-2 rounded-lg flex items-center space-x-2 font-display transition ${
                   isActive("/analytics")
-                    ? "bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300"
-                    : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    ? "bg-accent-1/10 text-accent-1"
+                    : "text-text-secondary hover:bg-accent-1/5 hover:text-accent-1"
                 }`}
               >
                 <BarChart className="h-4 w-4" />
@@ -76,10 +76,10 @@ export default function Navbar() {
               <Link
                 href="/profile"
                 data-onboarding="profile-link"
-                className={`px-4 py-2 rounded-lg flex items-center space-x-2 transition ${
+                className={`px-4 py-2 rounded-lg flex items-center space-x-2 font-display transition ${
                   isActive("/profile")
-                    ? "bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300"
-                    : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    ? "bg-accent-1/10 text-accent-1"
+                    : "text-text-secondary hover:bg-accent-1/5 hover:text-accent-1"
                 }`}
               >
                 <User className="h-4 w-4" />
@@ -89,10 +89,10 @@ export default function Navbar() {
               {isAdmin && (
                 <Link
                   href="/admin"
-                  className={`px-4 py-2 rounded-lg flex items-center space-x-2 transition ${
+                  className={`px-4 py-2 rounded-lg flex items-center space-x-2 font-display transition ${
                     isActive("/admin")
-                      ? "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300"
-                      : "text-gray-600 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/30"
+                      ? "bg-semantic-error/10 text-semantic-error"
+                      : "text-text-secondary hover:bg-semantic-error/5 hover:text-semantic-error"
                   }`}
                 >
                   <Shield className="h-4 w-4" />
