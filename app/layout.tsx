@@ -7,6 +7,7 @@ import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { OnboardingProvider } from "@/components/OnboardingProvider";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
+import { CookieConsent } from "@/components/CookieConsent";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -115,6 +116,7 @@ export default function RootLayout({
                 <OnboardingProvider>
                   <ServiceWorkerRegistration />
                   <PWAInstallPrompt />
+                  <CookieConsent />
                   {children}
                   <OfflineIndicator />
                 </OnboardingProvider>
