@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
+import { handleApiError, unauthorizedError, notFoundError, validationError } from '@/lib/api-error-handler';
 
 // GET: Get user's current points and level
 export async function GET(request: NextRequest) {
@@ -8,7 +9,7 @@ export async function GET(request: NextRequest) {
     const { userId } = await auth();
     
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return unauthorizedError();
     }
 
     const user = await prisma.user.findUnique({
@@ -23,7 +24,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return notFoundError('User not found');
     }
 
     return NextResponse.json({
@@ -36,11 +37,7 @@ export async function GET(request: NextRequest) {
       progressToNextLevel: calculateProgressToNextLevel(user.points, user.level),
     });
   } catch (error) {
-    console.error('Error fetching points:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch points' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'Failed to fetch points');
   }
 }
 
@@ -56,10 +53,7 @@ export async function POST(request: NextRequest) {
     const { points, reason } = await request.json();
 
     if (!points || points <= 0) {
-      return NextResponse.json(
-        { error: 'Invalid points value' },
-        { status: 400 }
-      );
+      return validationError('Invalid points value');
     }
 
     const user = await prisma.user.findUnique({
@@ -68,7 +62,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return notFoundError('User not found');
     }
 
     const newPoints = user.points + points;
@@ -101,11 +95,7 @@ export async function POST(request: NextRequest) {
       reason,
     });
   } catch (error) {
-    console.error('Error awarding points:', error);
-    return NextResponse.json(
-      { error: 'Failed to award points' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'Failed to award points');
   }
 }
 

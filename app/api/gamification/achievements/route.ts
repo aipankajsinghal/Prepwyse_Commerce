@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
+import { handleApiError, unauthorizedError, notFoundError, validationError } from '@/lib/api-error-handler';
 
 // GET: Get user's achievements
 export async function GET(request: NextRequest) {
@@ -8,7 +9,7 @@ export async function GET(request: NextRequest) {
     const { userId } = await auth();
     
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return unauthorizedError();
     }
 
     const user = await prisma.user.findUnique({
@@ -17,7 +18,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return notFoundError('User not found');
     }
 
     const achievements = await prisma.achievement.findMany({
@@ -41,11 +42,7 @@ export async function GET(request: NextRequest) {
       totalPoints: achievements.reduce((sum, a) => sum + a.points, 0),
     });
   } catch (error) {
-    console.error('Error fetching achievements:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch achievements' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'Failed to fetch achievements');
   }
 }
 
@@ -61,10 +58,7 @@ export async function POST(request: NextRequest) {
     const { type, name, description, icon, category, points } = await request.json();
 
     if (!type || !name || !description || !icon || !category) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      );
+      return validationError('Missing required fields');
     }
 
     const user = await prisma.user.findUnique({
@@ -73,7 +67,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return notFoundError('User not found');
     }
 
     // Check if achievement already exists
@@ -82,10 +76,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (existing) {
-      return NextResponse.json(
-        { error: 'Achievement already unlocked' },
-        { status: 400 }
-      );
+      return validationError('Achievement already unlocked');
     }
 
     // Create achievement
@@ -116,10 +107,6 @@ export async function POST(request: NextRequest) {
       message: `Achievement unlocked: ${name}`,
     });
   } catch (error) {
-    console.error('Error awarding achievement:', error);
-    return NextResponse.json(
-      { error: 'Failed to award achievement' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'Failed to award achievement');
   }
 }

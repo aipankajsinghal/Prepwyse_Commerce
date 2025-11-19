@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
+import { handleApiError, unauthorizedError } from '@/lib/api-error-handler';
 
 // GET: Get leaderboard
 export async function GET(request: NextRequest) {
@@ -8,7 +9,7 @@ export async function GET(request: NextRequest) {
     const { userId } = await auth();
     
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return unauthorizedError();
     }
 
     const { searchParams } = new URL(request.url);
@@ -90,11 +91,7 @@ export async function GET(request: NextRequest) {
       total: entries.length,
     });
   } catch (error) {
-    console.error('Error fetching leaderboard:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch leaderboard' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'Failed to fetch leaderboard');
   }
 }
 
