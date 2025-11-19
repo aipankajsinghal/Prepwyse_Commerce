@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { handleApiError, unauthorizedError } from "@/lib/api-error-handler";
 
 // GET /api/search/suggestions - Get search suggestions for auto-complete
 export async function GET(request: Request) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return unauthorizedError();
     }
 
     const { searchParams } = new URL(request.url);
@@ -44,23 +45,22 @@ export async function GET(request: Request) {
       }),
 
       // Recent searches (if user is authenticated)
-      prisma.user
-        .findUnique({
+      (async () => {
+        const user = await prisma.user.findUnique({
           where: { clerkId: userId },
-        })
-        .then(async (user) => {
-          if (!user) return [];
-          return prisma.searchHistory.findMany({
-            where: {
-              userId: user.id,
-              query: { contains: searchTerm, mode: "insensitive" },
-            },
-            take: limit,
-            orderBy: { createdAt: "desc" },
-            distinct: ["query"],
-            select: { query: true },
-          });
-        }),
+        });
+        if (!user) return [];
+        return prisma.searchHistory.findMany({
+          where: {
+            userId: user.id,
+            query: { contains: searchTerm, mode: "insensitive" },
+          },
+          take: limit,
+          orderBy: { createdAt: "desc" },
+          distinct: ["query"],
+          select: { query: true },
+        });
+      })(),
     ]);
 
     // Combine and format suggestions
@@ -92,10 +92,6 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ suggestions: uniqueSuggestions });
   } catch (error) {
-    console.error("Error getting search suggestions:", error);
-    return NextResponse.json(
-      { error: "Failed to get suggestions" },
-      { status: 500 }
-    );
+    return handleApiError(error, "Failed to get suggestions");
   }
 }
