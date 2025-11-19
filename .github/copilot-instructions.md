@@ -115,14 +115,39 @@ prepwyse-commerce/
 2. **Authentication**:
    - All API routes except public endpoints must check authentication
    - Use Clerk's `auth()` helper to get current user
-   - Admin routes must verify admin role
+   - Admin routes must verify admin role using `withAdminAuth` wrapper
 
-3. **Error Handling**:
+3. **Admin Route Pattern** (PREFERRED):
+   - Use `withAdminAuth` or `withAdminAuthParams` from `lib/auth/withAdminAuth.ts`
+   - Eliminates repetitive auth checking and error handling boilerplate
+   - Focuses code on business logic only
+   
+   ```typescript
+   // Simple route
+   import { withAdminAuth } from '@/lib/auth/withAdminAuth';
+   
+   export const GET = withAdminAuth(async (req, { user }) => {
+     const data = await prisma.model.findMany();
+     return NextResponse.json({ data }, { status: 200 });
+   });
+   
+   // Route with dynamic parameters
+   import { withAdminAuthParams } from '@/lib/auth/withAdminAuth';
+   
+   export const GET = withAdminAuthParams(async (req, { user, params }) => {
+     const { id } = params;
+     const data = await prisma.model.findUnique({ where: { id } });
+     return NextResponse.json({ data }, { status: 200 });
+   });
+   ```
+
+4. **Error Handling**:
    - Return proper HTTP status codes (200, 201, 400, 401, 403, 404, 500)
    - Include descriptive error messages
    - Log errors for debugging
+   - For admin routes using `withAdminAuth`, error handling is automatic
 
-4. **Response Format**:
+5. **Response Format**:
    ```typescript
    // Success
    return NextResponse.json({ data: result }, { status: 200 });
@@ -130,6 +155,63 @@ prepwyse-commerce/
    // Error
    return NextResponse.json({ error: "Error message" }, { status: 400 });
    ```
+
+### Code Refactoring Guidelines
+
+1. **Identify Repetitive Patterns**:
+   - Look for code blocks repeated across multiple files (3+ occurrences)
+   - Common patterns: authentication checks, error handling, validation
+   - Calculate code reduction potential before refactoring
+
+2. **Higher-Order Functions for Route Handlers**:
+   - Create wrapper functions for cross-cutting concerns (auth, logging, error handling)
+   - Example: `withAdminAuth` wraps route handlers with authentication and error handling
+   - Benefits: 60-70% code reduction, consistent behavior, single source of truth
+   
+   ```typescript
+   // lib/auth/withAdminAuth.ts pattern
+   export function withAdminAuth(
+     handler: (req: NextRequest, context: { user: any; params?: any }) => Promise<NextResponse>
+   ): (req: NextRequest, context?: any) => Promise<NextResponse> {
+     return async (req: NextRequest, context?: any) => {
+       try {
+         // Cross-cutting concerns (auth, validation, etc.)
+         const authResult = await checkAdminAuth();
+         if (authResult instanceof NextResponse) return authResult;
+         
+         // Call actual handler with enriched context
+         return await handler(req, { user: authResult.user, ...context });
+       } catch (error) {
+         // Centralized error handling
+         return NextResponse.json({ error: message }, { status: 500 });
+       }
+     };
+   }
+   ```
+
+3. **When to Refactor**:
+   - ✅ Code is repeated 3+ times across files
+   - ✅ Pattern is stable and unlikely to change frequently
+   - ✅ Refactoring reduces lines by >40%
+   - ✅ Improves maintainability without sacrificing readability
+   - ❌ Pattern occurs only 1-2 times
+   - ❌ Code is too specialized or unique
+   - ❌ Abstraction makes code harder to understand
+
+4. **Refactoring Process**:
+   - Document the pattern in a markdown file (e.g., `REFACTORING_OPTIONS.md`)
+   - Create the abstraction/wrapper function
+   - Refactor 2-3 example files to demonstrate
+   - Test thoroughly (lint, build, type-check)
+   - Leave migration path for remaining files
+   - Don't refactor everything at once - provide examples and let others adopt
+
+5. **Best Practices**:
+   - Keep abstractions simple and focused
+   - Maintain full TypeScript type safety
+   - Provide clear examples in documentation
+   - Consider backward compatibility
+   - Test edge cases thoroughly
 
 ### AI Integration
 
@@ -271,6 +353,16 @@ prepwyse-commerce/
    - Test thoroughly
    - Update documentation if APIs changed
 
+5. **Refactoring Existing Code**:
+   - Identify repetitive patterns (3+ occurrences)
+   - Calculate potential code reduction (aim for >40%)
+   - Create abstraction/wrapper (e.g., higher-order function)
+   - Document approach in markdown file (e.g., `REFACTORING_OPTIONS.md`)
+   - Refactor 2-3 example files to demonstrate pattern
+   - Test thoroughly: `npm run lint`, `npx tsc --noEmit`, `npm run build`
+   - Leave migration path for others to adopt
+   - Commit: `refactor: description`
+
 ### AI-Specific Guidelines
 
 1. **Prompt Engineering**:
@@ -385,3 +477,12 @@ When working on this project:
 - Keep documentation up to date
 - Be mindful of AI API costs
 - Focus on educational value and user experience
+- **Look for refactoring opportunities** - eliminate code duplication with abstractions
+- **Use `withAdminAuth` for admin routes** - follow the established pattern for consistency
+
+## Reference Documentation
+
+For detailed examples and patterns:
+- **REFACTORING_OPTIONS.md**: Complete guide to the `withAdminAuth` refactoring pattern
+- **FIXES_CHECKLIST.md**: Code quality improvements checklist
+- **CONTRIBUTING.md**: Contribution workflow and standards
