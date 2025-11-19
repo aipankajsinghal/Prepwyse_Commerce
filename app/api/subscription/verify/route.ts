@@ -12,6 +12,7 @@ import { prisma } from '@/lib/prisma';
 import { verifyRazorpaySignature } from '@/lib/razorpay';
 import { activateSubscription } from '@/lib/subscription';
 import { applyPendingRewards, processReferralSubscription } from '@/lib/referral';
+import { handleApiError, unauthorizedError, notFoundError, validationError } from '@/lib/api-error-handler';
 
 /**
  * POST /api/subscription/verify
@@ -22,10 +23,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const { userId: clerkUserId } = await auth();
 
     if (!clerkUserId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return unauthorizedError();
     }
 
     // Get user from database
@@ -34,10 +32,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     });
 
     if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
+      return notFoundError('User not found');
     }
 
     const body = await req.json();
@@ -49,10 +44,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     } = body;
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !planId) {
-      return NextResponse.json(
-        { error: 'Missing required payment details' },
-        { status: 400 }
-      );
+      return validationError('Missing required payment details');
     }
 
     // Verify payment signature
@@ -74,10 +66,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         },
       });
 
-      return NextResponse.json(
-        { error: 'Payment verification failed' },
-        { status: 400 }
-      );
+      return validationError('Payment verification failed');
     }
 
     // Get plan details
@@ -86,10 +75,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     });
 
     if (!plan) {
-      return NextResponse.json(
-        { error: 'Subscription plan not found' },
-        { status: 404 }
-      );
+      return notFoundError('Subscription plan not found');
     }
 
     // Activate subscription
@@ -137,10 +123,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       { status: 200 }
     );
   } catch (error) {
-    console.error('Error verifying payment:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'Failed to verify payment');
   }
 }

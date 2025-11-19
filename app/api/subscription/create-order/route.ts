@@ -10,6 +10,7 @@ import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createRazorpayOrder } from '@/lib/razorpay';
+import { handleApiError, unauthorizedError, notFoundError, validationError } from '@/lib/api-error-handler';
 
 /**
  * POST /api/subscription/create-order
@@ -20,10 +21,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const { userId: clerkUserId } = await auth();
 
     if (!clerkUserId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return unauthorizedError();
     }
 
     // Get user from database
@@ -32,20 +30,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     });
 
     if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
+      return notFoundError('User not found');
     }
 
     const body = await req.json();
     const { planId } = body;
 
     if (!planId) {
-      return NextResponse.json(
-        { error: 'Plan ID is required' },
-        { status: 400 }
-      );
+      return validationError('Plan ID is required');
     }
 
     // Get subscription plan
@@ -54,17 +46,11 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     });
 
     if (!plan) {
-      return NextResponse.json(
-        { error: 'Subscription plan not found' },
-        { status: 404 }
-      );
+      return notFoundError('Subscription plan not found');
     }
 
     if (!plan.isActive) {
-      return NextResponse.json(
-        { error: 'This subscription plan is not active' },
-        { status: 400 }
-      );
+      return validationError('This subscription plan is not active');
     }
 
     // Create Razorpay order
@@ -114,10 +100,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       { status: 200 }
     );
   } catch (error) {
-    console.error('Error creating payment order:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'Failed to create payment order');
   }
 }
