@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { handleApiError, unauthorizedError, notFoundError } from "@/lib/api-error-handler";
+import { logger } from "@/lib/logger";
 
 /**
  * Export user data (GDPR/DPDP compliance)
@@ -11,7 +13,7 @@ export async function GET() {
     const { userId } = await auth();
     
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return unauthorizedError();
     }
 
     const clerkUser = await currentUser();
@@ -22,7 +24,7 @@ export async function GET() {
     });
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return notFoundError("User");
     }
 
     // Gather all user data

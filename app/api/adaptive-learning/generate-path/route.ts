@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { generateAdaptiveLearningPath } from "@/lib/adaptive-learning";
+import { handleApiError, unauthorizedError, validationError } from "@/lib/api-error-handler";
 
 /**
  * POST /api/adaptive-learning/generate-path
@@ -11,17 +12,14 @@ export async function POST(request: Request) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return unauthorizedError();
     }
 
     const { subjectId, goalType, targetDate, weeklyHours } = await request.json();
 
     // Validate input
     if (!goalType || !["exam_prep", "chapter_mastery", "skill_improvement"].includes(goalType)) {
-      return NextResponse.json(
-        { error: "Invalid goal type. Must be one of: exam_prep, chapter_mastery, skill_improvement" },
-        { status: 400 }
-      );
+      return validationError("Invalid goal type. Must be one of: exam_prep, chapter_mastery, skill_improvement");
     }
 
     // Ensure user exists in database
@@ -48,11 +46,7 @@ export async function POST(request: Request) {
       learningPath,
       message: "Adaptive learning path generated successfully",
     });
-  } catch (error: any) {
-    console.error("Error generating adaptive learning path:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to generate learning path" },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleApiError(error, "Failed to generate learning path");
   }
 }

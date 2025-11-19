@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { updateLearningPathProgress } from "@/lib/adaptive-learning";
+import { handleApiError, unauthorizedError, validationError, notFoundError } from "@/lib/api-error-handler";
 
 /**
  * POST /api/adaptive-learning/progress
@@ -11,24 +12,18 @@ export async function POST(request: Request) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return unauthorizedError();
     }
 
     const { pathId, nodeId, status, score, timeSpent } = await request.json();
 
     // Validate input
     if (!pathId || !nodeId || !status) {
-      return NextResponse.json(
-        { error: "Missing required fields: pathId, nodeId, status" },
-        { status: 400 }
-      );
+      return validationError("Missing required fields: pathId, nodeId, status");
     }
 
     if (!["not_started", "in_progress", "completed", "skipped"].includes(status)) {
-      return NextResponse.json(
-        { error: "Invalid status. Must be one of: not_started, in_progress, completed, skipped" },
-        { status: 400 }
-      );
+      return validationError("Invalid status. Must be one of: not_started, in_progress, completed, skipped");
     }
 
     // Ensure user exists in database
@@ -37,7 +32,7 @@ export async function POST(request: Request) {
     });
 
     if (!dbUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return notFoundError("User");
     }
 
     // Update progress
@@ -55,11 +50,7 @@ export async function POST(request: Request) {
       progress,
       message: "Progress updated successfully",
     });
-  } catch (error: any) {
-    console.error("Error updating learning path progress:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to update progress" },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleApiError(error, "Failed to update progress");
   }
 }
