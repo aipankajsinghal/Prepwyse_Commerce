@@ -10,6 +10,7 @@ import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getOrCreateReferralCode } from '@/lib/referral';
+import { handleApiError, unauthorizedError, notFoundError } from '@/lib/api-error-handler';
 
 /**
  * GET /api/referral/code
@@ -19,24 +20,14 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
     const { userId: clerkUserId } = await auth();
 
-    if (!clerkUserId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
+    if (!clerkUserId) return unauthorizedError();
 
     // Get user from database
     const user = await prisma.user.findUnique({
       where: { clerkId: clerkUserId },
     });
 
-    if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
-    }
+    if (!user) return notFoundError('User not found');
 
     // Get or create referral code
     const referralCode = await getOrCreateReferralCode(user.id);
@@ -49,10 +40,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       { status: 200 }
     );
   } catch (error) {
-    console.error('Error getting referral code:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'Failed to get referral code');
   }
 }

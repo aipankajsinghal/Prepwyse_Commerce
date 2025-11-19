@@ -10,6 +10,7 @@ import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { applyReferralCode, validateReferralCode } from '@/lib/referral';
+import { handleApiError, unauthorizedError, notFoundError, validationError } from '@/lib/api-error-handler';
 
 /**
  * POST /api/referral/apply
@@ -19,51 +20,28 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     const { userId: clerkUserId } = await auth();
 
-    if (!clerkUserId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
+    if (!clerkUserId) return unauthorizedError();
 
     // Get user from database
     const user = await prisma.user.findUnique({
       where: { clerkId: clerkUserId },
     });
 
-    if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
-    }
+    if (!user) return notFoundError('User not found');
 
     const body = await req.json();
     const { referralCode } = body;
 
-    if (!referralCode) {
-      return NextResponse.json(
-        { error: 'Referral code is required' },
-        { status: 400 }
-      );
-    }
+    if (!referralCode) return validationError('Referral code is required');
 
     // Validate referral code
     const isValid = await validateReferralCode(referralCode);
 
-    if (!isValid) {
-      return NextResponse.json(
-        { error: 'Invalid referral code' },
-        { status: 400 }
-      );
-    }
+    if (!isValid) return validationError('Invalid referral code');
 
     // Check if user already used a referral code
     if (user.referredBy) {
-      return NextResponse.json(
-        { error: 'You have already used a referral code' },
-        { status: 400 }
-      );
+      return validationError('You have already used a referral code');
     }
 
     // Apply referral code
@@ -76,18 +54,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       { status: 200 }
     );
   } catch (error) {
-    console.error('Error applying referral code:', error);
-    
-    if (error instanceof Error) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      );
-    }
-
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'Failed to apply referral code');
   }
 }
