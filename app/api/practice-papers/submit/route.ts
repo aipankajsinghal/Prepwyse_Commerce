@@ -1,22 +1,18 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { handleApiError, unauthorizedError, notFoundError, validationError, forbiddenError } from "@/lib/api-error-handler";
 
 // POST /api/practice-papers/submit - Submit practice paper attempt
 export async function POST(request: Request) {
   try {
     const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    if (!userId) return unauthorizedError();
 
     const { attemptId, answers, timeSpent } = await request.json();
 
     if (!attemptId || !answers) {
-      return NextResponse.json(
-        { error: "Attempt ID and answers are required" },
-        { status: 400 }
-      );
+      return validationError("Attempt ID and answers are required");
     }
 
     // Get user from database
@@ -24,9 +20,7 @@ export async function POST(request: Request) {
       where: { clerkId: userId },
     });
 
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
+    if (!user) return notFoundError("User not found");
 
     // Get attempt with paper details
     const attempt = await prisma.practicePaperAttempt.findUnique({
@@ -34,19 +28,12 @@ export async function POST(request: Request) {
       include: { paper: true },
     });
 
-    if (!attempt) {
-      return NextResponse.json({ error: "Attempt not found" }, { status: 404 });
-    }
+    if (!attempt) return notFoundError("Attempt not found");
 
-    if (attempt.userId !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
+    if (attempt.userId !== user.id) return forbiddenError();
 
     if (attempt.completedAt) {
-      return NextResponse.json(
-        { error: "Attempt already submitted" },
-        { status: 400 }
-      );
+      return validationError("Attempt already submitted");
     }
 
     // Calculate score
@@ -88,10 +75,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ attempt: updatedAttempt });
   } catch (error) {
-    console.error("Error submitting practice paper:", error);
-    return NextResponse.json(
-      { error: "Failed to submit practice paper" },
-      { status: 500 }
-    );
+    return handleApiError(error, "Failed to submit practice paper");
   }
 }

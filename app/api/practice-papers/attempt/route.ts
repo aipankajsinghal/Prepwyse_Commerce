@@ -1,44 +1,31 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { handleApiError, unauthorizedError, notFoundError, validationError } from "@/lib/api-error-handler";
 
 // POST /api/practice-papers/attempt - Start a new practice paper attempt
 export async function POST(request: Request) {
   try {
     const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    if (!userId) return unauthorizedError();
 
     const { paperId } = await request.json();
 
-    if (!paperId) {
-      return NextResponse.json(
-        { error: "Paper ID is required" },
-        { status: 400 }
-      );
-    }
+    if (!paperId) return validationError("Paper ID is required");
 
     // Get paper details
     const paper = await prisma.practicePaper.findUnique({
       where: { id: paperId },
     });
 
-    if (!paper) {
-      return NextResponse.json(
-        { error: "Practice paper not found" },
-        { status: 404 }
-      );
-    }
+    if (!paper) return notFoundError("Practice paper not found");
 
     // Get user from database
     const user = await prisma.user.findUnique({
       where: { clerkId: userId },
     });
 
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
+    if (!user) return notFoundError("User not found");
 
     // Parse questions to get count
     const questions = paper.questions as any[];
@@ -57,10 +44,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ attempt, paper }, { status: 201 });
   } catch (error) {
-    console.error("Error starting practice paper attempt:", error);
-    return NextResponse.json(
-      { error: "Failed to start practice paper attempt" },
-      { status: 500 }
-    );
+    return handleApiError(error, "Failed to start practice paper attempt");
   }
 }

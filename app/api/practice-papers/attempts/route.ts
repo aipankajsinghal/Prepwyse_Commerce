@@ -1,14 +1,13 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { handleApiError, unauthorizedError, notFoundError } from "@/lib/api-error-handler";
 
 // GET /api/practice-papers/attempts - Get user's practice paper attempts
 export async function GET(request: Request) {
   try {
     const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    if (!userId) return unauthorizedError();
 
     const { searchParams } = new URL(request.url);
     const paperId = searchParams.get("paperId");
@@ -21,9 +20,7 @@ export async function GET(request: Request) {
       where: { clerkId: userId },
     });
 
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
+    if (!user) return notFoundError("User not found");
 
     // Build where clause
     const where: any = { userId: user.id };
@@ -64,10 +61,6 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
-    console.error("Error fetching practice paper attempts:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch attempts" },
-      { status: 500 }
-    );
+    return handleApiError(error, "Failed to fetch attempts");
   }
 }
