@@ -1,24 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
+import { handleApiError, unauthorizedError, notFoundError, validationError } from '@/lib/api-error-handler';
 
 // GET: Get user's study plans
 export async function GET(request: NextRequest) {
   try {
     const { userId } = await auth();
     
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    if (!userId) return unauthorizedError();
 
     const user = await prisma.user.findUnique({
       where: { clerkId: userId },
       select: { id: true },
     });
 
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
+    if (!user) return notFoundError('User not found');
 
     const plans = await prisma.studyPlan.findMany({
       where: { userId: user.id },
@@ -36,11 +33,7 @@ export async function GET(request: NextRequest) {
       total: plans.length,
     });
   } catch (error) {
-    console.error('Error fetching study plans:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch study plans' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'Failed to fetch study plans');
   }
 }
 
@@ -49,9 +42,7 @@ export async function POST(request: NextRequest) {
   try {
     const { userId } = await auth();
     
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    if (!userId) return unauthorizedError();
 
     const {
       title,
@@ -64,10 +55,7 @@ export async function POST(request: NextRequest) {
     } = await request.json();
 
     if (!title || !weeklyHours) {
-      return NextResponse.json(
-        { error: 'Title and weekly hours are required' },
-        { status: 400 }
-      );
+      return validationError('Title and weekly hours are required');
     }
 
     const user = await prisma.user.findUnique({
@@ -75,9 +63,7 @@ export async function POST(request: NextRequest) {
       select: { id: true, weakAreas: true, strongAreas: true },
     });
 
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
+    if (!user) return notFoundError('User not found');
 
     // Create study plan
     const plan = await prisma.studyPlan.create({
@@ -109,11 +95,7 @@ export async function POST(request: NextRequest) {
       message: 'Study plan created successfully',
     });
   } catch (error) {
-    console.error('Error creating study plan:', error);
-    return NextResponse.json(
-      { error: 'Failed to create study plan' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'Failed to create study plan');
   }
 }
 

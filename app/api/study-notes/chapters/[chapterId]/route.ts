@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { handleApiError, unauthorizedError, notFoundError } from "@/lib/api-error-handler";
 
 
 type RouteParams = {
@@ -14,9 +15,7 @@ export async function GET(
 ) {
   try {
     const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    if (!userId) return unauthorizedError();
 
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
@@ -30,9 +29,7 @@ export async function GET(
       where: { clerkId: userId },
     });
 
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
+    if (!user) return notFoundError("User not found");
 
     // Get notes for the chapter
     const [notes, total] = await Promise.all([
@@ -86,10 +83,6 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error("Error fetching study notes:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch study notes" },
-      { status: 500 }
-    );
+    return handleApiError(error, "Failed to fetch study notes");
   }
 }

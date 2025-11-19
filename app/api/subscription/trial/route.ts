@@ -10,6 +10,7 @@ import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createTrialSubscription, getUserSubscription } from '@/lib/subscription';
+import { handleApiError, unauthorizedError, notFoundError, validationError } from '@/lib/api-error-handler';
 
 /**
  * POST /api/subscription/trial
@@ -19,33 +20,20 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     const { userId: clerkUserId } = await auth();
 
-    if (!clerkUserId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
+    if (!clerkUserId) return unauthorizedError();
 
     // Get user from database
     const user = await prisma.user.findUnique({
       where: { clerkId: clerkUserId },
     });
 
-    if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
-    }
+    if (!user) return notFoundError('User not found');
 
     // Check if user already has a subscription
     const existingSubscription = await getUserSubscription(user.id);
 
     if (existingSubscription) {
-      return NextResponse.json(
-        { error: 'User already has a subscription' },
-        { status: 400 }
-      );
+      return validationError('User already has a subscription');
     }
 
     // Get the first available plan (or default plan)
@@ -56,10 +44,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     });
 
     if (plans.length === 0) {
-      return NextResponse.json(
-        { error: 'No subscription plans available' },
-        { status: 400 }
-      );
+      return validationError('No subscription plans available');
     }
 
     const plan = plans[0];
@@ -75,10 +60,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       { status: 201 }
     );
   } catch (error) {
-    console.error('Error starting trial subscription:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'Failed to start trial subscription');
   }
 }
