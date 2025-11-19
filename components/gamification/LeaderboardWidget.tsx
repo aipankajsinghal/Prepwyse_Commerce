@@ -24,6 +24,7 @@ export default function LeaderboardWidget() {
 
   useEffect(() => {
     fetchLeaderboard();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [period]);
 
   const fetchLeaderboard = async () => {

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { reviewGeneratedQuestion, batchApproveQuestions } from "@/lib/question-generation";
+import { checkAdminAuth } from "@/lib/auth/requireAdmin";
 
 /**
  * POST /api/question-generation/review
@@ -8,12 +8,12 @@ import { reviewGeneratedQuestion, batchApproveQuestions } from "@/lib/question-g
  */
 export async function POST(request: Request) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Check admin authorization
+    const authResult = await checkAdminAuth();
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
-
-    // TODO: Add admin role check
+    const { user } = authResult;
 
     const { questionId, action, reviewNotes, batch, questionIds } = await request.json();
 
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     if (batch && questionIds && Array.isArray(questionIds)) {
       const result = await batchApproveQuestions({
         questionIds,
-        adminId: userId,
+        adminId: user.clerkId,
       });
 
       return NextResponse.json({
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     // Review question
     const result = await reviewGeneratedQuestion({
       questionId,
-      adminId: userId,
+      adminId: user.clerkId,
       action,
       reviewNotes,
     });

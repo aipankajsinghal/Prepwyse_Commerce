@@ -110,7 +110,7 @@ export default async function GamificationPage() {
         <div className="mt-8 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 rounded-lg p-6 text-white text-center">
           <h3 className="text-2xl font-bold mb-2">Keep Going! 💪</h3>
           <p className="text-lg opacity-90">
-            You're doing great! Complete more quizzes to earn points and climb the leaderboard.
+            You&apos;re doing great! Complete more quizzes to earn points and climb the leaderboard.
           </p>
         </div>
       </div>

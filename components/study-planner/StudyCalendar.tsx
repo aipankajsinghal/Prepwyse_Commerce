@@ -22,6 +22,7 @@ export default function StudyCalendar({ planId }: { planId?: string }) {
 
   useEffect(() => {
     fetchSessions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [planId]);
 
   const fetchSessions = async () => {

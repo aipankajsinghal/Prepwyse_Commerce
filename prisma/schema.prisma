@@ -15,6 +15,7 @@ model User {
   clerkId               String         @unique
   email                 String         @unique
   name                  String?
+  role                  UserRole       @default(STUDENT) // User role for authorization
   grade                 String?        // "11", "12", "CUET"
   preferredDifficulty   String?        // AI-determined preferred difficulty level
   weakAreas             Json?          // AI-tracked weak subject/chapter areas
@@ -641,4 +642,10 @@ model SearchHistory {
   createdAt   DateTime @default(now())
   
   @@index([userId, createdAt])
+}
+
+// User roles for authorization
+enum UserRole {
+  STUDENT
+  ADMIN
 }

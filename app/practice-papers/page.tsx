@@ -37,6 +37,7 @@ export default function PracticePapersPage() {
 
   useEffect(() => {
     fetchPapers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [examTypeFilter, yearFilter]);
 
   const fetchPapers = async () => {

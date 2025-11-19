@@ -66,6 +66,7 @@ export default function AdaptiveLearningPage() {
 
   useEffect(() => {
     loadPaths();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadPaths = async () => {

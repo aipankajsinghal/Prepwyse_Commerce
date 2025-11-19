@@ -43,6 +43,7 @@ export default function PracticePaperDetailsPage({
 
   useEffect(() => {
     fetchPaper();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id]);
 
   const fetchPaper = async () => {

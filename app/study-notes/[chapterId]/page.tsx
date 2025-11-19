@@ -41,6 +41,7 @@ export default function ChapterNotesPage({
   useEffect(() => {
     fetchNotes();
     fetchChapterInfo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.chapterId]);
 
   const fetchNotes = async () => {

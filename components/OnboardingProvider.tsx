@@ -43,6 +43,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     } else {
       completeOnboarding();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStep, steps.length]);
 
   const prevStep = useCallback(() => {

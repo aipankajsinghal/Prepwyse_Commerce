@@ -228,7 +228,7 @@ export default function PrivacyPolicyPage() {
 
           {/* Section 6: Children's Privacy */}
           <section className="mb-8">
-            <h2 className="text-2xl font-display font-bold text-primary mb-4">6. Children's Privacy</h2>
+            <h2 className="text-2xl font-display font-bold text-primary mb-4">6. Children&apos;s Privacy</h2>
             <div className="space-y-3 font-body text-text-primary">
               <p>
                 PrepWyse Commerce is designed for students aged 13 and above. We do not knowingly collect personal information from children under 13 without parental consent. If we become aware of such collection, we will delete the information immediately.

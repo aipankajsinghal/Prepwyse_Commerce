@@ -1,28 +1,14 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-
-// Helper to check if user is admin
-async function isAdmin(userId: string): Promise<boolean> {
-  const user = await prisma.user.findUnique({
-    where: { clerkId: userId },
-  });
-  // In production, you would check a role field or use Clerk's organizations
-  // For now, we'll use a simple email check (configure admin emails in env)
-  const adminEmails = process.env.ADMIN_EMAILS?.split(",") || [];
-  return user ? adminEmails.includes(user.email) : false;
-}
+import { checkAdminAuth } from "@/lib/auth/requireAdmin";
 
 // POST /api/admin/practice-papers - Create practice paper (admin only)
 export async function POST(request: Request) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    if (!(await isAdmin(userId))) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    // Check admin authorization
+    const authResult = await checkAdminAuth();
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
 
     const data = await request.json();
@@ -83,13 +69,10 @@ export async function POST(request: Request) {
 // GET /api/admin/practice-papers - List all papers for admin
 export async function GET(request: Request) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    if (!(await isAdmin(userId))) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    // Check admin authorization
+    const authResult = await checkAdminAuth();
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
 
     const { searchParams } = new URL(request.url);

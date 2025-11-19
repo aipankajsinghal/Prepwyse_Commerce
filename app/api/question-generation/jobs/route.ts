@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { getQuestionGenerationJobs } from "@/lib/question-generation";
+import { checkAdminAuth } from "@/lib/auth/requireAdmin";
 
 /**
  * GET /api/question-generation/jobs
@@ -8,12 +8,12 @@ import { getQuestionGenerationJobs } from "@/lib/question-generation";
  */
 export async function GET(request: Request) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Check admin authorization
+    const authResult = await checkAdminAuth();
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
-
-    // TODO: Add admin role check
+    const { user } = authResult;
 
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status") || undefined;
@@ -21,7 +21,7 @@ export async function GET(request: Request) {
     const limit = parseInt(searchParams.get("limit") || "20");
 
     const result = await getQuestionGenerationJobs({
-      adminId: userId, // Filter by current admin
+      adminId: user.clerkId, // Filter by current admin
       status,
       page,
       limit,

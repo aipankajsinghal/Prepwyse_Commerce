@@ -40,7 +40,7 @@ export default function TermsOfServicePage() {
             <h2 className="text-2xl font-display font-bold text-primary mb-4">1. Acceptance of Terms</h2>
             <div className="space-y-3 font-body text-text-primary">
               <p>
-                By creating an account, accessing, or using PrepWyse Commerce ("Service", "Platform"), you agree to:
+                By creating an account, accessing, or using PrepWyse Commerce (&quot;Service&quot;, &quot;Platform&quot;), you agree to:
               </p>
               <ul className="list-disc pl-6 space-y-1">
                 <li>Be bound by these Terms of Service</li>
@@ -195,9 +195,9 @@ export default function TermsOfServicePage() {
             </h2>
             <div className="space-y-3 font-body text-text-primary">
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">6.1 Service "As Is"</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">6.1 Service &quot;As Is&quot;</h3>
                 <p>
-                  PrepWyse Commerce is provided "as is" without warranties of any kind. We do not guarantee:
+                  PrepWyse Commerce is provided &quot;as is&quot; without warranties of any kind. We do not guarantee:
                 </p>
                 <ul className="list-disc pl-6 space-y-1">
                   <li>Uninterrupted or error-free operation</li>
