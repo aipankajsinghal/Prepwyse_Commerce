@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { handleApiError } from "@/lib/api-error-handler";
 
 // GET /api/subjects - Get all subjects with chapters
 export async function GET() {
@@ -16,11 +17,7 @@ export async function GET() {
 
     return NextResponse.json(subjects);
   } catch (error) {
-    console.error("Error fetching subjects:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch subjects" },
-      { status: 500 }
-    );
+    return handleApiError(error, "Failed to fetch subjects");
   }
 }
 
@@ -39,10 +36,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json(subject);
   } catch (error) {
-    console.error("Error creating subject:", error);
-    return NextResponse.json(
-      { error: "Failed to create subject" },
-      { status: 500 }
-    );
+    return handleApiError(error, "Failed to create subject");
   }
 }

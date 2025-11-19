@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { handleApiError, unauthorizedError } from "@/lib/api-error-handler";
 
 // POST /api/quiz - Create and start a new quiz
 export async function POST(request: Request) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return unauthorizedError();
     }
 
     const user = await currentUser();
@@ -67,10 +68,6 @@ export async function POST(request: Request) {
       questions,
     });
   } catch (error) {
-    console.error("Error creating quiz:", error);
-    return NextResponse.json(
-      { error: "Failed to create quiz" },
-      { status: 500 }
-    );
+    return handleApiError(error, "Failed to create quiz");
   }
 }

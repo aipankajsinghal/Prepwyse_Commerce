@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { handleApiError, unauthorizedError, notFoundError, validationError } from "@/lib/api-error-handler";
 
 // GET /api/search - Unified search across platform
 export async function GET(request: Request) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return unauthorizedError();
     }
 
     const { searchParams } = new URL(request.url);
@@ -18,10 +19,7 @@ export async function GET(request: Request) {
     const limit = parseInt(searchParams.get("limit") || "20");
 
     if (!query || query.trim().length < 2) {
-      return NextResponse.json(
-        { error: "Search query must be at least 2 characters" },
-        { status: 400 }
-      );
+      return validationError("Search query must be at least 2 characters");
     }
 
     const searchTerm = query.trim().toLowerCase();
@@ -32,7 +30,7 @@ export async function GET(request: Request) {
     });
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return notFoundError("User not found");
     }
 
     const results: any = {
@@ -165,10 +163,6 @@ export async function GET(request: Request) {
 
     return NextResponse.json(results);
   } catch (error) {
-    console.error("Error performing search:", error);
-    return NextResponse.json(
-      { error: "Failed to perform search" },
-      { status: 500 }
-    );
+    return handleApiError(error, "Failed to perform search");
   }
 }
