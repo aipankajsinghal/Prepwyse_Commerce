@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { handleApiError, unauthorizedError, notFoundError, forbiddenError } from "@/lib/api-error-handler";
 
 
 type RouteParams = {
@@ -14,9 +15,7 @@ export async function DELETE(
 ) {
   try {
     const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    if (!userId) return unauthorizedError();
 
     const { id } = await params;
 
@@ -25,25 +24,16 @@ export async function DELETE(
       where: { clerkId: userId },
     });
 
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
+    if (!user) return notFoundError("User not found");
 
     // Check if history item exists and belongs to user
     const historyItem = await prisma.searchHistory.findUnique({
       where: { id },
     });
 
-    if (!historyItem) {
-      return NextResponse.json(
-        { error: "Search history item not found" },
-        { status: 404 }
-      );
-    }
+    if (!historyItem) return notFoundError("Search history item not found");
 
-    if (historyItem.userId !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
+    if (historyItem.userId !== user.id) return forbiddenError();
 
     // Delete history item
     await prisma.searchHistory.delete({
@@ -54,10 +44,6 @@ export async function DELETE(
       message: "Search history item deleted successfully",
     });
   } catch (error) {
-    console.error("Error deleting search history:", error);
-    return NextResponse.json(
-      { error: "Failed to delete search history" },
-      { status: 500 }
-    );
+    return handleApiError(error, "Failed to delete search history");
   }
 }

@@ -1,14 +1,13 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { handleApiError, unauthorizedError, notFoundError, validationError } from "@/lib/api-error-handler";
 
 // GET /api/search/history - Get user's search history
 export async function GET(request: Request) {
   try {
     const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    if (!userId) return unauthorizedError();
 
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get("limit") || "10");
@@ -18,9 +17,7 @@ export async function GET(request: Request) {
       where: { clerkId: userId },
     });
 
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
+    if (!user) return notFoundError("User not found");
 
     // Get search history
     const history = await prisma.searchHistory.findMany({
@@ -38,11 +35,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ history });
   } catch (error) {
-    console.error("Error fetching search history:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch search history" },
-      { status: 500 }
-    );
+    return handleApiError(error, "Failed to fetch search history");
   }
 }
 
@@ -50,27 +43,18 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    if (!userId) return unauthorizedError();
 
     const { query, resultCount, filters } = await request.json();
 
-    if (!query) {
-      return NextResponse.json(
-        { error: "Query is required" },
-        { status: 400 }
-      );
-    }
+    if (!query) return validationError("Query is required");
 
     // Get user from database
     const user = await prisma.user.findUnique({
       where: { clerkId: userId },
     });
 
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
+    if (!user) return notFoundError("User not found");
 
     // Save search history
     const history = await prisma.searchHistory.create({
@@ -84,10 +68,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ history }, { status: 201 });
   } catch (error) {
-    console.error("Error saving search history:", error);
-    return NextResponse.json(
-      { error: "Failed to save search history" },
-      { status: 500 }
-    );
+    return handleApiError(error, "Failed to save search history");
   }
 }
