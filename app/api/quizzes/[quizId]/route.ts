@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth/requireUser";
+import { handleApiError, notFoundError } from "@/lib/api-error-handler";
 
 export async function GET(req: Request, { params }: { params: Promise<{ quizId: string }> }) {
   try {
@@ -13,17 +14,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ quizId: 
     });
 
     if (!quiz) {
-      return NextResponse.json(
-        { error: "Quiz not found" },
-        { status: 404 }
-      );
+      return notFoundError("Quiz");
     }
 
     return NextResponse.json({ quiz });
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || "Failed to fetch quiz" },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleApiError(error, "Failed to fetch quiz", { quizId: (await params).quizId });
   }
 }
