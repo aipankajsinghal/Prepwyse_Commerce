@@ -54,7 +54,7 @@ export class ErrorBoundary extends React.Component<
             </h1>
             
             <p className="text-gray-600 mb-6">
-              We're sorry, but something unexpected happened. Don't worry, your progress has been saved.
+              We&apos;re sorry, but something unexpected happened. Don&apos;t worry, your progress has been saved.
             </p>
 
             {process.env.NODE_ENV === "development" && this.state.error && (

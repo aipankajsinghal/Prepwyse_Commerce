@@ -271,7 +271,7 @@ export default function AnalyticsPage() {
             </li>
             <li className="flex items-start gap-2">
               <span className="text-semantic-success font-bold">•</span>
-              <span>You're improving consistently! Your scores have increased by <strong>12%</strong> this week.</span>
+              <span>You&apos;re improving consistently! Your scores have increased by <strong>12%</strong> this week.</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-accent-1 font-bold">•</span>

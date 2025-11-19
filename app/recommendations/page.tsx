@@ -227,7 +227,7 @@ export default function RecommendationsPage() {
             <Sparkles className="h-16 w-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-900 mb-2">No Recommendations Yet</h3>
             <p className="font-body text-text-secondary mb-6">
-              Click "Generate New Recommendations" to get personalized study suggestions based on your performance.
+              Click &quot;Generate New Recommendations&quot; to get personalized study suggestions based on your performance.
             </p>
           </div>
         )}

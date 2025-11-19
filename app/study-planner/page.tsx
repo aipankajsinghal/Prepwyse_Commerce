@@ -134,7 +134,7 @@ export default async function StudyPlannerPage() {
         {/* Motivational Quote */}
         <div className="mt-8 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 rounded-lg p-6 text-white text-center">
           <p className="text-2xl font-bold mb-2">
-            "Success is the sum of small efforts repeated day in and day out."
+            &quot;Success is the sum of small efforts repeated day in and day out.&quot;
           </p>
           <p className="text-lg opacity-90">- Robert Collier</p>
         </div>

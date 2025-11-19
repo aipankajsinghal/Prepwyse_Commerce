@@ -46,9 +46,10 @@
     "typescript": "^5.9.3"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
     "@types/papaparse": "^5.5.0",
-    "eslint": "^8.57.0",
-    "eslint-config-next": "^14.2.0",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^15.5.6",
     "prisma": "^6.19.0",
     "ts-node": "^10.9.2"
   }

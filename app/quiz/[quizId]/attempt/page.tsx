@@ -48,16 +48,14 @@ export default function QuizAttemptPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [autoSaveStatus, setAutoSaveStatus] = useState<"saving" | "saved" | "">("");
 
-  // Initialize quiz attempt hook only after we have attempt data
-  const quizAttemptHook = attempt
-    ? useQuizAttempt({
-        attemptId: attempt.id,
-        totalQuestions: questions.length,
-        initialQuestionIndex: attempt.currentQuestionIndex,
-        initialTimeRemaining: attempt.timeRemaining,
-        initialAnswers: attempt.answers,
-      })
-    : null;
+  // Always call the hook with safe defaults - will be properly initialized once attempt data loads
+  const quizAttemptHook = useQuizAttempt({
+    attemptId: attempt?.id || "temp",
+    totalQuestions: questions.length,
+    initialQuestionIndex: attempt?.currentQuestionIndex || 0,
+    initialTimeRemaining: attempt?.timeRemaining || null,
+    initialAnswers: attempt?.answers || [],
+  });
 
   // Load quiz, questions, and create/resume attempt
   useEffect(() => {
@@ -92,7 +90,7 @@ export default function QuizAttemptPage() {
 
   // Show auto-save feedback
   useEffect(() => {
-    if (quizAttemptHook) {
+    if (attempt) {
       setAutoSaveStatus("saving");
       const timer = setTimeout(() => {
         setAutoSaveStatus("saved");
@@ -100,14 +98,15 @@ export default function QuizAttemptPage() {
       }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [quizAttemptHook?.answers, quizAttemptHook?.currentQuestionIndex]);
+  }, [quizAttemptHook.answers, quizAttemptHook.currentQuestionIndex, attempt]);
 
   // Handle time expired
   useEffect(() => {
-    if (quizAttemptHook?.timeRemaining === 0) {
+    if (quizAttemptHook.timeRemaining === 0) {
       handleSubmit();
     }
-  }, [quizAttemptHook?.timeRemaining]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quizAttemptHook.timeRemaining]);
 
   const handleSubmit = async () => {
     if (!attempt || isSubmitting) return;
@@ -135,7 +134,7 @@ export default function QuizAttemptPage() {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  if (isLoading || !quiz || !questions.length || !attempt || !quizAttemptHook) {
+  if (isLoading || !quiz || !questions.length || !attempt) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Navbar />
