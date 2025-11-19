@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { handleApiError, unauthorizedError, validationError, notFoundError } from "@/lib/api-error-handler";
+import { logger } from "@/lib/logger";
 
 /**
  * Delete user account and all associated data (GDPR/DPDP compliance)
@@ -11,7 +13,7 @@ export async function DELETE(request: Request) {
     const { userId } = await auth();
     
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return unauthorizedError();
     }
 
     // Get confirmation from request body
@@ -19,10 +21,7 @@ export async function DELETE(request: Request) {
     const { confirmation } = body;
 
     if (confirmation !== "DELETE MY ACCOUNT") {
-      return NextResponse.json(
-        { error: "Invalid confirmation. Please type 'DELETE MY ACCOUNT' exactly." },
-        { status: 400 }
-      );
+      return validationError("Invalid confirmation. Please type 'DELETE MY ACCOUNT' exactly.");
     }
 
     // Get user from database
@@ -31,7 +30,7 @@ export async function DELETE(request: Request) {
     });
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return notFoundError("User");
     }
 
     // Delete user data in correct order (respecting foreign key constraints)
@@ -47,7 +46,7 @@ export async function DELETE(request: Request) {
       });
     });
 
-    console.log(`[GDPR] User account deleted: ${user.id} (${userId})`);
+    logger.compliance("User account deleted", { userId: user.id, clerkId: userId });
 
     // Note: Clerk user deletion should be handled separately via Clerk Dashboard or API
     // This ensures proper handling of authentication state
@@ -57,11 +56,7 @@ export async function DELETE(request: Request) {
       message: "Account and all associated data have been permanently deleted.",
       timestamp: new Date().toISOString(),
     });
-  } catch (error: any) {
-    console.error("Account deletion error:", error);
-    return NextResponse.json(
-      { error: "Failed to delete account", details: error.message },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleApiError(error, "Failed to delete account");
   }
 }

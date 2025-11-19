@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
+import { handleApiError, unauthorizedError, notFoundError, validationError } from '@/lib/api-error-handler';
 
 // GET: Get flashcards by chapter
 export async function GET(request: NextRequest) {
@@ -16,10 +17,7 @@ export async function GET(request: NextRequest) {
     const subjectId = searchParams.get('subjectId');
 
     if (!chapterId && !subjectId) {
-      return NextResponse.json(
-        { error: 'Chapter ID or Subject ID is required' },
-        { status: 400 }
-      );
+      return validationError('Chapter ID or Subject ID is required');
     }
 
     const user = await prisma.user.findUnique({
@@ -28,7 +26,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return notFoundError('User not found');
     }
 
     // Build query
@@ -67,11 +65,7 @@ export async function GET(request: NextRequest) {
       total: flashcards.length,
     });
   } catch (error) {
-    console.error('Error fetching flashcards:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch flashcards' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'Failed to fetch flashcards');
   }
 }
 
@@ -81,16 +75,13 @@ export async function POST(request: NextRequest) {
     const { userId } = await auth();
     
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return unauthorizedError();
     }
 
     const { chapterId, front, back, difficulty, tags } = await request.json();
 
     if (!chapterId || !front || !back) {
-      return NextResponse.json(
-        { error: 'Chapter ID, front, and back are required' },
-        { status: 400 }
-      );
+      return validationError('Chapter ID, front, and back are required');
     }
 
     const flashcard = await prisma.flashcard.create({
@@ -108,10 +99,6 @@ export async function POST(request: NextRequest) {
       message: 'Flashcard created successfully',
     });
   } catch (error) {
-    console.error('Error creating flashcard:', error);
-    return NextResponse.json(
-      { error: 'Failed to create flashcard' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'Failed to create flashcard');
   }
 }

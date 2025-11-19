@@ -1,30 +1,19 @@
+/**
+ * Admin API: AI Study Notes Generation
+ * Phase D: Advanced Features
+ * 
+ * Refactored to use withAdminAuth pattern for cleaner code.
+ * See REFACTORING_OPTIONS.md for details on this pattern.
+ */
+
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { withAdminAuth } from "@/lib/auth/withAdminAuth";
 import OpenAI from "openai";
 
-// Helper to check if user is admin
-async function isAdmin(userId: string): Promise<boolean> {
-  const user = await prisma.user.findUnique({
-    where: { clerkId: userId },
-  });
-  const adminEmails = process.env.ADMIN_EMAILS?.split(",") || [];
-  return user ? adminEmails.includes(user.email) : false;
-}
-
 // POST /api/admin/study-notes/generate - AI generate study note (admin only)
-export async function POST(request: Request) {
-  try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    if (!(await isAdmin(userId))) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-
-    const data = await request.json();
+export const POST = withAdminAuth(async (req, { user }) => {
+  const data = await req.json();
     const { chapterId, chapterName, subjectName, difficulty } = data;
 
     // Validate required fields
@@ -104,42 +93,26 @@ Format the content in a clear, structured manner suitable for student learning. 
     const generatedSummary =
       summaryCompletion.choices[0]?.message?.content || "";
 
-    // Get user
-    const user = await prisma.user.findUnique({
-      where: { clerkId: userId },
-    });
+  // Create the study note
+  const note = await prisma.studyNote.create({
+    data: {
+      chapterId,
+      title: `${chapterName} - Study Notes`,
+      content: generatedContent,
+      summary: generatedSummary,
+      type: "ai_generated",
+      authorId: user.id,
+      difficulty: difficulty || "medium",
+      isPublished: false, // Admin should review before publishing
+    },
+  });
 
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    // Create the study note
-    const note = await prisma.studyNote.create({
-      data: {
-        chapterId,
-        title: `${chapterName} - Study Notes`,
-        content: generatedContent,
-        summary: generatedSummary,
-        type: "ai_generated",
-        authorId: user.id,
-        difficulty: difficulty || "medium",
-        isPublished: false, // Admin should review before publishing
-      },
-    });
-
-    return NextResponse.json(
-      {
-        note,
-        message:
-          "Study note generated successfully. Please review before publishing.",
-      },
-      { status: 201 }
-    );
-  } catch (error) {
-    console.error("Error generating study note:", error);
-    return NextResponse.json(
-      { error: "Failed to generate study note" },
-      { status: 500 }
-    );
-  }
-}
+  return NextResponse.json(
+    {
+      note,
+      message:
+        "Study note generated successfully. Please review before publishing.",
+    },
+    { status: 201 }
+  );
+});

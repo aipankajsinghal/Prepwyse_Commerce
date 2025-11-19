@@ -64,12 +64,17 @@ export default function AdaptiveLearningPage() {
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
 
-  useEffect(() => {
-    loadPaths();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  const loadNextAction = useCallback(async (pathId: string) => {
+    try {
+      const res = await fetch(`/api/adaptive-learning/next-action?pathId=${pathId}`);
+      const data = await res.json();
+      setNextAction(data.recommendation);
+    } catch (error) {
+      console.error("Failed to load next action:", error);
+    }
   }, []);
 
-  const loadPaths = async () => {
+  const loadPaths = useCallback(async () => {
     try {
       const res = await fetch("/api/adaptive-learning/paths");
       const data = await res.json();
@@ -84,17 +89,11 @@ export default function AdaptiveLearningPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [loadNextAction]);
 
-  const loadNextAction = async (pathId: string) => {
-    try {
-      const res = await fetch(`/api/adaptive-learning/next-action?pathId=${pathId}`);
-      const data = await res.json();
-      setNextAction(data.recommendation);
-    } catch (error) {
-      console.error("Failed to load next action:", error);
-    }
-  };
+  useEffect(() => {
+    loadPaths();
+  }, [loadPaths]);
 
   const generateNewPath = async () => {
     setGenerating(true);

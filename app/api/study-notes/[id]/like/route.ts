@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { handleApiError, unauthorizedError, notFoundError } from "@/lib/api-error-handler";
 
 
 type RouteParams = {
@@ -14,9 +15,7 @@ export async function POST(
 ) {
   try {
     const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    if (!userId) return unauthorizedError();
 
     const { id } = await params;
 
@@ -25,21 +24,14 @@ export async function POST(
       where: { clerkId: userId },
     });
 
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
+    if (!user) return notFoundError("User not found");
 
     // Check if note exists
     const note = await prisma.studyNote.findUnique({
       where: { id },
     });
 
-    if (!note) {
-      return NextResponse.json(
-        { error: "Study note not found" },
-        { status: 404 }
-      );
-    }
+    if (!note) return notFoundError("Study note not found");
 
     // For simplicity, we'll just increment the likes count
     // In a production app, you might want to track who liked what
@@ -50,10 +42,6 @@ export async function POST(
 
     return NextResponse.json({ note: updatedNote });
   } catch (error) {
-    console.error("Error liking study note:", error);
-    return NextResponse.json(
-      { error: "Failed to like study note" },
-      { status: 500 }
-    );
+    return handleApiError(error, "Failed to like study note");
   }
 }

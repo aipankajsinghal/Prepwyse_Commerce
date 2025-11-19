@@ -2,13 +2,14 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { generateAIQuestions, determineAdaptiveDifficulty } from "@/lib/ai-services";
+import { handleApiError, unauthorizedError, notFoundError } from "@/lib/api-error-handler";
 
 // POST /api/ai/generate-quiz - Generate AI-powered quiz
 export async function POST(request: Request) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return unauthorizedError();
     }
 
     const { subjectId, chapterIds, questionCount, difficulty: requestedDifficulty } =
@@ -27,7 +28,7 @@ export async function POST(request: Request) {
     });
 
     if (!subject) {
-      return NextResponse.json({ error: "Subject not found" }, { status: 404 });
+      return notFoundError("Subject");
     }
 
     // Determine adaptive difficulty if not specified
@@ -100,11 +101,7 @@ export async function POST(request: Request) {
       adaptiveDifficulty: difficulty,
       message: `Generated ${storedQuestions.length} AI-powered questions at ${difficulty} difficulty`,
     });
-  } catch (error: any) {
-    console.error("Error generating AI quiz:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to generate AI quiz" },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleApiError(error, "Failed to generate AI quiz", { subjectId: (await request.json()).subjectId });
   }
 }

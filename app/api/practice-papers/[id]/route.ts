@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { handleApiError, unauthorizedError, notFoundError } from "@/lib/api-error-handler";
 
 type RouteParams = {
   params: Promise<{ id: string }>;
@@ -13,9 +14,7 @@ export async function GET(
 ) {
   try {
     const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    if (!userId) return unauthorizedError();
 
     const { id } = await params;
     const paper = await prisma.practicePaper.findUnique({
@@ -27,19 +26,10 @@ export async function GET(
       },
     });
 
-    if (!paper) {
-      return NextResponse.json(
-        { error: "Practice paper not found" },
-        { status: 404 }
-      );
-    }
+    if (!paper) return notFoundError("Practice paper not found");
 
     return NextResponse.json({ paper });
   } catch (error) {
-    console.error("Error fetching practice paper:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch practice paper" },
-      { status: 500 }
-    );
+    return handleApiError(error, "Failed to fetch practice paper");
   }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Flashcard {
@@ -27,12 +27,7 @@ export default function FlashcardReview({ chapterId }: { chapterId?: string }) {
   const [loading, setLoading] = useState(true);
   const [reviewing, setReviewing] = useState(false);
 
-  useEffect(() => {
-    fetchCards();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chapterId]);
-
-  const fetchCards = async () => {
+  const fetchCards = useCallback(async () => {
     setLoading(true);
     try {
       const url = chapterId
@@ -49,7 +44,11 @@ export default function FlashcardReview({ chapterId }: { chapterId?: string }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [chapterId]);
+
+  useEffect(() => {
+    fetchCards();
+  }, [fetchCards]);
 
   const handleReview = async (quality: number) => {
     if (reviewing || currentIndex >= cards.length) return;

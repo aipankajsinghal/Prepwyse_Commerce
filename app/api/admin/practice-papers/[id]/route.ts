@@ -1,130 +1,84 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+/**
+ * Admin API: Practice Papers Management (Dynamic ID Routes)
+ * Phase D: Advanced Features
+ * 
+ * Refactored to use withAdminAuthParams pattern for cleaner code.
+ * See REFACTORING_OPTIONS.md for details on this pattern.
+ */
+
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-
-// Helper to check if user is admin
-async function isAdmin(userId: string): Promise<boolean> {
-  const user = await prisma.user.findUnique({
-    where: { clerkId: userId },
-  });
-  const adminEmails = process.env.ADMIN_EMAILS?.split(",") || [];
-  return user ? adminEmails.includes(user.email) : false;
-}
-
-
-type RouteParams = {
-  params: Promise<{ id: string }>;
-};
+import { withAdminAuthParams } from "@/lib/auth/withAdminAuth";
 
 // PATCH /api/admin/practice-papers/[id] - Update practice paper (admin only)
-export async function PATCH(
-  request: NextRequest,
-  { params }: RouteParams
-) {
-  try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+export const PATCH = withAdminAuthParams(async (req, { user, params }) => {
+  const { id } = params;
+  const data = await req.json();
+  const {
+    year,
+    examType,
+    title,
+    description,
+    duration,
+    totalMarks,
+    subjectId,
+    questions,
+    solutions,
+    difficulty,
+  } = data;
 
-    if (!(await isAdmin(userId))) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
+  // Check if paper exists
+  const existingPaper = await prisma.practicePaper.findUnique({
+    where: { id },
+  });
 
-    const { id } = await params;
-    const data = await request.json();
-    const {
-      year,
-      examType,
-      title,
-      description,
-      duration,
-      totalMarks,
-      subjectId,
-      questions,
-      solutions,
-      difficulty,
-    } = data;
-
-    // Check if paper exists
-    const existingPaper = await prisma.practicePaper.findUnique({
-      where: { id },
-    });
-
-    if (!existingPaper) {
-      return NextResponse.json(
-        { error: "Practice paper not found" },
-        { status: 404 }
-      );
-    }
-
-    // Update practice paper
-    const paper = await prisma.practicePaper.update({
-      where: { id },
-      data: {
-        ...(year && { year: parseInt(year) }),
-        ...(examType && { examType }),
-        ...(title && { title }),
-        ...(description !== undefined && { description }),
-        ...(duration && { duration: parseInt(duration) }),
-        ...(totalMarks && { totalMarks: parseInt(totalMarks) }),
-        ...(subjectId !== undefined && { subjectId }),
-        ...(questions && { questions }),
-        ...(solutions !== undefined && { solutions }),
-        ...(difficulty && { difficulty }),
-      },
-    });
-
-    return NextResponse.json({ paper });
-  } catch (error) {
-    console.error("Error updating practice paper:", error);
+  if (!existingPaper) {
     return NextResponse.json(
-      { error: "Failed to update practice paper" },
-      { status: 500 }
+      { error: "Practice paper not found" },
+      { status: 404 }
     );
   }
-}
+
+  // Update practice paper
+  const paper = await prisma.practicePaper.update({
+    where: { id },
+    data: {
+      ...(year && { year: parseInt(year) }),
+      ...(examType && { examType }),
+      ...(title && { title }),
+      ...(description !== undefined && { description }),
+      ...(duration && { duration: parseInt(duration) }),
+      ...(totalMarks && { totalMarks: parseInt(totalMarks) }),
+      ...(subjectId !== undefined && { subjectId }),
+      ...(questions && { questions }),
+      ...(solutions !== undefined && { solutions }),
+      ...(difficulty && { difficulty }),
+    },
+  });
+
+  return NextResponse.json({ paper });
+});
 
 // DELETE /api/admin/practice-papers/[id] - Delete practice paper (admin only)
-export async function DELETE(
-  request: NextRequest,
-  { params }: RouteParams
-) {
-  try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+export const DELETE = withAdminAuthParams(async (req, { user, params }) => {
+  const { id } = params;
 
-    if (!(await isAdmin(userId))) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
+  // Check if paper exists
+  const existingPaper = await prisma.practicePaper.findUnique({
+    where: { id },
+  });
 
-    const { id } = await params;
-
-    // Check if paper exists
-    const existingPaper = await prisma.practicePaper.findUnique({
-      where: { id },
-    });
-
-    if (!existingPaper) {
-      return NextResponse.json(
-        { error: "Practice paper not found" },
-        { status: 404 }
-      );
-    }
-
-    // Delete practice paper (cascade will delete attempts)
-    await prisma.practicePaper.delete({
-      where: { id },
-    });
-
-    return NextResponse.json({ message: "Practice paper deleted successfully" });
-  } catch (error) {
-    console.error("Error deleting practice paper:", error);
+  if (!existingPaper) {
     return NextResponse.json(
-      { error: "Failed to delete practice paper" },
-      { status: 500 }
+      { error: "Practice paper not found" },
+      { status: 404 }
     );
   }
-}
+
+  // Delete practice paper (cascade will delete attempts)
+  await prisma.practicePaper.delete({
+    where: { id },
+  });
+
+  return NextResponse.json({ message: "Practice paper deleted successfully" });
+});

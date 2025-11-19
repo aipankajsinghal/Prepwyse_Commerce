@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
+import { handleApiError, unauthorizedError, notFoundError, validationError } from '@/lib/api-error-handler';
 
 // GET: Get user personalization preferences
 export async function GET(request: NextRequest) {
@@ -8,7 +9,7 @@ export async function GET(request: NextRequest) {
     const { userId } = await auth();
     
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return unauthorizedError();
     }
 
     const user = await prisma.user.findUnique({
@@ -23,7 +24,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return notFoundError('User not found');
     }
 
     return NextResponse.json({
@@ -40,11 +41,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error fetching personalization:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch personalization' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'Failed to fetch personalization');
   }
 }
 
@@ -54,7 +51,7 @@ export async function PATCH(request: NextRequest) {
     const { userId } = await auth();
     
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return unauthorizedError();
     }
 
     const {
@@ -69,10 +66,7 @@ export async function PATCH(request: NextRequest) {
     
     if (preferredLanguage !== undefined) {
       if (!['en', 'hi'].includes(preferredLanguage)) {
-        return NextResponse.json(
-          { error: 'Invalid language' },
-          { status: 400 }
-        );
+        return validationError('Invalid language');
       }
       updateData.preferredLanguage = preferredLanguage;
     }
@@ -107,10 +101,6 @@ export async function PATCH(request: NextRequest) {
       message: 'Preferences updated successfully',
     });
   } catch (error) {
-    console.error('Error updating personalization:', error);
-    return NextResponse.json(
-      { error: 'Failed to update personalization' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'Failed to update personalization');
   }
 }

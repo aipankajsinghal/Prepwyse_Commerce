@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { getUserLearningPaths } from "@/lib/adaptive-learning";
+import { handleApiError, unauthorizedError } from "@/lib/api-error-handler";
 
 /**
  * GET /api/adaptive-learning/paths
@@ -11,7 +12,7 @@ export async function GET(request: Request) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return unauthorizedError();
     }
 
     // Ensure user exists in database
@@ -30,11 +31,7 @@ export async function GET(request: Request) {
       success: true,
       paths,
     });
-  } catch (error: any) {
-    console.error("Error fetching learning paths:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to fetch learning paths" },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleApiError(error, "Failed to fetch learning paths");
   }
 }

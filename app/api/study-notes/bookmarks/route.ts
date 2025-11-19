@@ -1,22 +1,18 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { handleApiError, unauthorizedError, notFoundError, validationError } from "@/lib/api-error-handler";
 
 // POST /api/study-notes/bookmarks - Bookmark/unbookmark a note
 export async function POST(request: Request) {
   try {
     const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    if (!userId) return unauthorizedError();
 
     const { noteId } = await request.json();
 
     if (!noteId) {
-      return NextResponse.json(
-        { error: "Note ID is required" },
-        { status: 400 }
-      );
+      return validationError("Note ID is required");
     }
 
     // Get user from database
@@ -24,9 +20,7 @@ export async function POST(request: Request) {
       where: { clerkId: userId },
     });
 
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
+    if (!user) return notFoundError("User not found");
 
     // Check if note exists
     const note = await prisma.studyNote.findUnique({
@@ -34,10 +28,7 @@ export async function POST(request: Request) {
     });
 
     if (!note) {
-      return NextResponse.json(
-        { error: "Study note not found" },
-        { status: 404 }
-      );
+      return notFoundError("Study note not found");
     }
 
     // Check if already bookmarked
@@ -67,11 +58,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ bookmarked: true }, { status: 201 });
     }
   } catch (error) {
-    console.error("Error bookmarking study note:", error);
-    return NextResponse.json(
-      { error: "Failed to bookmark study note" },
-      { status: 500 }
-    );
+    return handleApiError(error, "Failed to bookmark study note");
   }
 }
 
@@ -79,9 +66,7 @@ export async function POST(request: Request) {
 export async function GET(request: Request) {
   try {
     const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    if (!userId) return unauthorizedError();
 
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
@@ -93,9 +78,7 @@ export async function GET(request: Request) {
       where: { clerkId: userId },
     });
 
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
+    if (!user) return notFoundError("User not found");
 
     // Get bookmarked notes
     const [bookmarks, total] = await Promise.all([
@@ -141,10 +124,6 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
-    console.error("Error fetching bookmarked notes:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch bookmarked notes" },
-      { status: 500 }
-    );
+    return handleApiError(error, "Failed to fetch bookmarked notes");
   }
 }

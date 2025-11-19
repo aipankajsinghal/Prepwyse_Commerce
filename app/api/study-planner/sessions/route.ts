@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
+import { handleApiError, unauthorizedError, notFoundError, validationError, forbiddenError } from '@/lib/api-error-handler';
 
 // GET: Get study sessions (filtered by date range or plan)
 export async function GET(request: NextRequest) {
   try {
     const { userId } = await auth();
     
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    if (!userId) return unauthorizedError();
 
     const { searchParams } = new URL(request.url);
     const planId = searchParams.get('planId');
@@ -22,9 +21,7 @@ export async function GET(request: NextRequest) {
       select: { id: true },
     });
 
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
+    if (!user) return notFoundError('User not found');
 
     // Build query filters
     const where: any = {};
@@ -68,11 +65,7 @@ export async function GET(request: NextRequest) {
       total: sessions.length,
     });
   } catch (error) {
-    console.error('Error fetching study sessions:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch study sessions' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'Failed to fetch study sessions');
   }
 }
 
@@ -81,17 +74,12 @@ export async function PATCH(request: NextRequest) {
   try {
     const { userId } = await auth();
     
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    if (!userId) return unauthorizedError();
 
     const { sessionId, completed, notes } = await request.json();
 
     if (!sessionId) {
-      return NextResponse.json(
-        { error: 'Session ID is required' },
-        { status: 400 }
-      );
+      return validationError('Session ID is required');
     }
 
     // Verify session belongs to user
@@ -104,9 +92,7 @@ export async function PATCH(request: NextRequest) {
       },
     });
 
-    if (!session) {
-      return NextResponse.json({ error: 'Session not found' }, { status: 404 });
-    }
+    if (!session) return notFoundError('Session not found');
 
     const user = await prisma.user.findUnique({
       where: { clerkId: userId },
@@ -114,7 +100,7 @@ export async function PATCH(request: NextRequest) {
     });
 
     if (!user || session.plan.userId !== user.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+      return forbiddenError('Unauthorized to update this session');
     }
 
     // Update session
@@ -149,10 +135,6 @@ export async function PATCH(request: NextRequest) {
       message: 'Session updated successfully',
     });
   } catch (error) {
-    console.error('Error updating session:', error);
-    return NextResponse.json(
-      { error: 'Failed to update session' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'Failed to update session');
   }
 }

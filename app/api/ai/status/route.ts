@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { getAIProviderInfo } from "@/lib/ai-provider";
+import { handleApiError, unauthorizedError } from "@/lib/api-error-handler";
 
 /**
  * GET /api/ai/status
@@ -10,12 +11,7 @@ export async function GET() {
   try {
     const { userId } = await auth();
 
-    if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
-    }
+    if (!userId) return unauthorizedError();
 
     const providerInfo = getAIProviderInfo();
 
@@ -27,10 +23,6 @@ export async function GET() {
         : "No AI providers configured. Please add OPENAI_API_KEY or GEMINI_API_KEY to environment variables.",
     });
   } catch (error) {
-    console.error("Error getting AI provider status:", error);
-    return NextResponse.json(
-      { error: "Failed to get AI provider status" },
-      { status: 500 }
-    );
+    return handleApiError(error, "Failed to get AI provider status");
   }
 }

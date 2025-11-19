@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { handleApiError, unauthorizedError, notFoundError, forbiddenError } from "@/lib/api-error-handler";
 
 
 type RouteParams = {
@@ -14,18 +15,14 @@ export async function GET(
 ) {
   try {
     const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    if (!userId) return unauthorizedError();
 
     // Get user from database
     const user = await prisma.user.findUnique({
       where: { clerkId: userId },
     });
 
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
+    if (!user) return notFoundError("User not found");
 
     const { id } = await params;
 
@@ -40,19 +37,9 @@ export async function GET(
       },
     });
 
-    if (!note) {
-      return NextResponse.json(
-        { error: "Study note not found" },
-        { status: 404 }
-      );
-    }
+    if (!note) return notFoundError("Study note not found");
 
-    if (!note.isPublished) {
-      return NextResponse.json(
-        { error: "Study note not available" },
-        { status: 403 }
-      );
-    }
+    if (!note.isPublished) return forbiddenError("Study note not available");
 
     // Increment views
     await prisma.studyNote.update({
@@ -70,10 +57,6 @@ export async function GET(
 
     return NextResponse.json({ note: noteWithBookmark });
   } catch (error) {
-    console.error("Error fetching study note:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch study note" },
-      { status: 500 }
-    );
+    return handleApiError(error, "Failed to fetch study note");
   }
 }

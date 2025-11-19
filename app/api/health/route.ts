@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { handleApiError } from "@/lib/api-error-handler";
 
 export async function GET() {
   try {
@@ -15,8 +16,6 @@ export async function GET() {
       },
     });
   } catch (error) {
-    console.error("Health check failed:", error);
-    
     return NextResponse.json(
       {
         status: "unhealthy",

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { handleApiError, unauthorizedError, notFoundError } from "@/lib/api-error-handler";
+import { logger } from "@/lib/logger";
 
 /**
  * Export user data (GDPR/DPDP compliance)
@@ -11,7 +13,7 @@ export async function GET() {
     const { userId } = await auth();
     
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return unauthorizedError();
     }
 
     const clerkUser = await currentUser();
@@ -22,7 +24,7 @@ export async function GET() {
     });
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return notFoundError("User");
     }
 
     // Gather all user data
@@ -85,6 +87,8 @@ export async function GET() {
       },
     };
 
+    logger.compliance("User data export", { userId: user.id, clerkId: userId });
+
     // Return as JSON for download
     return new NextResponse(JSON.stringify(exportData, null, 2), {
       headers: {
@@ -92,11 +96,7 @@ export async function GET() {
         "Content-Disposition": `attachment; filename="prepwyse-data-export-${userId}-${Date.now()}.json"`,
       },
     });
-  } catch (error: any) {
-    console.error("Data export error:", error);
-    return NextResponse.json(
-      { error: "Failed to export data", details: error.message },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleApiError(error, "Failed to export data");
   }
 }

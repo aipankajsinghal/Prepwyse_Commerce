@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { recommendNextAction } from "@/lib/adaptive-learning";
+import { handleApiError, unauthorizedError, validationError, notFoundError } from "@/lib/api-error-handler";
 
 /**
  * GET /api/adaptive-learning/next-action?pathId=xxx
@@ -11,17 +12,14 @@ export async function GET(request: Request) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return unauthorizedError();
     }
 
     const { searchParams } = new URL(request.url);
     const pathId = searchParams.get("pathId");
 
     if (!pathId) {
-      return NextResponse.json(
-        { error: "Missing required parameter: pathId" },
-        { status: 400 }
-      );
+      return validationError("Missing required parameter: pathId");
     }
 
     // Ensure user exists in database
@@ -30,7 +28,7 @@ export async function GET(request: Request) {
     });
 
     if (!dbUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return notFoundError("User");
     }
 
     // Get next recommended action
@@ -40,11 +38,7 @@ export async function GET(request: Request) {
       success: true,
       recommendation,
     });
-  } catch (error: any) {
-    console.error("Error getting next action:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to get next action" },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleApiError(error, "Failed to get next action");
   }
 }

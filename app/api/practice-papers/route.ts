@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { handleApiError, unauthorizedError } from "@/lib/api-error-handler";
 
 // GET /api/practice-papers - List all practice papers
 export async function GET(request: Request) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return unauthorizedError();
     }
 
     const { searchParams } = new URL(request.url);
@@ -61,10 +62,6 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
-    console.error("Error fetching practice papers:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch practice papers" },
-      { status: 500 }
-    );
+    return handleApiError(error, "Failed to fetch practice papers");
   }
 }

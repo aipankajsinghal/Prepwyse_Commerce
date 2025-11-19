@@ -2,13 +2,14 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { generatePersonalizedRecommendations } from "@/lib/ai-services";
+import { handleApiError, unauthorizedError, notFoundError } from "@/lib/api-error-handler";
 
 // GET /api/ai/recommendations - Get personalized recommendations
 export async function GET() {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return unauthorizedError();
     }
 
     // Get or create user in database
@@ -17,7 +18,7 @@ export async function GET() {
     });
 
     if (!dbUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return notFoundError("User");
     }
 
     // Generate AI recommendations
@@ -58,12 +59,8 @@ export async function GET() {
         suggestedDifficulty: aiRecommendations.suggestedDifficulty,
       },
     });
-  } catch (error: any) {
-    console.error("Error generating recommendations:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to generate recommendations" },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleApiError(error, "Failed to generate recommendations");
   }
 }
 
@@ -72,7 +69,7 @@ export async function POST(request: Request) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return unauthorizedError();
     }
 
     const { recommendationId } = await request.json();
@@ -82,7 +79,7 @@ export async function POST(request: Request) {
     });
 
     if (!dbUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return notFoundError("User");
     }
 
     await prisma.recommendation.update({
@@ -96,11 +93,7 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    console.error("Error marking recommendation as read:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to update recommendation" },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleApiError(error, "Failed to update recommendation");
   }
 }
