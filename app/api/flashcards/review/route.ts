@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
+import { handleApiError, unauthorizedError, notFoundError, validationError } from '@/lib/api-error-handler';
 
 // GET: Get flashcards due for review
 export async function GET(request: NextRequest) {
@@ -8,7 +9,7 @@ export async function GET(request: NextRequest) {
     const { userId } = await auth();
     
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return unauthorizedError();
     }
 
     const { searchParams } = new URL(request.url);
@@ -21,7 +22,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return notFoundError('User not found');
     }
 
     const now = new Date();
@@ -93,11 +94,7 @@ export async function GET(request: NextRequest) {
       total: progress.length + newCards.length,
     });
   } catch (error) {
-    console.error('Error fetching review flashcards:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch review flashcards' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'Failed to fetch review flashcards');
   }
 }
 
@@ -113,10 +110,7 @@ export async function POST(request: NextRequest) {
     const { flashcardId, quality } = await request.json();
 
     if (!flashcardId || quality === undefined || quality < 0 || quality > 5) {
-      return NextResponse.json(
-        { error: 'Flashcard ID and quality (0-5) are required' },
-        { status: 400 }
-      );
+      return validationError('Flashcard ID and quality (0-5) are required');
     }
 
     const user = await prisma.user.findUnique({
@@ -125,7 +119,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return notFoundError('User not found');
     }
 
     // Get or create progress
@@ -185,11 +179,7 @@ export async function POST(request: NextRequest) {
       message: 'Review submitted successfully',
     });
   } catch (error) {
-    console.error('Error submitting review:', error);
-    return NextResponse.json(
-      { error: 'Failed to submit review' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'Failed to submit review');
   }
 }
 

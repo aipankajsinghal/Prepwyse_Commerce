@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
+import { handleApiError, unauthorizedError, notFoundError } from '@/lib/api-error-handler';
 
 // GET: Get user's streak information
 export async function GET(request: NextRequest) {
@@ -8,7 +9,7 @@ export async function GET(request: NextRequest) {
     const { userId } = await auth();
     
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return unauthorizedError();
     }
 
     const user = await prisma.user.findUnique({
@@ -21,7 +22,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return notFoundError('User not found');
     }
 
     return NextResponse.json({
@@ -31,11 +32,7 @@ export async function GET(request: NextRequest) {
       isActiveToday: isActiveToday(user.lastActivityDate),
     });
   } catch (error) {
-    console.error('Error fetching streak:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch streak' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'Failed to fetch streak');
   }
 }
 
@@ -59,7 +56,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return notFoundError('User not found');
     }
 
     const now = new Date();
@@ -141,11 +138,7 @@ export async function POST(request: NextRequest) {
       longestStreakBroken,
     });
   } catch (error) {
-    console.error('Error updating streak:', error);
-    return NextResponse.json(
-      { error: 'Failed to update streak' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'Failed to update streak');
   }
 }
 
