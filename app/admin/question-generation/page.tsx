@@ -57,6 +57,7 @@ export default function QuestionGenerationReviewPage() {
 
   useEffect(() => {
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusFilter, selectedJob]);
 
   const loadData = async () => {

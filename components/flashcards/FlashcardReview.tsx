@@ -29,6 +29,7 @@ export default function FlashcardReview({ chapterId }: { chapterId?: string }) {
 
   useEffect(() => {
     fetchCards();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chapterId]);
 
   const fetchCards = async () => {

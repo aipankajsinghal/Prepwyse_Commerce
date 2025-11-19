@@ -44,6 +44,7 @@ export default function ViewNotePage({
 
   useEffect(() => {
     fetchNote();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id]);
 
   const fetchNote = async () => {
