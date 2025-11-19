@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
+import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import ThemeSelector from "@/components/ThemeSelector";
 import {
@@ -93,9 +94,11 @@ export default function ProfilePage() {
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
               <div className="text-center">
                 <div className="relative inline-block mb-4">
-                  <img
+                  <Image
                     src={user.imageUrl}
                     alt={user.fullName || "User"}
+                    width={128}
+                    height={128}
                     className="w-32 h-32 rounded-full border-4 border-blue-100 dark:border-blue-900"
                   />
                   <div className="absolute bottom-0 right-0 bg-semantic-success-500 w-6 h-6 rounded-full border-4 border-white dark:border-gray-800" />

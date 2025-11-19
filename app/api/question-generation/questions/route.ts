@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { getGeneratedQuestionsForReview } from "@/lib/question-generation";
+import { checkAdminAuth } from "@/lib/auth/requireAdmin";
 
 /**
  * GET /api/question-generation/questions
@@ -8,12 +8,11 @@ import { getGeneratedQuestionsForReview } from "@/lib/question-generation";
  */
 export async function GET(request: Request) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Check admin authorization
+    const authResult = await checkAdminAuth();
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
-
-    // TODO: Add admin role check
 
     const { searchParams } = new URL(request.url);
     const jobId = searchParams.get("jobId") || undefined;

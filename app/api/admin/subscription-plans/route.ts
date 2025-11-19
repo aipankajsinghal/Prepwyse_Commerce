@@ -7,9 +7,9 @@
  * - POST: Create new subscription plan
  */
 
-import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { checkAdminAuth } from '@/lib/auth/requireAdmin';
 
 /**
  * GET /api/admin/subscription-plans
@@ -17,17 +17,11 @@ import { prisma } from '@/lib/prisma';
  */
 export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
-    const { userId } = await auth();
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+    // Check admin authorization
+    const authResult = await checkAdminAuth();
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
-
-    // TODO: Add admin role check
-    // For now, all authenticated users can view plans
 
     const plans = await prisma.subscriptionPlan.findMany({
       orderBy: { order: 'asc' },
@@ -49,17 +43,11 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
  */
 export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
-    const { userId } = await auth();
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+    // Check admin authorization
+    const authResult = await checkAdminAuth();
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
-
-    // TODO: Add admin role check
-    // For now, this should be restricted to admin users only
 
     const body = await req.json();
     const {

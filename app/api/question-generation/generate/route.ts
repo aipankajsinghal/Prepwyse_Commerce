@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { startQuestionGenerationJob } from "@/lib/question-generation";
+import { checkAdminAuth } from "@/lib/auth/requireAdmin";
 
 /**
  * POST /api/question-generation/generate
@@ -8,14 +8,12 @@ import { startQuestionGenerationJob } from "@/lib/question-generation";
  */
 export async function POST(request: Request) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Check admin authorization
+    const authResult = await checkAdminAuth();
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
-
-    // TODO: Add admin role check
-    // For now, we'll allow any authenticated user
-    // In production, check if user has admin role
+    const { user } = authResult;
 
     const { subjectId, chapterIds, questionCount, difficulty, sourceContent, sourceType } =
       await request.json();
@@ -44,8 +42,8 @@ export async function POST(request: Request) {
 
     // Start generation job
     const job = await startQuestionGenerationJob({
-      adminId: userId,
-      adminName: "Admin", // TODO: Get actual admin name from Clerk
+      adminId: user.clerkId,
+      adminName: user.name || "Admin",
       subjectId,
       chapterIds,
       questionCount,
