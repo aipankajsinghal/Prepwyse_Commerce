@@ -10,6 +10,7 @@ export async function POST(request: Request) {
     if (authResult instanceof NextResponse) {
       return authResult;
     }
+    const { user } = authResult;
 
     const data = await request.json();
     const {
@@ -30,15 +31,6 @@ export async function POST(request: Request) {
         { error: "Chapter ID, title, and content are required" },
         { status: 400 }
       );
-    }
-
-    // Get user
-    const user = await prisma.user.findUnique({
-      where: { clerkId: userId },
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     // Create study note
