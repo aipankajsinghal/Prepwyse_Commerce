@@ -87,6 +87,8 @@ export async function GET() {
       },
     };
 
+    logger.compliance("User data export", { userId: user.id, clerkId: userId });
+
     // Return as JSON for download
     return new NextResponse(JSON.stringify(exportData, null, 2), {
       headers: {
@@ -94,11 +96,7 @@ export async function GET() {
         "Content-Disposition": `attachment; filename="prepwyse-data-export-${userId}-${Date.now()}.json"`,
       },
     });
-  } catch (error: any) {
-    console.error("Data export error:", error);
-    return NextResponse.json(
-      { error: "Failed to export data", details: error.message },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleApiError(error, "Failed to export data");
   }
 }
