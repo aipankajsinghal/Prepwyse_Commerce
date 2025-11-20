@@ -47,14 +47,24 @@ export default function QuizAttemptPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [autoSaveStatus, setAutoSaveStatus] = useState<"saving" | "saved" | "">("");
+  
+  // Store initial attempt data to avoid hook parameter changes
+  const [initialAttemptData, setInitialAttemptData] = useState<{
+    attemptId: string;
+    totalQuestions: number;
+    initialQuestionIndex: number;
+    initialTimeRemaining: number | null;
+    initialAnswers: QuizAttempt["answers"];
+  } | null>(null);
 
-  // Always call the hook with safe defaults - will be properly initialized once attempt data loads
+  // Always call the hook with stable initial values
+  // Use a stable "loading" attemptId until real data is available
   const quizAttemptHook = useQuizAttempt({
-    attemptId: attempt?.id || "temp",
-    totalQuestions: questions.length,
-    initialQuestionIndex: attempt?.currentQuestionIndex || 0,
-    initialTimeRemaining: attempt?.timeRemaining || null,
-    initialAnswers: attempt?.answers || [],
+    attemptId: initialAttemptData?.attemptId || "loading",
+    totalQuestions: initialAttemptData?.totalQuestions || 0,
+    initialQuestionIndex: initialAttemptData?.initialQuestionIndex || 0,
+    initialTimeRemaining: initialAttemptData?.initialTimeRemaining || null,
+    initialAnswers: initialAttemptData?.initialAnswers || [],
   });
 
   // Load quiz, questions, and create/resume attempt
@@ -69,13 +79,25 @@ export default function QuizAttemptPage() {
         const questionsData = await apiGet<{ questions: Question[] }>(
           `/api/quizzes/${quizId}/questions`
         );
-        setQuestions(questionsData.questions);
+        const loadedQuestions = questionsData.questions;
+        setQuestions(loadedQuestions);
 
         // Create or resume attempt
         const attemptData = await apiPost<{ attempt: QuizAttempt }>(
           `/api/quizzes/${quizId}/attempts`
         );
-        setAttempt(attemptData.attempt);
+        const loadedAttempt = attemptData.attempt;
+        setAttempt(loadedAttempt);
+        
+        // Set initial attempt data only once for the hook
+        // This ensures the hook parameters remain stable
+        setInitialAttemptData({
+          attemptId: loadedAttempt.id,
+          totalQuestions: loadedQuestions.length,
+          initialQuestionIndex: loadedAttempt.currentQuestionIndex || 0,
+          initialTimeRemaining: loadedAttempt.timeRemaining,
+          initialAnswers: loadedAttempt.answers || [],
+        });
       } catch (error) {
         console.error("Error loading quiz:", error);
         toast.error(getErrorMessage(error));

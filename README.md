@@ -252,17 +252,61 @@ npm run dev          # Start development server
 npm run build        # Production build
 npm start            # Start production server
 npm run lint         # Run ESLint
+npm test             # Run tests
+npm run test:watch   # Run tests in watch mode
+npm run test:coverage # Run tests with coverage report
 npx prisma studio    # Open Prisma Studio
 npx prisma generate  # Generate Prisma Client
 npm run seed         # Seed database
 ```
 
+### Testing
+
+The project uses **Jest** and **React Testing Library** for testing.
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode (for development)
+npm run test:watch
+
+# Generate coverage report
+npm run test:coverage
+```
+
+**Test Structure:**
+- `__tests__/lib/` - Unit tests for utility functions
+- `__tests__/lib/services/` - Service layer tests
+- `__tests__/lib/middleware/` - Middleware tests
+- `__tests__/lib/validations/` - Validation schema tests
+
+**Writing Tests:**
+```typescript
+// Example test file: __tests__/lib/utils.test.ts
+import { describe, it, expect } from '@jest/globals';
+import { myFunction } from '@/lib/utils';
+
+describe('myFunction', () => {
+  it('should return expected output', () => {
+    expect(myFunction('input')).toBe('expected');
+  });
+});
+```
+
+**Current Coverage:**
+- Initial test infrastructure established
+- Unit tests for critical functions
+- Validation schema tests
+- See `npm run test:coverage` for detailed metrics
+
 ### Code Quality
 
 - **TypeScript**: Strict mode enabled
-- **ESLint**: Next.js recommended configuration
-- **Prettier**: Consistent code formatting
+- **ESLint**: Next.js recommended configuration with console.log warnings
+- **Jest**: Testing infrastructure with 34+ passing tests
 - **Prisma**: Type-safe database queries
+- **Zod**: Runtime type validation
 
 ### Git Workflow
 
