@@ -102,16 +102,18 @@ export async function deleteUser(id: string): Promise<void> {
  * Get user with their subscription
  */
 export async function getUserWithSubscription(userId: string) {
-  return await prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: { id: userId },
+  });
+  
+  const subscription = await prisma.subscription.findUnique({
+    where: { userId },
     include: {
-      subscription: {
-        include: {
-          plan: true,
-        },
-      },
+      plan: true,
     },
   });
+
+  return { ...user, subscription };
 }
 
 /**
@@ -124,11 +126,11 @@ export async function getUserQuizStats(userId: string) {
       quiz: {
         select: {
           title: true,
-          difficulty: true,
+          description: true,
         },
       },
     },
-    orderBy: { createdAt: "desc" },
+    orderBy: { startedAt: "desc" },
   });
 
   const totalAttempts = attempts.length;
@@ -144,43 +146,27 @@ export async function getUserQuizStats(userId: string) {
 }
 
 /**
- * Get user's performance by difficulty
+ * Get user's performance summary
  */
-export async function getUserPerformanceByDifficulty(userId: string) {
+export async function getUserPerformanceSummary(userId: string) {
   const attempts = await prisma.quizAttempt.findMany({
-    where: { userId },
-    include: {
-      quiz: {
-        select: {
-          difficulty: true,
-        },
-      },
-    },
+    where: { userId, status: "COMPLETED" },
   });
 
-  const performance = {
-    EASY: { total: 0, avgScore: 0 },
-    MEDIUM: { total: 0, avgScore: 0 },
-    HARD: { total: 0, avgScore: 0 },
+  const totalAttempts = attempts.length;
+  const averageScore = attempts.length > 0
+    ? attempts.reduce((sum, a) => sum + a.score, 0) / attempts.length
+    : 0;
+  
+  const highestScore = attempts.length > 0
+    ? Math.max(...attempts.map((a) => a.score))
+    : 0;
+
+  return {
+    totalAttempts,
+    averageScore: Math.round(averageScore * 100) / 100,
+    highestScore,
   };
-
-  attempts.forEach((attempt) => {
-    const difficulty = attempt.quiz.difficulty as keyof typeof performance;
-    if (performance[difficulty]) {
-      performance[difficulty].total++;
-      performance[difficulty].avgScore += attempt.score;
-    }
-  });
-
-  // Calculate averages
-  Object.keys(performance).forEach((key) => {
-    const diff = key as keyof typeof performance;
-    if (performance[diff].total > 0) {
-      performance[diff].avgScore = performance[diff].avgScore / performance[diff].total;
-    }
-  });
-
-  return performance;
 }
 
 /**
@@ -189,24 +175,25 @@ export async function getUserPerformanceByDifficulty(userId: string) {
 export async function exportUserData(userId: string) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
+  });
+
+  const quizAttempts = await prisma.quizAttempt.findMany({
+    where: { userId },
     include: {
-      quizAttempts: {
-        include: {
-          quiz: true,
-        },
-      },
-      mockTestAttempts: {
-        include: {
-          mockTest: true,
-        },
-      },
-      subscription: {
-        include: {
-          plan: true,
-        },
-      },
+      quiz: true,
     },
   });
 
-  return user;
+  const subscription = await prisma.subscription.findUnique({
+    where: { userId },
+    include: {
+      plan: true,
+    },
+  });
+
+  return {
+    user,
+    quizAttempts,
+    subscription,
+  };
 }

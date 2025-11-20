@@ -96,7 +96,7 @@ export async function createSubscription(
   // Calculate end date based on plan duration
   const now = new Date();
   const endDate = new Date(now);
-  endDate.setMonth(endDate.getMonth() + plan.durationMonths);
+  endDate.setDate(endDate.getDate() + plan.durationDays);
 
   return await prisma.subscription.create({
     data: {
@@ -147,7 +147,7 @@ export async function renewSubscription(
   // Calculate new end date
   const now = new Date();
   const newEndDate = new Date(now);
-  newEndDate.setMonth(newEndDate.getMonth() + subscription.plan.durationMonths);
+  newEndDate.setDate(newEndDate.getDate() + subscription.plan.durationDays);
 
   return await prisma.subscription.update({
     where: { userId },
@@ -215,7 +215,7 @@ export async function getSubscriptionStatistics() {
   });
 
   const monthlyRevenue = activeSubscriptions.reduce(
-    (sum, sub) => sum + sub.plan.price,
+    (sum, sub) => sum + Number(sub.plan.price),
     0
   );
 

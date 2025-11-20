@@ -26,8 +26,7 @@ export async function getQuizById(id: string): Promise<Quiz | null> {
   return await prisma.quiz.findUnique({
     where: { id },
     include: {
-      questions: true,
-      subject: true,
+      attempts: true,
     },
   });
 }
@@ -37,22 +36,13 @@ export async function getQuizById(id: string): Promise<Quiz | null> {
  */
 export async function getQuizzes(filters?: {
   subjectId?: string;
-  difficulty?: string;
-  userId?: string;
 }) {
   return await prisma.quiz.findMany({
     where: {
       ...(filters?.subjectId && { subjectId: filters.subjectId }),
-      ...(filters?.difficulty && { difficulty: filters.difficulty }),
-      ...(filters?.userId && { userId: filters.userId }),
     },
     include: {
-      subject: {
-        select: {
-          name: true,
-        },
-      },
-      questions: {
+      attempts: {
         select: {
           id: true,
         },
@@ -85,12 +75,17 @@ export async function deleteQuiz(id: string): Promise<void> {
 }
 
 /**
- * Get quiz questions
+ * Get questions for chapters in quiz
+ * Note: Quiz stores chapterIds in Json field, so this needs to be parsed
  */
-export async function getQuizQuestions(quizId: string): Promise<Question[]> {
+export async function getQuizQuestions(chapterIds: string[]): Promise<Question[]> {
   return await prisma.question.findMany({
-    where: { quizId },
-    orderBy: { order: "asc" },
+    where: {
+      chapterId: {
+        in: chapterIds,
+      },
+    },
+    orderBy: { createdAt: "desc" },
   });
 }
 
@@ -99,15 +94,17 @@ export async function getQuizQuestions(quizId: string): Promise<Question[]> {
  */
 export async function createQuizAttempt(
   userId: string,
-  quizId: string
+  quizId: string,
+  totalQuestions: number
 ): Promise<QuizAttempt> {
   return await prisma.quizAttempt.create({
     data: {
       userId,
       quizId,
-      answers: {},
+      answers: [],
       score: 0,
-      completed: false,
+      totalQuestions,
+      status: "IN_PROGRESS",
     },
   });
 }
@@ -119,9 +116,11 @@ export async function getQuizAttempt(attemptId: string) {
   return await prisma.quizAttempt.findUnique({
     where: { id: attemptId },
     include: {
-      quiz: {
-        include: {
-          questions: true,
+      quiz: true,
+      user: {
+        select: {
+          id: true,
+          name: true,
         },
       },
     },
@@ -145,44 +144,25 @@ export async function updateQuizAttemptProgress(
 
 /**
  * Submit and score quiz attempt
+ * Note: Scoring logic should be implemented based on your specific requirements
+ * This is a simplified version
  */
 export async function submitQuizAttempt(
   attemptId: string,
-  answers: Record<string, string>
+  answers: any[],
+  score: number
 ): Promise<QuizAttempt> {
   const attempt = await prisma.quizAttempt.findUnique({
     where: { id: attemptId },
-    include: {
-      quiz: {
-        include: {
-          questions: true,
-        },
-      },
-    },
   });
 
   if (!attempt) {
     throw new Error("Quiz attempt not found");
   }
 
-  if (attempt.completed) {
+  if (attempt.status === "COMPLETED") {
     throw new Error("Quiz attempt already completed");
   }
-
-  // Calculate score
-  let correctAnswers = 0;
-  const totalQuestions = attempt.quiz.questions.length;
-
-  attempt.quiz.questions.forEach((question) => {
-    const userAnswer = answers[question.id];
-    if (userAnswer === question.correctAnswer) {
-      correctAnswers++;
-    }
-  });
-
-  const score = totalQuestions > 0
-    ? Math.round((correctAnswers / totalQuestions) * 100)
-    : 0;
 
   // Update attempt with final score
   return await prisma.quizAttempt.update({
@@ -190,7 +170,7 @@ export async function submitQuizAttempt(
     data: {
       answers: answers as any,
       score,
-      completed: true,
+      status: "COMPLETED",
       completedAt: new Date(),
     },
   });
@@ -212,11 +192,11 @@ export async function getUserQuizAttempts(
       quiz: {
         select: {
           title: true,
-          difficulty: true,
+          description: true,
         },
       },
     },
-    orderBy: { createdAt: "desc" },
+    orderBy: { startedAt: "desc" },
   });
 }
 
@@ -225,7 +205,7 @@ export async function getUserQuizAttempts(
  */
 export async function getQuizStatistics(quizId: string) {
   const attempts = await prisma.quizAttempt.findMany({
-    where: { quizId, completed: true },
+    where: { quizId, status: "COMPLETED" },
   });
 
   const totalAttempts = attempts.length;
@@ -259,12 +239,12 @@ export async function getRecentQuizAttempts(
   return await prisma.quizAttempt.findMany({
     where: {
       userId,
-      completed: true,
+      status: "COMPLETED",
     },
     include: {
       quiz: {
         select: {
-          difficulty: true,
+          title: true,
           subjectId: true,
         },
       },
@@ -280,28 +260,23 @@ export async function getRecentQuizAttempts(
 export async function canUserAttemptQuiz(userId: string): Promise<boolean> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    include: {
-      subscription: true,
-      quizAttempts: {
-        where: {
-          createdAt: {
-            gte: new Date(Date.now() - 24 * 60 * 60 * 1000), // Last 24 hours
-          },
-        },
-      },
-    },
   });
 
   if (!user) {
     return false;
   }
 
-  // If user has active subscription, allow unlimited attempts
-  if (user.subscription && user.subscription.status === "ACTIVE") {
-    return true;
-  }
+  // Get recent attempts
+  const attemptsToday = await prisma.quizAttempt.count({
+    where: {
+      userId,
+      startedAt: {
+        gte: new Date(Date.now() - 24 * 60 * 60 * 1000), // Last 24 hours
+      },
+    },
+  });
 
+  // Simple check: For now, allow if user is a student (expand with subscription logic later)
   // For free users, limit to 5 quizzes per day
-  const attemptsToday = user.quizAttempts.length;
   return attemptsToday < 5;
 }

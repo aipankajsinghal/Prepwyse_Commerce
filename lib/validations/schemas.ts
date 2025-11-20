@@ -110,7 +110,7 @@ export const createSubscriptionPlanSchema = z.object({
   name: z.string().min(3).max(100),
   description: z.string().max(500).optional(),
   price: z.number().min(0),
-  durationMonths: z.number().int().min(1).max(36),
+  durationDays: z.number().int().min(1).max(1095), // ~3 years
   features: z.array(z.string()),
   isActive: z.boolean().default(true),
   maxQuizzes: z.number().int().min(-1).optional(), // -1 for unlimited
@@ -275,7 +275,7 @@ export function validateRequest<T>(
  */
 export function formatValidationErrors(error: z.ZodError): Record<string, string[]> {
   const formatted: Record<string, string[]> = {};
-  error.errors.forEach((err) => {
+  error.issues.forEach((err) => {
     const path = err.path.join(".");
     if (!formatted[path]) {
       formatted[path] = [];
