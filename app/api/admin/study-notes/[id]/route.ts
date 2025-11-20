@@ -12,6 +12,9 @@ import { withAdminAuthParams } from "@/lib/auth/withAdminAuth";
 
 // PATCH /api/admin/study-notes/[id] - Update study note (admin only)
 export const PATCH = withAdminAuthParams(async (req, { user, params }) => {
+  if (!params?.id) {
+    return NextResponse.json({ error: "Study note ID is required" }, { status: 400 });
+  }
   const { id } = params;
   const data = await req.json();
   const {
@@ -57,6 +60,9 @@ export const PATCH = withAdminAuthParams(async (req, { user, params }) => {
 
 // DELETE /api/admin/study-notes/[id] - Delete study note (admin only)
 export const DELETE = withAdminAuthParams(async (req, { user, params }) => {
+  if (!params?.id) {
+    return NextResponse.json({ error: "Study note ID is required" }, { status: 400 });
+  }
   const { id } = params;
 
   // Check if note exists

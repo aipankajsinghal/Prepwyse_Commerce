@@ -12,6 +12,9 @@ import { withAdminAuthParams } from "@/lib/auth/withAdminAuth";
 
 // PATCH /api/admin/practice-papers/[id] - Update practice paper (admin only)
 export const PATCH = withAdminAuthParams(async (req, { user, params }) => {
+  if (!params?.id) {
+    return NextResponse.json({ error: "Practice paper ID is required" }, { status: 400 });
+  }
   const { id } = params;
   const data = await req.json();
   const {
@@ -61,6 +64,9 @@ export const PATCH = withAdminAuthParams(async (req, { user, params }) => {
 
 // DELETE /api/admin/practice-papers/[id] - Delete practice paper (admin only)
 export const DELETE = withAdminAuthParams(async (req, { user, params }) => {
+  if (!params?.id) {
+    return NextResponse.json({ error: "Practice paper ID is required" }, { status: 400 });
+  }
   const { id } = params;
 
   // Check if paper exists

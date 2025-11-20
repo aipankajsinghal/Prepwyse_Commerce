@@ -3,6 +3,25 @@ import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { handleApiError, unauthorizedError, notFoundError, validationError, forbiddenError } from "@/lib/api-error-handler";
 
+// Type definitions for practice paper data
+interface PracticeQuestion {
+  id: string;
+  correctAnswer?: string;
+  [key: string]: unknown;
+}
+
+interface PracticeSolution {
+  questionId: string;
+  correctAnswer: string;
+  [key: string]: unknown;
+}
+
+interface SubmittedAnswer {
+  questionId: string;
+  selectedAnswer: string;
+  [key: string]: unknown;
+}
+
 // POST /api/practice-papers/submit - Submit practice paper attempt
 export async function POST(request: Request) {
   try {
@@ -37,8 +56,8 @@ export async function POST(request: Request) {
     }
 
     // Calculate score
-    const questions = attempt.paper.questions as any[];
-    const solutions = (attempt.paper.solutions as any[]) || [];
+    const questions = attempt.paper.questions as PracticeQuestion[];
+    const solutions = (attempt.paper.solutions as PracticeSolution[]) || [];
     
     // Validate questions array is not empty
     if (!questions || questions.length === 0) {
@@ -46,11 +65,11 @@ export async function POST(request: Request) {
     }
     
     let correctAnswers = 0;
-    const answersArray = Array.isArray(answers) ? answers : [];
+    const answersArray = Array.isArray(answers) ? (answers as SubmittedAnswer[]) : [];
 
-    answersArray.forEach((answer: any) => {
-      const question = questions.find((q: any) => q.id === answer.questionId);
-      const solution = solutions.find((s: any) => s.questionId === answer.questionId);
+    answersArray.forEach((answer: SubmittedAnswer) => {
+      const question = questions.find((q: PracticeQuestion) => q.id === answer.questionId);
+      const solution = solutions.find((s: PracticeSolution) => s.questionId === answer.questionId);
       
       if (question && solution && answer.selectedAnswer === solution.correctAnswer) {
         correctAnswers++;
@@ -68,7 +87,7 @@ export async function POST(request: Request) {
     const updatedAttempt = await prisma.practicePaperAttempt.update({
       where: { id: attemptId },
       data: {
-        answers: answersArray,
+        answers: answersArray as unknown as any, // Prisma Json type requires any for dynamic objects
         score: correctAnswers,
         obtainedMarks,
         accuracy,

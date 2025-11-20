@@ -53,7 +53,7 @@ export async function requireAdmin() {
  * 
  * @returns Promise<{ user: User } | NextResponse> Either the admin user or an error response
  */
-export async function checkAdminAuth(): Promise<{ user: any } | NextResponse> {
+export async function checkAdminAuth(): Promise<{ user: Awaited<ReturnType<typeof requireAdmin>> } | NextResponse> {
   try {
     const user = await requireAdmin();
     return { user };
