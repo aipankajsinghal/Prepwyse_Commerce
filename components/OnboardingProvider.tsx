@@ -37,6 +37,28 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     setIsActive(true);
   }, []);
 
+  const completeOnboarding = useCallback(() => {
+    setIsActive(false);
+    setCurrentStep(0);
+    setSteps([]);
+    setHighlightedElement(null);
+    // Store in localStorage that user completed onboarding
+    if (typeof window !== "undefined") {
+      localStorage.setItem("onboarding_completed", "true");
+    }
+  }, []);
+
+  const skipOnboarding = useCallback(() => {
+    setIsActive(false);
+    setCurrentStep(0);
+    setSteps([]);
+    setHighlightedElement(null);
+    // Store in localStorage that user skipped onboarding
+    if (typeof window !== "undefined") {
+      localStorage.setItem("onboarding_completed", "skipped");
+    }
+  }, []);
+
   const nextStep = useCallback(() => {
     if (currentStep < steps.length - 1) {
       setCurrentStep((prev) => prev + 1);
@@ -50,28 +72,6 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       setCurrentStep((prev) => prev - 1);
     }
   }, [currentStep]);
-
-  const skipOnboarding = useCallback(() => {
-    setIsActive(false);
-    setCurrentStep(0);
-    setSteps([]);
-    setHighlightedElement(null);
-    // Store in localStorage that user skipped onboarding
-    if (typeof window !== "undefined") {
-      localStorage.setItem("onboarding_completed", "skipped");
-    }
-  }, []);
-
-  const completeOnboarding = useCallback(() => {
-    setIsActive(false);
-    setCurrentStep(0);
-    setSteps([]);
-    setHighlightedElement(null);
-    // Store in localStorage that user completed onboarding
-    if (typeof window !== "undefined") {
-      localStorage.setItem("onboarding_completed", "true");
-    }
-  }, []);
 
   // Update highlighted element when step changes
   useEffect(() => {
