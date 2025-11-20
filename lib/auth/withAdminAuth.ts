@@ -1,12 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkAdminAuth } from "./requireAdmin";
+import type { User } from "@prisma/client";
+
+/**
+ * Context type for Next.js route handlers
+ */
+type RouteContext = {
+  params?: Promise<Record<string, string>> | Record<string, string>;
+};
 
 /**
  * Type definition for admin route handlers
  */
 type AdminRouteHandler = (
   req: NextRequest,
-  context: { user: any; params?: any }
+  context: { user: User; params?: Record<string, string> }
 ) => Promise<NextResponse>;
 
 /**
@@ -29,8 +37,8 @@ type AdminRouteHandler = (
  */
 export function withAdminAuth(
   handler: AdminRouteHandler
-): (req: NextRequest, context?: any) => Promise<NextResponse> {
-  return async (req: NextRequest, context?: any) => {
+): (req: NextRequest, context?: RouteContext) => Promise<NextResponse> {
+  return async (req: NextRequest, context?: RouteContext) => {
     try {
       // Check admin authorization
       const authResult = await checkAdminAuth();
@@ -39,9 +47,13 @@ export function withAdminAuth(
       }
 
       // Extract user and pass to handler along with any route params
+      const params = context?.params ? 
+        (context.params instanceof Promise ? await context.params : context.params) : 
+        undefined;
+      
       const handlerContext = {
         user: authResult.user,
-        ...(context?.params && { params: await context.params }),
+        params,
       };
 
       // Call the actual handler

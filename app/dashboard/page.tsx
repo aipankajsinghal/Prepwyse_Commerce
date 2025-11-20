@@ -11,7 +11,7 @@ export default async function DashboardPage() {
   }
 
   const user = await currentUser();
-  const userName = user?.firstName || user?.emailAddresses[0].emailAddress || "Student";
+  const userName = user?.firstName || user?.emailAddresses?.[0]?.emailAddress || "Student";
 
   return (
     <div className="min-h-screen bg-[rgb(var(--bg))] bg-pattern">

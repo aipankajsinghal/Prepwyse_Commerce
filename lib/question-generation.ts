@@ -17,6 +17,16 @@ interface GenerateQuestionsParams {
   sourceType: "ai" | "upload" | "manual";
 }
 
+interface GeneratedQuestion {
+  questionText: string;
+  options: string[];
+  correctAnswer: string;
+  explanation?: string;
+  difficulty: "easy" | "medium" | "hard";
+  tags?: string[];
+  qualityScore?: number;
+}
+
 /**
  * Start a bulk question generation job
  */
@@ -61,17 +71,19 @@ export async function startQuestionGenerationJob(params: GenerateQuestionsParams
   });
 
   // Process job asynchronously
-  processQuestionGenerationJob(job.id).catch((error) => {
+  processQuestionGenerationJob(job.id).catch(async (error) => {
     console.error("Error processing question generation job:", error);
-    prisma.questionGenerationJob
-      .update({
+    try {
+      await prisma.questionGenerationJob.update({
         where: { id: job.id },
         data: {
           status: "failed",
           errorMessage: error.message,
         },
-      })
-      .catch(console.error);
+      });
+    } catch (updateError) {
+      console.error("Failed to update job status after error:", updateError);
+    }
   });
 
   return job;
@@ -159,12 +171,13 @@ async function processQuestionGenerationJob(jobId: string) {
         progress: 100,
       },
     });
-  } catch (error: any) {
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
     await prisma.questionGenerationJob.update({
       where: { id: jobId },
       data: {
         status: "failed",
-        errorMessage: error.message,
+        errorMessage,
       },
     });
     throw error;
@@ -179,7 +192,7 @@ async function generateQuestionsForChapter(params: {
   count: number;
   difficulty?: "easy" | "medium" | "hard";
   sourceContent?: string;
-}): Promise<any[]> {
+}): Promise<GeneratedQuestion[]> {
   const { chapterId, count, difficulty, sourceContent } = params;
 
   // Get chapter details
@@ -244,10 +257,10 @@ Important:
 
     // Validate generated questions
     const validatedQuestions = await Promise.all(
-      questions.map((q: any) => validateGeneratedQuestion(q, chapterId))
+      questions.map((q: unknown) => validateGeneratedQuestion(q as GeneratedQuestion, chapterId))
     );
 
-    return validatedQuestions.filter((q) => q !== null);
+    return validatedQuestions.filter((q): q is GeneratedQuestion => q !== null);
   } catch (error) {
     console.error("Failed to parse AI response:", content);
     throw new Error("Invalid AI response format");
@@ -257,7 +270,7 @@ Important:
 /**
  * Validate a generated question
  */
-async function validateGeneratedQuestion(question: any, chapterId: string) {
+async function validateGeneratedQuestion(question: GeneratedQuestion, chapterId: string): Promise<GeneratedQuestion | null> {
   const issues: string[] = [];
   const suggestions: string[] = [];
 
@@ -289,7 +302,7 @@ async function validateGeneratedQuestion(question: any, chapterId: string) {
   }
 
   // Check explanation
-  if (!question.explanation || question.explanation.length < 20) {
+  if (!question.explanation || (question.explanation && question.explanation.length < 20)) {
     suggestions.push("Explanation should be more detailed");
   }
 
@@ -379,7 +392,7 @@ function calculateTextSimilarity(text1: string, text2: string): number {
  * Calculate quality score for a question
  */
 function calculateQualityScore(
-  question: any,
+  question: GeneratedQuestion,
   issues: string[],
   suggestions: string[]
 ): number {
@@ -397,7 +410,7 @@ function calculateQualityScore(
   }
 
   // Explanation length factor
-  if (question.explanation?.length < 50) {
+  if (question.explanation && question.explanation.length < 50) {
     score -= 0.1;
   }
 
@@ -483,7 +496,7 @@ async function updateJobStats(
 
   if (!job) return;
 
-  const updates: any = {};
+  const updates: { totalApproved?: number; totalRejected?: number } = {};
 
   if (action === "approve") {
     updates.totalApproved = job.totalApproved + 1;

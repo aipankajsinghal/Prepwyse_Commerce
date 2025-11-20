@@ -33,7 +33,9 @@ export const QuizAttemptService = {
     { userId: string; attemptId: string; currentQuestionIndex?: number; timeRemaining?: number | null; answers?: StoredAnswer[]; }) {
 
     const attempt = await prisma.quizAttempt.findFirstOrThrow({ where: { id: attemptId, userId } });
-    if (attempt.status !== "IN_PROGRESS") return attempt;
+    if (attempt.status !== "IN_PROGRESS") {
+      throw new Error(`Cannot update quiz attempt: status is ${attempt.status}, expected IN_PROGRESS`);
+    }
 
     const existingAnswers = (attempt.answers as StoredAnswer[]) ?? [];
     const merged = mergeAnswers(existingAnswers, answers ?? []);
@@ -52,7 +54,9 @@ export const QuizAttemptService = {
 
   async submitAttempt({ userId, attemptId }: { userId: string; attemptId: string }) {
     const attempt = await prisma.quizAttempt.findFirstOrThrow({ where: { id: attemptId, userId } });
-    if (attempt.status !== "IN_PROGRESS") return attempt;
+    if (attempt.status !== "IN_PROGRESS") {
+      throw new Error(`Cannot submit quiz attempt: status is ${attempt.status}, expected IN_PROGRESS`);
+    }
 
     const quiz = await prisma.quiz.findUniqueOrThrow({ where: { id: attempt.quizId } });
     const chapterIds = (quiz.chapterIds as string[]) ?? [];

@@ -23,6 +23,9 @@ type RouteParams = {
  * Get single subscription plan
  */
 export const GET = withAdminAuthParams(async (req, { user, params }) => {
+  if (!params?.id) {
+    return NextResponse.json({ error: "Subscription plan ID is required" }, { status: 400 });
+  }
   const { id } = params;
 
   const plan = await prisma.subscriptionPlan.findUnique({
@@ -44,6 +47,9 @@ export const GET = withAdminAuthParams(async (req, { user, params }) => {
  * Update subscription plan (admin only)
  */
 export const PATCH = withAdminAuthParams(async (req, { user, params }) => {
+  if (!params?.id) {
+    return NextResponse.json({ error: "Subscription plan ID is required" }, { status: 400 });
+  }
   const { id } = params;
   const body = await req.json();
 
@@ -94,6 +100,9 @@ export const PATCH = withAdminAuthParams(async (req, { user, params }) => {
  * Delete subscription plan (admin only)
  */
 export const DELETE = withAdminAuthParams(async (req, { user, params }) => {
+  if (!params?.id) {
+    return NextResponse.json({ error: "Subscription plan ID is required" }, { status: 400 });
+  }
   const { id } = params;
 
   // Check if plan exists

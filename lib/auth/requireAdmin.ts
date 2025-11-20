@@ -18,16 +18,22 @@ export async function requireAdmin() {
 
   const clerkUser = await currentUser();
   
+  // Validate email exists
+  const email = clerkUser?.emailAddresses?.[0]?.emailAddress;
+  if (!email) {
+    throw new Error("User email address is required");
+  }
+  
   // Ensure user exists in database
   const dbUser = await prisma.user.upsert({
     where: { clerkId: userId },
     update: {
-      email: clerkUser?.emailAddresses[0].emailAddress || "",
+      email,
       name: `${clerkUser?.firstName || ""} ${clerkUser?.lastName || ""}`.trim() || null,
     },
     create: {
       clerkId: userId,
-      email: clerkUser?.emailAddresses[0].emailAddress || "",
+      email,
       name: `${clerkUser?.firstName || ""} ${clerkUser?.lastName || ""}`.trim() || null,
       role: "STUDENT", // Default role for new users
     },
@@ -47,7 +53,7 @@ export async function requireAdmin() {
  * 
  * @returns Promise<{ user: User } | NextResponse> Either the admin user or an error response
  */
-export async function checkAdminAuth(): Promise<{ user: any } | NextResponse> {
+export async function checkAdminAuth(): Promise<{ user: Awaited<ReturnType<typeof requireAdmin>> } | NextResponse> {
   try {
     const user = await requireAdmin();
     return { user };
