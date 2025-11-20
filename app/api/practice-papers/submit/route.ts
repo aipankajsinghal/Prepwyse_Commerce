@@ -40,6 +40,11 @@ export async function POST(request: Request) {
     const questions = attempt.paper.questions as any[];
     const solutions = (attempt.paper.solutions as any[]) || [];
     
+    // Validate questions array is not empty
+    if (!questions || questions.length === 0) {
+      return validationError("Practice paper has no questions");
+    }
+    
     let correctAnswers = 0;
     const answersArray = Array.isArray(answers) ? answers : [];
 

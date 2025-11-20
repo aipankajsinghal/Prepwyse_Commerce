@@ -22,12 +22,12 @@ export async function requireAdmin() {
   const dbUser = await prisma.user.upsert({
     where: { clerkId: userId },
     update: {
-      email: clerkUser?.emailAddresses[0].emailAddress || "",
+      email: clerkUser?.emailAddresses?.[0]?.emailAddress || "",
       name: `${clerkUser?.firstName || ""} ${clerkUser?.lastName || ""}`.trim() || null,
     },
     create: {
       clerkId: userId,
-      email: clerkUser?.emailAddresses[0].emailAddress || "",
+      email: clerkUser?.emailAddresses?.[0]?.emailAddress || "",
       name: `${clerkUser?.firstName || ""} ${clerkUser?.lastName || ""}`.trim() || null,
       role: "STUDENT", // Default role for new users
     },

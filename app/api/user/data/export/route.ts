@@ -51,7 +51,7 @@ export async function GET() {
       user: {
         id: user.id,
         clerkId: user.clerkId,
-        email: clerkUser?.emailAddresses[0]?.emailAddress || user.email,
+        email: clerkUser?.emailAddresses?.[0]?.emailAddress || user.email,
         name: user.name,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,

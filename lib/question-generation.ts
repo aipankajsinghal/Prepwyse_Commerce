@@ -61,17 +61,19 @@ export async function startQuestionGenerationJob(params: GenerateQuestionsParams
   });
 
   // Process job asynchronously
-  processQuestionGenerationJob(job.id).catch((error) => {
+  processQuestionGenerationJob(job.id).catch(async (error) => {
     console.error("Error processing question generation job:", error);
-    prisma.questionGenerationJob
-      .update({
+    try {
+      await prisma.questionGenerationJob.update({
         where: { id: job.id },
         data: {
           status: "failed",
           errorMessage: error.message,
         },
-      })
-      .catch(console.error);
+      });
+    } catch (updateError) {
+      console.error("Failed to update job status after error:", updateError);
+    }
   });
 
   return job;
