@@ -8,12 +8,19 @@ An enterprise-grade, AI-powered EdTech platform designed for commerce students i
 
 ## 🚀 Quick Links
 
+### Documentation
 - [📖 Technical Documentation](./TECHNICAL_DOCUMENTATION.md) - Architecture, APIs, and development guide
-- [🐳 Docker Deployment Guide](./DOCKER_DEPLOYMENT.md) - VPS deployment with Docker
 - [⚡ Quick Start Guide](./QUICKSTART.md) - 5-minute local setup
 - [🔒 Security Documentation](./SECURITY.md) - Security practices and policies
 - [🤝 Contributing Guide](./CONTRIBUTING.md) - How to contribute
-- [🎯 Phase E Documentation](./PHASE_E_DOCUMENTATION.md) - Adaptive Learning & Question Generation ✨ NEW
+- [🎯 Phase E Documentation](./PHASE_E_DOCUMENTATION.md) - Adaptive Learning & Question Generation
+
+### Deployment Guides ✨ NEW
+- [🚀 Deployment Quick Start](./DEPLOYMENT_QUICK_START.md) - Fast-track deployment in 30 minutes
+- [🐳 Docker Deployment Guide](./DOCKER_DEPLOYMENT.md) - VPS deployment with Docker
+- [📋 Deployment Readiness Checklist](./DEPLOYMENT_READINESS_CHECKLIST.md) - Production readiness verification
+- [🧪 Deployment Testing Guide](./DEPLOYMENT_TESTING_GUIDE.md) - Comprehensive testing procedures
+- [⚙️ CI/CD Setup](./CI_CD_SETUP.md) - Automated deployment pipelines
 
 ## ✨ Features
 
