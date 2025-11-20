@@ -8,10 +8,7 @@
 
 # testing
 /coverage
-*.test.ts
-*.test.tsx
-*.spec.ts
-*.spec.tsx
+# Test files are now included in the repository
 
 # next.js
 /.next/
