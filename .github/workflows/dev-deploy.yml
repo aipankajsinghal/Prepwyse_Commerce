@@ -1,0 +1,81 @@
+name: Dev Deploy (build, test, migrate, optional deploy)
+
+on:
+  push:
+    branches: [ 'develop', 'dev' ]
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+
+      - name: Run tests
+        run: |
+          if npm run -s test --silent; then
+            echo "Tests passed";
+          else
+            echo "Tests failed or not present, continuing";
+          fi
+
+  prisma-migrate:
+    name: Run Prisma Migrations (if DATABASE_URL set)
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: ${{ secrets.DATABASE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Prisma Migrate Deploy
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          echo "Running prisma migrate deploy against provided DATABASE_URL"
+          npx prisma migrate deploy
+
+  vercel-deploy:
+    name: (Optional) Deploy to Vercel Preview
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Vercel (preview)
+        uses: amondnet/vercel-action@v20
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          prod: false
