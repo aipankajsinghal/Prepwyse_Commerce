@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import DOMPurify from "isomorphic-dompurify";
 import {
   BookOpen,
   ArrowLeft,
@@ -280,7 +281,17 @@ export default function ViewNotePage({
             <div
               className="prose prose-lg dark:prose-invert max-w-none"
               dangerouslySetInnerHTML={{
-                __html: note.content.replace(/\n/g, "<br>"),
+                __html: DOMPurify.sanitize(
+                  note.content.replace(/\n/g, "<br>"),
+                  {
+                    ALLOWED_TAGS: [
+                      'b', 'i', 'em', 'strong', 'a', 'p', 'br', 'ul', 'ol', 'li',
+                      'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'code', 'pre', 'blockquote',
+                      'span', 'div', 'table', 'thead', 'tbody', 'tr', 'th', 'td'
+                    ],
+                    ALLOWED_ATTR: ['href', 'target', 'rel', 'class'],
+                  }
+                ),
               }}
             />
           </div>
