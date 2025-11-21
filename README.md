@@ -3,8 +3,15 @@
 [![CI Pipeline](https://github.com/aipankajsinghal/Prepwyse_Commerce/workflows/CI%20Pipeline/badge.svg)](https://github.com/aipankajsinghal/Prepwyse_Commerce/actions)
 [![Docker Build](https://github.com/aipankajsinghal/Prepwyse_Commerce/workflows/Docker%20Build/badge.svg)](https://github.com/aipankajsinghal/Prepwyse_Commerce/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Faipankajsinghal%2FPrepwyse_Commerce&env=DATABASE_URL,NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,CLERK_SECRET_KEY,OPENAI_API_KEY&envDescription=Required%20environment%20variables%20for%20PrepWyse%20Commerce&envLink=https%3A%2F%2Fgithub.com%2Faipankajsinghal%2FPrepwyse_Commerce%2Fblob%2Fmain%2FVERCEL_DEPLOYMENT.md&project-name=prepwyse-commerce&repository-name=prepwyse-commerce)
 
 An enterprise-grade, AI-powered EdTech platform designed for commerce students in Class 11, Class 12, and CUET Commerce exam preparation in India. Features intelligent adaptive learning, comprehensive mock tests, and professional deployment support.
+
+## 🚀 One-Click Deploy
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Faipankajsinghal%2FPrepwyse_Commerce&env=DATABASE_URL,NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,CLERK_SECRET_KEY,OPENAI_API_KEY&envDescription=Required%20environment%20variables%20for%20PrepWyse%20Commerce&envLink=https%3A%2F%2Fgithub.com%2Faipankajsinghal%2FPrepwyse_Commerce%2Fblob%2Fmain%2FVERCEL_DEPLOYMENT.md&project-name=prepwyse-commerce&repository-name=prepwyse-commerce)
+
+Click the button above to deploy to Vercel instantly. For detailed instructions, see the [Vercel Deployment Guide](./VERCEL_DEPLOYMENT.md).
 
 ## 🚀 Quick Links
 
@@ -16,6 +23,7 @@ An enterprise-grade, AI-powered EdTech platform designed for commerce students i
 - [🎯 Phase E Documentation](./PHASE_E_DOCUMENTATION.md) - Adaptive Learning & Question Generation
 
 ### Deployment Guides ✨ NEW
+- [▲ Vercel Deployment](./VERCEL_DEPLOYMENT.md) - **Recommended**: Deploy to Vercel in minutes
 - [🚀 Deployment Quick Start](./DEPLOYMENT_QUICK_START.md) - Fast-track deployment in 30 minutes
 - [🐳 Docker Deployment Guide](./DOCKER_DEPLOYMENT.md) - VPS deployment with Docker
 - [📋 Deployment Readiness Checklist](./DEPLOYMENT_READINESS_CHECKLIST.md) - Production readiness verification
