@@ -52,7 +52,8 @@ CODE_OF_CONDUCT.md
 .gitignore
 .gitattributes
 
-# Prisma (migrations are applied separately)
+# Prisma migrations (applied separately via CLI, not needed in Vercel build)
+# Note: prisma/schema.prisma is needed and will be included
 prisma/migrations
 
 # Temporary files
