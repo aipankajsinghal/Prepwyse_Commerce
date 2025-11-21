@@ -124,7 +124,7 @@ If you seeded the database, you can explore:
 
 2. **Customize**: Edit components in `components/` and pages in `app/`
 
-3. **Deploy**: Follow [DEPLOYMENT.md](./DEPLOYMENT.md) for production deployment
+3. **Deploy**: See the consolidated deployment instructions in [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)
 
 4. **Contribute**: Check [CONTRIBUTING.md](./CONTRIBUTING.md) to add features
 
