@@ -130,8 +130,8 @@ export default function RecommendationsPage() {
                 {insights.weakAreas.length > 0 ? (
                   insights.weakAreas.map((area, index) => (
                     <li key={index} className="text-sm text-text-primary flex items-start">
-                      <span className="mr-2">•</span>
-                      <span>{area}</span>
+                      <span className="mr-2 flex-shrink-0">•</span>
+                      <span className="break-words flex-1">{area}</span>
                     </li>
                   ))
                 ) : (
@@ -150,8 +150,8 @@ export default function RecommendationsPage() {
                 {insights.strongAreas.length > 0 ? (
                   insights.strongAreas.map((area, index) => (
                     <li key={index} className="text-sm text-text-primary flex items-start">
-                      <span className="mr-2">•</span>
-                      <span>{area}</span>
+                      <span className="mr-2 flex-shrink-0">•</span>
+                      <span className="break-words flex-1">{area}</span>
                     </li>
                   ))
                 ) : (
@@ -192,8 +192,8 @@ export default function RecommendationsPage() {
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center space-x-3">
                       <div className="text-text-primary">{getTypeIcon(rec.type)}</div>
-                      <div>
-                        <h3 className="font-semibold text-lg text-gray-900">{rec.title}</h3>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-lg text-gray-900 break-words">{rec.title}</h3>
                         <p className="text-xs text-gray-500 capitalize">{rec.type.replace("_", " ")}</p>
                       </div>
                     </div>
@@ -204,7 +204,7 @@ export default function RecommendationsPage() {
                     </div>
                   </div>
                   
-                  <p className="text-text-primary mb-3">{rec.description}</p>
+                  <p className="text-text-primary mb-3 break-words">{rec.description}</p>
                   
                   {Array.isArray(rec.content) && rec.content.length > 0 && (
                     <div className="mt-3 bg-white rounded-lg p-4">
@@ -212,8 +212,8 @@ export default function RecommendationsPage() {
                       <ul className="space-y-1">
                         {rec.content.map((item, index) => (
                           <li key={index} className="text-sm font-body text-text-secondary flex items-start">
-                            <span className="mr-2">✓</span>
-                            <span>{item}</span>
+                            <span className="mr-2 flex-shrink-0">✓</span>
+                            <span className="break-words flex-1">{item}</span>
                           </li>
                         ))}
                       </ul>

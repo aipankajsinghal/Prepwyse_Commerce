@@ -4,6 +4,7 @@ import Link from "next/link";
 import { BookOpen, Target, Trophy, TrendingUp, Sparkles } from "lucide-react";
 import { DashboardOnboarding } from "./DashboardOnboarding";
 import { ProfileCompletionChecklist } from "./ProfileCompletionChecklist";
+import { FirstLoginProfilePrompt } from "./FirstLoginProfilePrompt";
 
 interface DashboardClientProps {
   userName: string;
@@ -12,6 +13,7 @@ interface DashboardClientProps {
 export function DashboardClient({ userName }: DashboardClientProps) {
   return (
     <>
+      <FirstLoginProfilePrompt />
       <DashboardOnboarding />
       
       <main className="container mx-auto px-4 py-8">

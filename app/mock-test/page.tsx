@@ -77,11 +77,11 @@ export default function MockTestPage() {
                         {test.examType}
                       </span>
                     </div>
-                    <h3 className="text-xl font-display font-bold text-text-primary">{test.title}</h3>
+                    <h3 className="text-xl font-display font-bold text-text-primary break-words">{test.title}</h3>
                   </div>
                 </div>
 
-                <p className="font-body text-text-secondary mb-4">{test.description}</p>
+                <p className="font-body text-text-secondary mb-4 break-words">{test.description}</p>
 
                 {/* Test Info */}
                 <div className="grid grid-cols-2 gap-4 mb-4">

@@ -89,41 +89,41 @@ export default function AnalyticsPage() {
         <div className="grid md:grid-cols-4 gap-6 mb-8">
           <div className="edu-card p-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-body text-text-secondary font-medium">Average Score</h3>
-              <Target className="h-5 w-5 text-primary-600" />
+              <h3 className="font-body text-text-secondary font-medium break-words flex-1 mr-2">Average Score</h3>
+              <Target className="h-5 w-5 text-primary-600 flex-shrink-0" />
             </div>
             <p className="text-3xl font-display font-bold text-primary">{avgScore}%</p>
             <div className="flex items-center gap-1 mt-2 text-semantic-success text-sm">
-              <TrendingUp className="h-4 w-4" />
-              <span>+{improvement}% this week</span>
+              <TrendingUp className="h-4 w-4 flex-shrink-0" />
+              <span className="break-words">+{improvement}% this week</span>
             </div>
           </div>
 
           <div className="edu-card p-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-body text-text-secondary font-medium">Total Quizzes</h3>
-              <BarChart3 className="h-5 w-5 text-accent-1" />
+              <h3 className="font-body text-text-secondary font-medium break-words flex-1 mr-2">Total Quizzes</h3>
+              <BarChart3 className="h-5 w-5 text-accent-1 flex-shrink-0" />
             </div>
             <p className="text-3xl font-display font-bold text-primary">{totalQuizzes}</p>
-            <p className="text-sm font-body text-text-secondary mt-2">Across all subjects</p>
+            <p className="text-sm font-body text-text-secondary mt-2 break-words">Across all subjects</p>
           </div>
 
           <div className="edu-card p-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-body text-text-secondary font-medium">Study Time</h3>
-              <Clock className="h-5 w-5 text-accent-2" />
+              <h3 className="font-body text-text-secondary font-medium break-words flex-1 mr-2">Study Time</h3>
+              <Clock className="h-5 w-5 text-accent-2 flex-shrink-0" />
             </div>
             <p className="text-3xl font-display font-bold text-primary">12.5h</p>
-            <p className="text-sm font-body text-text-secondary mt-2">This week</p>
+            <p className="text-sm font-body text-text-secondary mt-2 break-words">This week</p>
           </div>
 
           <div className="edu-card p-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-body text-text-secondary font-medium">Rank</h3>
-              <Award className="h-5 w-5 text-yellow-600" />
+              <h3 className="font-body text-text-secondary font-medium break-words flex-1 mr-2">Rank</h3>
+              <Award className="h-5 w-5 text-yellow-600 flex-shrink-0" />
             </div>
             <p className="text-3xl font-display font-bold text-primary">Top 15%</p>
-            <p className="text-sm font-body text-text-secondary mt-2">Among peers</p>
+            <p className="text-sm font-body text-text-secondary mt-2 break-words">Among peers</p>
           </div>
         </div>
 
@@ -167,10 +167,10 @@ export default function AnalyticsPage() {
             <div className="space-y-4">
               {mockSubjectData.map((subject, index) => (
                 <div key={index} className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium text-gray-900">{subject.subject}</span>
-                    <div className="flex items-center gap-4 text-sm">
-                      <span className="font-body text-text-secondary">{subject.quizzes} quizzes</span>
+                  <div className="flex justify-between items-center gap-2">
+                    <span className="font-medium text-gray-900 break-words flex-1">{subject.subject}</span>
+                    <div className="flex items-center gap-4 text-sm flex-shrink-0">
+                      <span className="font-body text-text-secondary whitespace-nowrap">{subject.quizzes} quizzes</span>
                       <span className="font-semibold text-gray-900">{subject.score}%</span>
                     </div>
                   </div>
