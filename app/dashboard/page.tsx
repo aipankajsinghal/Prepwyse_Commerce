@@ -3,6 +3,9 @@ import { redirect } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import { DashboardClient } from "@/components/DashboardClient";
 
+// Force dynamic rendering so Clerk keys are only required at runtime
+export const dynamic = "force-dynamic";
+
 export default async function DashboardPage() {
   const { userId } = await auth();
 

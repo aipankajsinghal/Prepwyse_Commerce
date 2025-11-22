@@ -20,7 +20,9 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 
-export default function ProfilePage() {
+const hasClerkKey = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
+function ProfilePageWithAuth() {
   const { user, isLoaded } = useUser();
   const [isEditing, setIsEditing] = useState(false);
   const [grade, setGrade] = useState("");
@@ -334,4 +336,22 @@ export default function ProfilePage() {
       </main>
     </div>
   );
+}
+
+export default function ProfilePage() {
+  if (!hasClerkKey) {
+    return (
+      <div className="min-h-screen bg-[rgb(var(--bg))] bg-pattern dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <User className="h-16 w-16 text-primary mx-auto mb-4" />
+          <h1 className="text-2xl font-display font-bold text-primary dark:text-white mb-2">Authentication unavailable</h1>
+          <p className="font-body text-text-secondary dark:text-gray-300">
+            Provide NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY to enable the profile experience.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return <ProfilePageWithAuth />;
 }

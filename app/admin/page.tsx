@@ -20,7 +20,9 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 
-export default function AdminPanel() {
+const hasClerkKey = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
+function AdminPanelWithAuth() {
   const { user, isLoaded } = useUser();
   const [activeTab, setActiveTab] = useState("overview");
   const [searchQuery, setSearchQuery] = useState("");
@@ -363,4 +365,24 @@ export default function AdminPanel() {
       </main>
     </div>
   );
+}
+
+export default function AdminPanel() {
+  if (!hasClerkKey) {
+    return (
+      <div className="min-h-screen bg-[rgb(var(--bg))] bg-pattern dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <Shield className="h-16 w-16 text-red-500 mx-auto mb-4" />
+          <h1 className="text-2xl font-display font-bold text-primary dark:text-white mb-2">
+            Authentication unavailable
+          </h1>
+          <p className="font-body text-text-secondary dark:text-gray-300">
+            Provide NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY to enable the admin experience.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return <AdminPanelWithAuth />;
 }
