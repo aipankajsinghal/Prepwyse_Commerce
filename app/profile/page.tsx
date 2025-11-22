@@ -63,9 +63,9 @@ function ProfilePageWithAuth() {
       setIsEditing(false);
       setSuccess("Profile updated successfully!");
       setTimeout(() => setSuccess(""), 3000);
-    } catch (err) {
+    } catch (err: any) {
       setError("Failed to update profile. Please try again.");
-      console.error("Profile update error:", err);
+      console.error("Profile update error:", err.message || "Unknown error");
     } finally {
       setSaving(false);
     }

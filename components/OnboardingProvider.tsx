@@ -197,14 +197,13 @@ function OnboardingOverlay({
       <div className="fixed inset-0 bg-black/60 z-50 pointer-events-none">
         {highlightedElement && (
           <div
-            className="absolute border-4 border-accent-1 rounded-lg pointer-events-auto shadow-xl"
+            className="absolute border-4 border-accent-1 rounded-lg pointer-events-auto shadow-xl animate-pulse"
             style={{
               top: highlightedElement.getBoundingClientRect().top - (step.highlightPadding || 8),
               left: highlightedElement.getBoundingClientRect().left - (step.highlightPadding || 8),
               width: highlightedElement.getBoundingClientRect().width + (step.highlightPadding || 8) * 2,
               height: highlightedElement.getBoundingClientRect().height + (step.highlightPadding || 8) * 2,
               backgroundColor: 'rgba(255, 255, 255, 0.05)',
-              animation: 'pulse 2s ease-in-out infinite',
             }}
           />
         )}

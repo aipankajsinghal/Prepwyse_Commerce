@@ -51,6 +51,7 @@ export default function QuizPage() {
   const [useAI, setUseAI] = useState(true);
   const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard" | "adaptive">("adaptive");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChapterToggle = (chapterId: string) => {
     setSelectedChapters((prev) =>
@@ -74,11 +75,12 @@ export default function QuizPage() {
 
   const handleStartQuiz = async () => {
     if (selectedChapters.length === 0) {
-      alert("Please select at least one chapter");
+      setError("Please select at least one chapter");
       return;
     }
 
     setIsGenerating(true);
+    setError("");
     
     try {
       if (useAI) {
@@ -140,8 +142,14 @@ export default function QuizPage() {
         }
       }
     } catch (error: any) {
-      console.error("Quiz creation error:", error);
-      alert(`Error: ${error.message}\n\n${useAI ? "Note: AI quiz generation requires API keys to be configured. Try disabling AI mode or contact support." : "Please try again or contact support."}`);
+      console.error("Quiz creation error:", error.message || "Unknown error");
+      let errorMessage = error.message || "An error occurred";
+      if (useAI) {
+        errorMessage += ". AI quiz generation requires API keys to be configured. Try disabling AI mode or contact support.";
+      } else {
+        errorMessage += ". Please try again or contact support.";
+      }
+      setError(errorMessage);
     } finally {
       setIsGenerating(false);
     }
@@ -318,6 +326,13 @@ export default function QuizPage() {
                 )}
               </div>
             </div>
+
+            {/* Error Display */}
+            {error && (
+              <div className="p-4 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl mb-4">
+                <p className="text-red-800 dark:text-red-200 text-sm font-body break-words">{error}</p>
+              </div>
+            )}
 
             <div className={`rounded-xl p-6 border-2 ${useAI ? "bg-gradient-to-br from-accent-1/10 to-accent-2/10 border-accent-1/20" : "bg-accent-1/10 border-accent-1/20"}`}>
               <h3 className="font-display font-semibold mb-2 flex items-center text-primary">

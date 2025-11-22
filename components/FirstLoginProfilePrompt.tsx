@@ -13,12 +13,12 @@ export function FirstLoginProfilePrompt() {
   useEffect(() => {
     if (!isLoaded || !user) return;
 
-    // Check if user has completed profile
-    const hasCompletedProfile = localStorage.getItem("profile_completed");
+    // Check if user has completed profile using user metadata
     const hasGrade = user.publicMetadata?.grade;
+    const profileDismissed = user.publicMetadata?.profilePromptDismissed;
     
     // Show prompt if user hasn't completed profile and hasn't dismissed it
-    if (!hasCompletedProfile && !hasGrade) {
+    if (!hasGrade && !profileDismissed) {
       // Small delay to let the page render
       setTimeout(() => setShowPrompt(true), 1000);
     }
@@ -28,8 +28,19 @@ export function FirstLoginProfilePrompt() {
     router.push("/profile");
   };
 
-  const handleDismiss = () => {
-    localStorage.setItem("profile_completed", "dismissed");
+  const handleDismiss = async () => {
+    // Update user metadata to record dismissal
+    try {
+      await fetch("/api/user/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          profilePromptDismissed: true 
+        }),
+      });
+    } catch (error) {
+      console.error("Failed to update dismissal state:", error);
+    }
     setShowPrompt(false);
   };
 
