@@ -3,6 +3,9 @@ import { redirect } from 'next/navigation';
 import PointsDisplay from '@/components/gamification/PointsDisplay';
 import LeaderboardWidget from '@/components/gamification/LeaderboardWidget';
 
+// Force dynamic rendering so Clerk keys are only required at runtime
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: 'Gamification - PrepWyse Commerce',
   description: 'Track your points, achievements, and compete on the leaderboard',

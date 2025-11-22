@@ -8,7 +8,9 @@ import ThemeSelector from "./ThemeSelector";
 import { useUser } from "@clerk/nextjs";
 import { useState } from "react";
 
-export default function Navbar() {
+const hasClerkKey = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
+function NavbarWithAuth() {
   const pathname = usePathname();
   const router = useRouter();
   const { user } = useUser();
@@ -174,4 +176,29 @@ export default function Navbar() {
       </div>
     </nav>
   );
+}
+
+export default function Navbar() {
+  if (!hasClerkKey) {
+    return (
+      <nav className="bg-surface-elevated shadow-md border-b border-text-primary/10">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-between items-center h-16">
+            <Link href="/" className="flex items-center space-x-2 group">
+              <BookOpen className="h-6 w-6 text-accent-1 group-hover:scale-110 transition-transform" />
+              <span className="text-xl font-display font-bold text-primary">PrepWyse</span>
+            </Link>
+            <div className="flex items-center space-x-4">
+              <Link href="/sign-in" className="text-text-secondary font-display hover:text-accent-1">
+                Sign In
+              </Link>
+              <ThemeSelector />
+            </div>
+          </div>
+        </div>
+      </nav>
+    );
+  }
+
+  return <NavbarWithAuth />;
 }

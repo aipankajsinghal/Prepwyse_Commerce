@@ -2,6 +2,9 @@ import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import StudyCalendar from '@/components/study-planner/StudyCalendar';
 
+// Force dynamic rendering so Clerk keys are only required at runtime
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: 'Study Planner - PrepWyse Commerce',
   description: 'Plan your study sessions with AI-powered scheduling',

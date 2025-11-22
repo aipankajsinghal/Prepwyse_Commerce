@@ -2,6 +2,9 @@ import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import FlashcardReview from '@/components/flashcards/FlashcardReview';
 
+// Force dynamic rendering so Clerk keys are only required at runtime
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: 'Flashcards - PrepWyse Commerce',
   description: 'Review flashcards with spaced repetition for better retention',
