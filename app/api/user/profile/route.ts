@@ -9,7 +9,7 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { grade, bio, profilePromptDismissed } = await request.json();
+    const { firstName, lastName, grade, bio, profilePromptDismissed } = await request.json();
 
     // Update user's public metadata using Clerk API
     const client = await clerkClient();
@@ -18,15 +18,22 @@ export async function PATCH(request: Request) {
     const currentUser = await client.users.getUser(userId);
     const currentMetadata = currentUser.publicMetadata || {};
     
-    // Merge new data with existing metadata
+    // Prepare update data
+    const updateData: any = {};
+    
+    // Update basic profile fields (firstName, lastName)
+    if (firstName !== undefined) updateData.firstName = firstName;
+    if (lastName !== undefined) updateData.lastName = lastName;
+    
+    // Merge metadata
     const updatedMetadata: any = { ...currentMetadata };
     if (grade !== undefined) updatedMetadata.grade = grade;
     if (bio !== undefined) updatedMetadata.bio = bio;
     if (profilePromptDismissed !== undefined) updatedMetadata.profilePromptDismissed = profilePromptDismissed;
     
-    await client.users.updateUser(userId, {
-      publicMetadata: updatedMetadata,
-    });
+    updateData.publicMetadata = updatedMetadata;
+    
+    await client.users.updateUser(userId, updateData);
 
     return NextResponse.json({ 
       success: true, 

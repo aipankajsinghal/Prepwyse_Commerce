@@ -25,6 +25,8 @@ const hasClerkKey = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 function ProfilePageWithAuth() {
   const { user, isLoaded } = useUser();
   const [isEditing, setIsEditing] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [grade, setGrade] = useState("");
   const [bio, setBio] = useState("");
   const [saving, setSaving] = useState(false);
@@ -33,6 +35,8 @@ function ProfilePageWithAuth() {
 
   useEffect(() => {
     if (user) {
+      setFirstName(user.firstName || "");
+      setLastName(user.lastName || "");
       setGrade(user.publicMetadata?.grade as string || "");
       setBio(user.publicMetadata?.bio as string || "");
     }
@@ -46,18 +50,23 @@ function ProfilePageWithAuth() {
     setSuccess("");
     
     try {
-      // Use API route to update public metadata
+      // Use API route to update profile data
       const response = await fetch("/api/user/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ grade, bio }),
+        body: JSON.stringify({ 
+          firstName, 
+          lastName, 
+          grade, 
+          bio 
+        }),
       });
 
       if (!response.ok) {
         throw new Error("Failed to update profile");
       }
 
-      // Reload user to get updated metadata
+      // Reload user to get updated data
       await user.reload();
       
       setIsEditing(false);
@@ -160,6 +169,30 @@ function ProfilePageWithAuth() {
                     )}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        First Name
+                      </label>
+                      <input
+                        type="text"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        placeholder="Enter your first name"
+                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Last Name
+                      </label>
+                      <input
+                        type="text"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        placeholder="Enter your last name"
+                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Grade/Class
                       </label>
                       <select
@@ -189,7 +222,7 @@ function ProfilePageWithAuth() {
                       <button
                         onClick={handleSave}
                         disabled={saving}
-                        className="flex-1 px-4 py-2 bg-accent-1-600 text-white rounded-lg hover:bg-accent-1-700 transition flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex-1 px-4 py-2 bg-accent-1 text-white rounded-lg hover:bg-accent-1-dark transition flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {saving ? (
                           <>
@@ -220,15 +253,28 @@ function ProfilePageWithAuth() {
                 ) : (
                   <>
                     <div className="text-left space-y-3 mb-6">
-                      {grade && (
+                      <div className="flex items-center font-body text-text-secondary dark:text-gray-300">
+                        <User className="h-4 w-4 mr-2" />
+                        <span>{firstName} {lastName}</span>
+                      </div>
+                      {grade ? (
                         <div className="flex items-center font-body text-text-secondary dark:text-gray-300">
                           <BookOpen className="h-4 w-4 mr-2" />
                           <span>{grade === "CUET" ? "CUET Preparation" : `Class ${grade}`}</span>
                         </div>
+                      ) : (
+                        <div className="flex items-center font-body text-text-muted dark:text-gray-500 italic">
+                          <BookOpen className="h-4 w-4 mr-2" />
+                          <span>Grade not set</span>
+                        </div>
                       )}
-                      {bio && (
+                      {bio ? (
                         <p className="text-sm font-body text-text-secondary dark:text-gray-300 italic">
-                          {bio}
+                          &ldquo;{bio}&rdquo;
+                        </p>
+                      ) : (
+                        <p className="text-sm font-body text-text-muted dark:text-gray-500 italic">
+                          No bio added yet
                         </p>
                       )}
                       <div className="flex items-center font-body text-text-secondary dark:text-gray-300">
@@ -243,9 +289,9 @@ function ProfilePageWithAuth() {
                     </div>
                     <button
                       onClick={() => setIsEditing(true)}
-                      className="w-full px-4 py-2 bg-accent-1-600 text-white rounded-lg hover:bg-accent-1-700 transition flex items-center justify-center space-x-2"
+                      className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-md hover:shadow-lg flex items-center justify-center space-x-2 font-semibold"
                     >
-                      <Edit2 className="h-4 w-4" />
+                      <Edit2 className="h-5 w-5" />
                       <span>Edit Profile</span>
                     </button>
                   </>
