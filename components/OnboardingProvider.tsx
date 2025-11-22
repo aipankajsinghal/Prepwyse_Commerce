@@ -144,6 +144,8 @@ function OnboardingOverlay({
     if (highlightedElement) {
       const rect = highlightedElement.getBoundingClientRect();
       const padding = step.highlightPadding || 8;
+      const tooltipWidth = 400; // Approximate tooltip width
+      const tooltipHeight = 250; // Approximate tooltip height
 
       // Calculate tooltip position based on placement
       let top = 0;
@@ -151,20 +153,28 @@ function OnboardingOverlay({
 
       switch (step.placement) {
         case "top":
-          top = rect.top - 220; // Tooltip height + spacing
+          top = Math.max(20, rect.top - tooltipHeight - 20);
           left = rect.left + rect.width / 2;
+          // Ensure left is not off-screen
+          left = Math.max(tooltipWidth / 2 + 20, Math.min(window.innerWidth - tooltipWidth / 2 - 20, left));
           break;
         case "bottom":
-          top = rect.bottom + 20;
+          top = Math.min(window.innerHeight - tooltipHeight - 20, rect.bottom + 20);
           left = rect.left + rect.width / 2;
+          // Ensure left is not off-screen
+          left = Math.max(tooltipWidth / 2 + 20, Math.min(window.innerWidth - tooltipWidth / 2 - 20, left));
           break;
         case "left":
           top = rect.top + rect.height / 2;
-          left = rect.left - 320; // Tooltip width + spacing
+          left = Math.max(tooltipWidth + 20, rect.left - 20);
+          // Ensure top is not off-screen
+          top = Math.max(tooltipHeight / 2 + 20, Math.min(window.innerHeight - tooltipHeight / 2 - 20, top));
           break;
         case "right":
           top = rect.top + rect.height / 2;
-          left = rect.right + 20;
+          left = Math.min(window.innerWidth - tooltipWidth - 20, rect.right + 20);
+          // Ensure top is not off-screen
+          top = Math.max(tooltipHeight / 2 + 20, Math.min(window.innerHeight - tooltipHeight / 2 - 20, top));
           break;
         default:
           top = window.innerHeight / 2;
@@ -184,15 +194,17 @@ function OnboardingOverlay({
   return (
     <>
       {/* Backdrop with spotlight */}
-      <div className="fixed inset-0 bg-black bg-opacity-60 z-50 pointer-events-none">
+      <div className="fixed inset-0 bg-black/60 z-50 pointer-events-none">
         {highlightedElement && (
           <div
-            className="absolute border-4 border-primary-500 rounded-lg pointer-events-auto shadow-xl animate-pulse"
+            className="absolute border-4 border-accent-1 rounded-lg pointer-events-auto shadow-xl"
             style={{
               top: highlightedElement.getBoundingClientRect().top - (step.highlightPadding || 8),
               left: highlightedElement.getBoundingClientRect().left - (step.highlightPadding || 8),
               width: highlightedElement.getBoundingClientRect().width + (step.highlightPadding || 8) * 2,
               height: highlightedElement.getBoundingClientRect().height + (step.highlightPadding || 8) * 2,
+              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              animation: 'pulse 2s ease-in-out infinite',
             }}
           />
         )}
@@ -200,27 +212,28 @@ function OnboardingOverlay({
 
       {/* Tooltip */}
       <div
-        className="fixed z-50 pointer-events-auto"
+        className="fixed z-50 pointer-events-auto px-4"
         style={{
           top: `${tooltipPosition.top}px`,
           left: `${tooltipPosition.left}px`,
           transform: step.placement === "center" ? "translate(-50%, -50%)" : 
                      step.placement === "left" || step.placement === "right" ? "translateY(-50%)" :
                      "translateX(-50%)",
+          maxWidth: "min(400px, calc(100vw - 32px))",
         }}
       >
-        <div className="bg-white rounded-xl shadow-2xl p-6 max-w-md animate-scale-in">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 w-full animate-scale-in">
           {/* Header */}
           <div className="flex justify-between items-start mb-4">
-            <div>
-              <h3 className="text-lg font-bold text-gray-900">{step.title}</h3>
-              <p className="text-sm text-gray-500 mt-1">
+            <div className="flex-1 min-w-0">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white break-words">{step.title}</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 Step {currentStep + 1} of {totalSteps}
               </p>
             </div>
             <button
               onClick={onSkip}
-              className="text-gray-400 hover:text-gray-600 transition"
+              className="flex-shrink-0 ml-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition"
               aria-label="Skip onboarding"
             >
               <X className="h-5 w-5" />
@@ -228,39 +241,39 @@ function OnboardingOverlay({
           </div>
 
           {/* Content */}
-          <p className="text-gray-700 mb-6">{step.content}</p>
+          <p className="text-gray-700 dark:text-gray-300 mb-6 break-words">{step.content}</p>
 
           {/* Progress bar */}
           <div className="mb-4">
-            <div className="h-1 bg-gray-200 rounded-full overflow-hidden">
+            <div className="h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
               <div
-                className="h-full bg-primary-600 transition-all duration-300"
+                className="h-full bg-accent-1 dark:bg-accent-1-light transition-all duration-300"
                 style={{ width: `${((currentStep + 1) / totalSteps) * 100}%` }}
               />
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center gap-2 flex-wrap sm:flex-nowrap">
             <button
               onClick={onPrev}
               disabled={currentStep === 0}
-              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition"
+              className="flex items-center gap-2 px-3 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition text-sm"
             >
               <ChevronLeft className="h-4 w-4" />
-              Previous
+              <span className="hidden sm:inline">Previous</span>
             </button>
 
             <div className="flex gap-2">
               <button
                 onClick={onSkip}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800 transition"
+                className="px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white transition"
               >
                 Skip
               </button>
               <button
                 onClick={onNext}
-                className="flex items-center gap-2 px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition font-medium"
+                className="flex items-center gap-2 px-4 py-2 bg-accent-1 text-white rounded-lg hover:bg-accent-1-dark transition font-medium text-sm"
               >
                 {currentStep === totalSteps - 1 ? (
                   <>

@@ -94,12 +94,15 @@ export default function QuizPage() {
           }),
         });
 
+        const data = await response.json();
+        
         if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.error || "Failed to generate AI quiz");
+          // More detailed error message
+          const errorMessage = data.error || "Failed to generate AI quiz";
+          const errorDetails = data.details ? `\n\nDetails: ${data.details}` : "";
+          throw new Error(errorMessage + errorDetails);
         }
 
-        const data = await response.json();
         // Redirect to quiz attempt page
         if (data.quizId) {
           router.push(`/quiz/${data.quizId}/attempt`);
@@ -122,11 +125,13 @@ export default function QuizPage() {
           }),
         });
 
+        const data = await response.json();
+        
         if (!response.ok) {
-          throw new Error("Failed to create quiz");
+          const errorMessage = data.error || "Failed to create quiz";
+          throw new Error(errorMessage);
         }
 
-        const data = await response.json();
         // Redirect to quiz attempt page
         if (data.quizId) {
           router.push(`/quiz/${data.quizId}/attempt`);
@@ -135,7 +140,8 @@ export default function QuizPage() {
         }
       }
     } catch (error: any) {
-      alert(`Error: ${error.message}`);
+      console.error("Quiz creation error:", error);
+      alert(`Error: ${error.message}\n\n${useAI ? "Note: AI quiz generation requires API keys to be configured. Try disabling AI mode or contact support." : "Please try again or contact support."}`);
     } finally {
       setIsGenerating(false);
     }
@@ -178,8 +184,8 @@ export default function QuizPage() {
                         : "border-text-primary/10 hover:border-accent-1/50"
                     }`}
                   >
-                    <h3 className="font-semibold text-text-primary">{subject.name}</h3>
-                    <p className="text-sm font-body text-text-secondary mt-1">
+                    <h3 className="font-semibold text-text-primary break-words">{subject.name}</h3>
+                    <p className="text-sm font-body text-text-secondary mt-1 break-words">
                       {subject.chapters.length} chapters
                     </p>
                   </button>
@@ -214,9 +220,9 @@ export default function QuizPage() {
                         type="checkbox"
                         checked={selectedChapters.includes(chapter.id)}
                         onChange={() => handleChapterToggle(chapter.id)}
-                        className="h-4 w-4 text-accent-1 rounded border-text-primary/20 focus:ring-accent-1"
+                        className="h-4 w-4 text-accent-1 rounded border-text-primary/20 focus:ring-accent-1 flex-shrink-0"
                       />
-                      <span className="ml-3 font-body text-text-primary">{chapter.name}</span>
+                      <span className="ml-3 font-body text-text-primary break-words flex-1">{chapter.name}</span>
                     </label>
                   ))}
                 </div>

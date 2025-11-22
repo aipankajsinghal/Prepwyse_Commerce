@@ -12,8 +12,23 @@ export async function POST(request: Request) {
       return unauthorizedError();
     }
 
-    const { subjectId, chapterIds, questionCount, difficulty: requestedDifficulty } =
-      await request.json();
+    const body = await request.json();
+    const { subjectId, chapterIds, questionCount, difficulty: requestedDifficulty } = body;
+
+    // Validate input
+    if (!subjectId || !chapterIds || !Array.isArray(chapterIds) || chapterIds.length === 0) {
+      return NextResponse.json(
+        { error: "Invalid input", details: "Please select a subject and at least one chapter" },
+        { status: 400 }
+      );
+    }
+
+    if (!questionCount || questionCount < 1) {
+      return NextResponse.json(
+        { error: "Invalid input", details: "Question count must be at least 1" },
+        { status: 400 }
+      );
+    }
 
     // Get subject and chapter names for AI context
     const subject = await prisma.subject.findUnique({
@@ -31,6 +46,13 @@ export async function POST(request: Request) {
       return notFoundError("Subject");
     }
 
+    if (subject.chapters.length === 0) {
+      return NextResponse.json(
+        { error: "Invalid chapters", details: "No valid chapters found for selected IDs" },
+        { status: 404 }
+      );
+    }
+
     // Determine adaptive difficulty if not specified
     const difficulty = requestedDifficulty || await determineAdaptiveDifficulty(userId);
 
@@ -45,13 +67,32 @@ export async function POST(request: Request) {
     });
 
     // Generate AI questions
-    const aiQuestions = await generateAIQuestions({
-      subjectName: subject.name,
-      chapterNames: subject.chapters.map(c => c.name),
-      questionCount,
-      difficulty,
-      userId: dbUser.id,
-    });
+    let aiQuestions;
+    try {
+      aiQuestions = await generateAIQuestions({
+        subjectName: subject.name,
+        chapterNames: subject.chapters.map(c => c.name),
+        questionCount,
+        difficulty,
+        userId: dbUser.id,
+      });
+    } catch (aiError: any) {
+      console.error("AI generation error:", aiError);
+      return NextResponse.json(
+        { 
+          error: "AI generation failed", 
+          details: aiError.message || "Could not generate questions. Please check if AI API keys are configured correctly."
+        },
+        { status: 503 }
+      );
+    }
+
+    if (!aiQuestions || aiQuestions.length === 0) {
+      return NextResponse.json(
+        { error: "No questions generated", details: "AI did not generate any questions. Please try again." },
+        { status: 500 }
+      );
+    }
 
     // Store questions in database
     const storedQuestions = await Promise.all(
@@ -79,8 +120,8 @@ export async function POST(request: Request) {
         description: `Adaptive ${difficulty} level quiz`,
         subjectId,
         chapterIds,
-        questionCount,
-        duration: questionCount * 2, // 2 minutes per question
+        questionCount: storedQuestions.length,
+        duration: storedQuestions.length * 2, // 2 minutes per question
       },
     });
 
@@ -101,7 +142,14 @@ export async function POST(request: Request) {
       adaptiveDifficulty: difficulty,
       message: `Generated ${storedQuestions.length} AI-powered questions at ${difficulty} difficulty`,
     });
-  } catch (error) {
-    return handleApiError(error, "Failed to generate AI quiz", { subjectId: (await request.json()).subjectId });
+  } catch (error: any) {
+    console.error("Quiz generation error:", error);
+    return NextResponse.json(
+      { 
+        error: "Failed to generate AI quiz",
+        details: error.message || "An unexpected error occurred. Please try again."
+      },
+      { status: 500 }
+    );
   }
 }

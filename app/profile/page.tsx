@@ -27,6 +27,9 @@ function ProfilePageWithAuth() {
   const [isEditing, setIsEditing] = useState(false);
   const [grade, setGrade] = useState("");
   const [bio, setBio] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   useEffect(() => {
     if (user) {
@@ -36,14 +39,35 @@ function ProfilePageWithAuth() {
   }, [user]);
 
   const handleSave = async () => {
-    if (user) {
-      await user.update({
-        unsafeMetadata: {
-          grade,
-          bio,
-        },
+    if (!user) return;
+    
+    setSaving(true);
+    setError("");
+    setSuccess("");
+    
+    try {
+      // Use API route to update public metadata
+      const response = await fetch("/api/user/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ grade, bio }),
       });
+
+      if (!response.ok) {
+        throw new Error("Failed to update profile");
+      }
+
+      // Reload user to get updated metadata
+      await user.reload();
+      
       setIsEditing(false);
+      setSuccess("Profile updated successfully!");
+      setTimeout(() => setSuccess(""), 3000);
+    } catch (err) {
+      setError("Failed to update profile. Please try again.");
+      console.error("Profile update error:", err);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -124,6 +148,16 @@ function ProfilePageWithAuth() {
 
                 {isEditing ? (
                   <div className="space-y-4 text-left">
+                    {error && (
+                      <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-800 dark:text-red-200 text-sm">
+                        {error}
+                      </div>
+                    )}
+                    {success && (
+                      <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg text-green-800 dark:text-green-200 text-sm">
+                        {success}
+                      </div>
+                    )}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Grade/Class
@@ -154,14 +188,29 @@ function ProfilePageWithAuth() {
                     <div className="flex space-x-2">
                       <button
                         onClick={handleSave}
-                        className="flex-1 px-4 py-2 bg-accent-1-600 text-white rounded-lg hover:bg-accent-1-700 transition flex items-center justify-center space-x-2"
+                        disabled={saving}
+                        className="flex-1 px-4 py-2 bg-accent-1-600 text-white rounded-lg hover:bg-accent-1-700 transition flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <Save className="h-4 w-4" />
-                        <span>Save</span>
+                        {saving ? (
+                          <>
+                            <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                            <span>Saving...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Save className="h-4 w-4" />
+                            <span>Save</span>
+                          </>
+                        )}
                       </button>
                       <button
-                        onClick={() => setIsEditing(false)}
-                        className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition flex items-center justify-center space-x-2"
+                        onClick={() => {
+                          setIsEditing(false);
+                          setError("");
+                          setSuccess("");
+                        }}
+                        disabled={saving}
+                        className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <X className="h-4 w-4" />
                         <span>Cancel</span>

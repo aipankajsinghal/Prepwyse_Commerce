@@ -39,8 +39,8 @@ export function DashboardClient({ userName }: DashboardClientProps) {
               <div className="h-12 w-12 bg-accent-1/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-accent-1 transition-colors">
                 <BookOpen className="h-6 w-6 text-accent-1 group-hover:text-white transition-colors" />
               </div>
-              <h3 className="text-xl font-display font-semibold mb-2 text-text-primary">Practice Quiz</h3>
-              <p className="font-body text-text-secondary">
+              <h3 className="text-xl font-display font-semibold mb-2 text-text-primary break-words">Practice Quiz</h3>
+              <p className="font-body text-text-secondary break-words">
                 AI-generated quizzes with adaptive difficulty
               </p>
             </div>
@@ -55,8 +55,8 @@ export function DashboardClient({ userName }: DashboardClientProps) {
               <div className="h-12 w-12 bg-accent-2/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-accent-2 transition-colors">
                 <Trophy className="h-6 w-6 text-accent-2 group-hover:text-white transition-colors" />
               </div>
-              <h3 className="text-xl font-display font-semibold mb-2 text-text-primary">Mock Tests</h3>
-              <p className="font-body text-text-secondary">
+              <h3 className="text-xl font-display font-semibold mb-2 text-text-primary break-words">Mock Tests</h3>
+              <p className="font-body text-text-secondary break-words">
                 Full-length exams matching CUET pattern
               </p>
             </div>
@@ -67,8 +67,8 @@ export function DashboardClient({ userName }: DashboardClientProps) {
               <div className="h-12 w-12 bg-accent-1/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-accent-1 transition-colors">
                 <TrendingUp className="h-6 w-6 text-accent-1 group-hover:text-white transition-colors" />
               </div>
-              <h3 className="text-xl font-display font-semibold mb-2 text-text-primary">Analytics</h3>
-              <p className="font-body text-text-secondary">
+              <h3 className="text-xl font-display font-semibold mb-2 text-text-primary break-words">Analytics</h3>
+              <p className="font-body text-text-secondary break-words">
                 Track performance and identify improvements
               </p>
             </div>
@@ -79,8 +79,8 @@ export function DashboardClient({ userName }: DashboardClientProps) {
               <div className="h-12 w-12 bg-accent-2/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-accent-2 transition-colors">
                 <Sparkles className="h-6 w-6 text-accent-2 group-hover:text-white transition-colors" />
               </div>
-              <h3 className="text-xl font-display font-semibold mb-2 text-text-primary">AI Recommendations</h3>
-              <p className="font-body text-text-secondary">
+              <h3 className="text-xl font-display font-semibold mb-2 text-text-primary break-words">AI Recommendations</h3>
+              <p className="font-body text-text-secondary break-words">
                 Personalized study suggestions
               </p>
             </div>
@@ -94,10 +94,10 @@ export function DashboardClient({ userName }: DashboardClientProps) {
             {/* Business Studies */}
             <Link href="/quiz" className="group">
               <div className="edu-card bg-gradient-to-br from-accent-1/5 to-accent-1/10 border-2 border-transparent group-hover:border-accent-1">
-                <h3 className="text-xl font-display font-semibold text-primary mb-2">
+                <h3 className="text-xl font-display font-semibold text-primary mb-2 break-words">
                   Business Studies
                 </h3>
-                <p className="font-body text-text-secondary text-sm mb-4">23 Chapters Available</p>
+                <p className="font-body text-text-secondary text-sm mb-4 break-words">23 Chapters Available</p>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-display font-semibold text-accent-1">Start Learning →</span>
                 </div>
@@ -107,10 +107,10 @@ export function DashboardClient({ userName }: DashboardClientProps) {
             {/* Accountancy */}
             <Link href="/quiz" className="group">
               <div className="edu-card bg-gradient-to-br from-accent-2/5 to-accent-2/10 border-2 border-transparent group-hover:border-accent-2">
-                <h3 className="text-xl font-display font-semibold text-primary mb-2">
+                <h3 className="text-xl font-display font-semibold text-primary mb-2 break-words">
                   Accountancy
                 </h3>
-                <p className="font-body text-text-secondary text-sm mb-4">20 Chapters Available</p>
+                <p className="font-body text-text-secondary text-sm mb-4 break-words">20 Chapters Available</p>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-display font-semibold text-accent-2">Start Learning →</span>
                 </div>
@@ -120,10 +120,10 @@ export function DashboardClient({ userName }: DashboardClientProps) {
             {/* Economics */}
             <Link href="/quiz" className="group">
               <div className="edu-card bg-gradient-to-br from-accent-1/5 to-accent-2/10 border-2 border-transparent group-hover:border-accent-1">
-                <h3 className="text-xl font-display font-semibold text-primary mb-2">
+                <h3 className="text-xl font-display font-semibold text-primary mb-2 break-words">
                   Economics
                 </h3>
-                <p className="font-body text-text-secondary text-sm mb-4">18 Chapters Available</p>
+                <p className="font-body text-text-secondary text-sm mb-4 break-words">18 Chapters Available</p>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-display font-semibold text-accent-1">Start Learning →</span>
                 </div>
@@ -139,17 +139,17 @@ export function DashboardClient({ userName }: DashboardClientProps) {
             <div className="text-center p-6 bg-accent-1/5 rounded-lg">
               <TrendingUp className="h-8 w-8 text-accent-1 mx-auto mb-3" />
               <p className="text-3xl font-display font-bold text-primary mb-1">0</p>
-              <p className="text-sm font-body text-text-secondary">Quizzes Completed</p>
+              <p className="text-sm font-body text-text-secondary break-words">Quizzes Completed</p>
             </div>
             <div className="text-center p-6 bg-accent-2/5 rounded-lg">
               <Trophy className="h-8 w-8 text-accent-2 mx-auto mb-3" />
               <p className="text-3xl font-display font-bold text-primary mb-1">0</p>
-              <p className="text-sm font-body text-text-secondary">Mock Tests Taken</p>
+              <p className="text-sm font-body text-text-secondary break-words">Mock Tests Taken</p>
             </div>
             <div className="text-center p-6 bg-accent-1/5 rounded-lg">
               <Target className="h-8 w-8 text-accent-1 mx-auto mb-3" />
               <p className="text-3xl font-display font-bold text-primary mb-1">0%</p>
-              <p className="text-sm font-body text-text-secondary">Average Score</p>
+              <p className="text-sm font-body text-text-secondary break-words">Average Score</p>
             </div>
           </div>
         </div>
