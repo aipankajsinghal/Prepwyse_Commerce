@@ -70,6 +70,98 @@ Return format (JSON array):
 }
 
 /**
+ * Generate AI-powered mock test with questions
+ */
+export async function generateAIMockTest(params: {
+  title: string;
+  examType: string;
+  description?: string;
+  duration: number;
+  totalQuestions: number;
+  sections: Array<{ name: string; questions: number; subjectId?: string }>;
+}) {
+  if (!isAnyAIConfigured()) {
+    throw new Error("No AI provider is configured. Please add OPENAI_API_KEY or GEMINI_API_KEY");
+  }
+
+  const { title, examType, description, duration, totalQuestions, sections } = params;
+
+  // Get subjects from database for context
+  const subjects = await prisma.subject.findMany({
+    include: {
+      chapters: {
+        orderBy: { order: "asc" },
+      },
+    },
+  });
+
+  const subjectMap = new Map(subjects.map(s => [s.id, s]));
+
+  const prompt = `You are an expert in creating comprehensive mock tests for Indian commerce education. Generate a complete mock test with the following specifications:
+
+Title: ${title}
+Exam Type: ${examType}
+Duration: ${duration} minutes
+Total Questions: ${totalQuestions}
+
+Sections:
+${sections.map((s, i) => `${i + 1}. ${s.name}: ${s.questions} questions`).join("\n")}
+
+Requirements:
+1. Generate exactly ${totalQuestions} multiple-choice questions distributed across the sections as specified
+2. Each question must have exactly 4 options (A, B, C, D)
+3. Include detailed explanations for correct answers
+4. Questions should be exam-pattern focused for ${examType}
+5. Mix difficulty levels: 40% easy, 40% medium, 20% hard
+6. Cover comprehensive topics within each section
+7. Questions should test conceptual understanding, not just memorization
+8. Return ONLY valid JSON, no markdown or extra text
+
+Return format (JSON object):
+{
+  "mockTest": {
+    "title": "${title}",
+    "examType": "${examType}",
+    "description": "${description || `Complete mock test for ${examType}`}",
+    "duration": ${duration},
+    "totalQuestions": ${totalQuestions}
+  },
+  "sections": [
+    {
+      "name": "Section name",
+      "questions": [
+        {
+          "questionText": "Question text here?",
+          "options": ["Option A", "Option B", "Option C", "Option D"],
+          "correctAnswer": "Option A",
+          "explanation": "Detailed explanation",
+          "difficulty": "easy|medium|hard",
+          "section": "Section name"
+        }
+      ]
+    }
+  ]
+}`;
+
+  const content = await generateChatCompletion({
+    prompt,
+    systemPrompt: "You are an expert commerce education content creator specializing in creating comprehensive mock tests for Indian commerce curriculum. Always return valid JSON only.",
+    temperature: 0.7,
+    jsonMode: true,
+    maxTokens: 8000, // Large token limit for full mock test
+  });
+
+  let parsed;
+  try {
+    parsed = JSON.parse(content);
+    return parsed;
+  } catch (error) {
+    console.error("Failed to parse AI mock test response:", content);
+    throw new Error("Invalid AI response format for mock test");
+  }
+}
+
+/**
  * Analyze user performance and generate personalized recommendations
  */
 export async function generatePersonalizedRecommendations(userId: string) {

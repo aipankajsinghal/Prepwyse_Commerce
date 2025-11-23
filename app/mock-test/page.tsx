@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
-import { Clock, FileText, Play, Trophy, AlertCircle } from "lucide-react";
+import { Clock, FileText, Play, Trophy, AlertCircle, Sparkles, Plus, X } from "lucide-react";
 
 interface MockTestSection {
   name: string;
@@ -26,6 +26,8 @@ export default function MockTestPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [startingTest, setStartingTest] = useState<string | null>(null);
+  const [showAIGenerator, setShowAIGenerator] = useState(false);
+  const [generatingAI, setGeneratingAI] = useState(false);
 
   // Fetch mock tests from API
   useEffect(() => {
@@ -84,6 +86,46 @@ export default function MockTestPage() {
     }
   };
 
+  const handleGenerateAIMockTest = async (params: {
+    title: string;
+    examType: string;
+    description: string;
+    duration: number;
+    totalQuestions: number;
+    sections: MockTestSection[];
+  }) => {
+    try {
+      setGeneratingAI(true);
+      setError("");
+
+      const response = await fetch("/api/ai/generate-mock-test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(params),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to generate AI mock test");
+      }
+
+      const data = await response.json();
+      
+      // Add the new mock test to the list
+      setMockTests(prev => [data.mockTest, ...prev]);
+      setShowAIGenerator(false);
+      
+      // Show success message
+      alert(`✨ AI Mock Test Generated Successfully!\n\n${data.message}\nQuestions Generated: ${data.questionsGenerated}\n\nThe mock test has been added to your list.`);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to generate AI mock test. Please try again.";
+      console.error("Error generating AI mock test:", errorMessage);
+      setError(errorMessage);
+    } finally {
+      setGeneratingAI(false);
+    }
+  };
+
   // Show loading state
   if (loading) {
     return (
@@ -105,11 +147,31 @@ export default function MockTestPage() {
 
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8 animate-reveal">
-          <h1 className="text-3xl font-display font-bold text-primary mb-2">Mock Tests</h1>
-          <p className="font-body text-text-secondary">
-            Take full-length mock tests designed as per actual exam patterns
-          </p>
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-3xl font-display font-bold text-primary mb-2">Mock Tests</h1>
+              <p className="font-body text-text-secondary">
+                Take full-length mock tests designed as per actual exam patterns
+              </p>
+            </div>
+            <button
+              onClick={() => setShowAIGenerator(true)}
+              className="btn-primary flex items-center"
+            >
+              <Sparkles className="h-5 w-5 mr-2" />
+              Generate AI Mock Test
+            </button>
+          </div>
         </div>
+
+        {/* AI Generator Modal */}
+        {showAIGenerator && (
+          <AIGeneratorModal
+            onGenerate={handleGenerateAIMockTest}
+            onClose={() => setShowAIGenerator(false)}
+            isGenerating={generatingAI}
+          />
+        )}
 
         {/* Error Display */}
         {error && (
@@ -239,5 +301,237 @@ export default function MockTestPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+// AI Generator Modal Component
+interface AIGeneratorModalProps {
+  onGenerate: (params: {
+    title: string;
+    examType: string;
+    description: string;
+    duration: number;
+    totalQuestions: number;
+    sections: MockTestSection[];
+  }) => void;
+  onClose: () => void;
+  isGenerating: boolean;
+}
+
+function AIGeneratorModal({ onGenerate, onClose, isGenerating }: AIGeneratorModalProps) {
+  const [title, setTitle] = useState("");
+  const [examType, setExamType] = useState("CUET");
+  const [description, setDescription] = useState("");
+  const [duration, setDuration] = useState(120);
+  const [sections, setSections] = useState<MockTestSection[]>([
+    { name: "Business Studies", questions: 40 },
+    { name: "Accountancy", questions: 30 },
+    { name: "Economics", questions: 30 },
+  ]);
+
+  const totalQuestions = sections.reduce((sum, s) => sum + s.questions, 0);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onGenerate({
+      title,
+      examType,
+      description,
+      duration,
+      totalQuestions,
+      sections,
+    });
+  };
+
+  const updateSection = (index: number, field: 'name' | 'questions', value: string | number) => {
+    const newSections = [...sections];
+    newSections[index] = { ...newSections[index], [field]: value };
+    setSections(newSections);
+  };
+
+  const addSection = () => {
+    setSections([...sections, { name: "", questions: 10 }]);
+  };
+
+  const removeSection = (index: number) => {
+    setSections(sections.filter((_, i) => i !== index));
+  };
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        {/* Modal */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full p-6 animate-scale-in max-h-[90vh] overflow-y-auto">
+          <div className="flex justify-between items-start mb-4">
+            <div className="flex items-center">
+              <div className="h-12 w-12 bg-accent-1/10 rounded-full flex items-center justify-center mr-3">
+                <Sparkles className="h-6 w-6 text-accent-1" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-display font-bold text-gray-900 dark:text-white">
+                  Generate AI Mock Test
+                </h2>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  AI will create questions for your custom mock test
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              disabled={isGenerating}
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition disabled:opacity-50"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Title */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Test Title *
+              </label>
+              <input
+                type="text"
+                required
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="e.g., CUET Commerce Full Mock Test"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-accent-1"
+              />
+            </div>
+
+            {/* Exam Type */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Exam Type *
+              </label>
+              <select
+                required
+                value={examType}
+                onChange={(e) => setExamType(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-accent-1"
+              >
+                <option value="CUET">CUET Commerce</option>
+                <option value="Class 12">Class 12</option>
+                <option value="Class 11">Class 11</option>
+              </select>
+            </div>
+
+            {/* Description */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Description
+              </label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Brief description of the mock test..."
+                rows={2}
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-accent-1"
+              />
+            </div>
+
+            {/* Duration */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Duration (minutes) *
+              </label>
+              <input
+                type="number"
+                required
+                min="30"
+                max="300"
+                value={duration}
+                onChange={(e) => setDuration(Number(e.target.value))}
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-accent-1"
+              />
+            </div>
+
+            {/* Sections */}
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Sections *
+                </label>
+                <button
+                  type="button"
+                  onClick={addSection}
+                  className="text-sm text-accent-1 hover:text-accent-1-dark flex items-center"
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add Section
+                </button>
+              </div>
+              <div className="space-y-2">
+                {sections.map((section, index) => (
+                  <div key={index} className="flex gap-2">
+                    <input
+                      type="text"
+                      required
+                      value={section.name}
+                      onChange={(e) => updateSection(index, 'name', e.target.value)}
+                      placeholder="Section name"
+                      className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                    />
+                    <input
+                      type="number"
+                      required
+                      min="1"
+                      value={section.questions}
+                      onChange={(e) => updateSection(index, 'questions', Number(e.target.value))}
+                      placeholder="Questions"
+                      className="w-24 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                    />
+                    {sections.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeSection(index)}
+                        className="px-2 text-red-600 hover:text-red-700"
+                      >
+                        <X className="h-5 w-5" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
+                Total Questions: {totalQuestions}
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-3 pt-4">
+              <button
+                type="submit"
+                disabled={isGenerating || !title || totalQuestions === 0}
+                className="flex-1 px-6 py-3 bg-accent-1 text-white rounded-lg hover:bg-accent-1-dark transition font-medium font-display disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              >
+                {isGenerating ? (
+                  <>
+                    <div className="animate-spin h-5 w-5 mr-2 border-2 border-white border-t-transparent rounded-full" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-5 w-5 mr-2" />
+                    Generate Mock Test
+                  </>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                disabled={isGenerating}
+                className="px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition font-medium font-display disabled:opacity-50"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </>
   );
 }
