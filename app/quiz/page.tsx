@@ -51,6 +51,7 @@ export default function QuizPage() {
   const [useAI, setUseAI] = useState(true);
   const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard" | "adaptive">("adaptive");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChapterToggle = (chapterId: string) => {
     setSelectedChapters((prev) =>
@@ -74,11 +75,12 @@ export default function QuizPage() {
 
   const handleStartQuiz = async () => {
     if (selectedChapters.length === 0) {
-      alert("Please select at least one chapter");
+      setError("Please select at least one chapter");
       return;
     }
 
     setIsGenerating(true);
+    setError("");
     
     try {
       if (useAI) {
@@ -94,12 +96,15 @@ export default function QuizPage() {
           }),
         });
 
+        const data = await response.json();
+        
         if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.error || "Failed to generate AI quiz");
+          // More detailed error message
+          const errorMessage = data.error || "Failed to generate AI quiz";
+          const errorDetails = data.details ? `\n\nDetails: ${data.details}` : "";
+          throw new Error(errorMessage + errorDetails);
         }
 
-        const data = await response.json();
         // Redirect to quiz attempt page
         if (data.quizId) {
           router.push(`/quiz/${data.quizId}/attempt`);
@@ -122,11 +127,13 @@ export default function QuizPage() {
           }),
         });
 
+        const data = await response.json();
+        
         if (!response.ok) {
-          throw new Error("Failed to create quiz");
+          const errorMessage = data.error || "Failed to create quiz";
+          throw new Error(errorMessage);
         }
 
-        const data = await response.json();
         // Redirect to quiz attempt page
         if (data.quizId) {
           router.push(`/quiz/${data.quizId}/attempt`);
@@ -135,7 +142,14 @@ export default function QuizPage() {
         }
       }
     } catch (error: any) {
-      alert(`Error: ${error.message}`);
+      console.error("Quiz creation error:", error.message || "Unknown error");
+      let errorMessage = error.message || "An error occurred";
+      if (useAI) {
+        errorMessage += ". AI quiz generation requires API keys to be configured. Try disabling AI mode or contact support.";
+      } else {
+        errorMessage += ". Please try again or contact support.";
+      }
+      setError(errorMessage);
     } finally {
       setIsGenerating(false);
     }
@@ -178,8 +192,8 @@ export default function QuizPage() {
                         : "border-text-primary/10 hover:border-accent-1/50"
                     }`}
                   >
-                    <h3 className="font-semibold text-text-primary">{subject.name}</h3>
-                    <p className="text-sm font-body text-text-secondary mt-1">
+                    <h3 className="font-semibold text-text-primary break-words">{subject.name}</h3>
+                    <p className="text-sm font-body text-text-secondary mt-1 break-words">
                       {subject.chapters.length} chapters
                     </p>
                   </button>
@@ -214,9 +228,9 @@ export default function QuizPage() {
                         type="checkbox"
                         checked={selectedChapters.includes(chapter.id)}
                         onChange={() => handleChapterToggle(chapter.id)}
-                        className="h-4 w-4 text-accent-1 rounded border-text-primary/20 focus:ring-accent-1"
+                        className="h-4 w-4 text-accent-1 rounded border-text-primary/20 focus:ring-accent-1 flex-shrink-0"
                       />
-                      <span className="ml-3 font-body text-text-primary">{chapter.name}</span>
+                      <span className="ml-3 font-body text-text-primary break-words flex-1">{chapter.name}</span>
                     </label>
                   ))}
                 </div>
@@ -312,6 +326,13 @@ export default function QuizPage() {
                 )}
               </div>
             </div>
+
+            {/* Error Display */}
+            {error && (
+              <div className="p-4 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl mb-4">
+                <p className="text-red-800 dark:text-red-200 text-sm font-body break-words">{error}</p>
+              </div>
+            )}
 
             <div className={`rounded-xl p-6 border-2 ${useAI ? "bg-gradient-to-br from-accent-1/10 to-accent-2/10 border-accent-1/20" : "bg-accent-1/10 border-accent-1/20"}`}>
               <h3 className="font-display font-semibold mb-2 flex items-center text-primary">

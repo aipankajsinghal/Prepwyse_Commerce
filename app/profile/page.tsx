@@ -25,25 +25,58 @@ const hasClerkKey = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 function ProfilePageWithAuth() {
   const { user, isLoaded } = useUser();
   const [isEditing, setIsEditing] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [grade, setGrade] = useState("");
   const [bio, setBio] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   useEffect(() => {
     if (user) {
+      setFirstName(user.firstName || "");
+      setLastName(user.lastName || "");
       setGrade(user.publicMetadata?.grade as string || "");
       setBio(user.publicMetadata?.bio as string || "");
     }
   }, [user]);
 
   const handleSave = async () => {
-    if (user) {
-      await user.update({
-        unsafeMetadata: {
-          grade,
-          bio,
-        },
+    if (!user) return;
+    
+    setSaving(true);
+    setError("");
+    setSuccess("");
+    
+    try {
+      // Use API route to update profile data
+      const response = await fetch("/api/user/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          firstName, 
+          lastName, 
+          grade, 
+          bio 
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error("Failed to update profile");
+      }
+
+      // Reload user to get updated data
+      await user.reload();
+      
       setIsEditing(false);
+      setSuccess("Profile updated successfully!");
+      setTimeout(() => setSuccess(""), 3000);
+    } catch (err: any) {
+      setError("Failed to update profile. Please try again.");
+      console.error("Profile update error:", err.message || "Unknown error");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -124,6 +157,40 @@ function ProfilePageWithAuth() {
 
                 {isEditing ? (
                   <div className="space-y-4 text-left">
+                    {error && (
+                      <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-800 dark:text-red-200 text-sm">
+                        {error}
+                      </div>
+                    )}
+                    {success && (
+                      <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg text-green-800 dark:text-green-200 text-sm">
+                        {success}
+                      </div>
+                    )}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        First Name
+                      </label>
+                      <input
+                        type="text"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        placeholder="Enter your first name"
+                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Last Name
+                      </label>
+                      <input
+                        type="text"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        placeholder="Enter your last name"
+                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Grade/Class
@@ -154,14 +221,29 @@ function ProfilePageWithAuth() {
                     <div className="flex space-x-2">
                       <button
                         onClick={handleSave}
-                        className="flex-1 px-4 py-2 bg-accent-1-600 text-white rounded-lg hover:bg-accent-1-700 transition flex items-center justify-center space-x-2"
+                        disabled={saving}
+                        className="flex-1 px-4 py-2 bg-accent-1 text-white rounded-lg hover:bg-accent-1-dark transition flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <Save className="h-4 w-4" />
-                        <span>Save</span>
+                        {saving ? (
+                          <>
+                            <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                            <span>Saving...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Save className="h-4 w-4" />
+                            <span>Save</span>
+                          </>
+                        )}
                       </button>
                       <button
-                        onClick={() => setIsEditing(false)}
-                        className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition flex items-center justify-center space-x-2"
+                        onClick={() => {
+                          setIsEditing(false);
+                          setError("");
+                          setSuccess("");
+                        }}
+                        disabled={saving}
+                        className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <X className="h-4 w-4" />
                         <span>Cancel</span>
@@ -171,15 +253,28 @@ function ProfilePageWithAuth() {
                 ) : (
                   <>
                     <div className="text-left space-y-3 mb-6">
-                      {grade && (
+                      <div className="flex items-center font-body text-text-secondary dark:text-gray-300">
+                        <User className="h-4 w-4 mr-2" />
+                        <span>{firstName} {lastName}</span>
+                      </div>
+                      {grade ? (
                         <div className="flex items-center font-body text-text-secondary dark:text-gray-300">
                           <BookOpen className="h-4 w-4 mr-2" />
                           <span>{grade === "CUET" ? "CUET Preparation" : `Class ${grade}`}</span>
                         </div>
+                      ) : (
+                        <div className="flex items-center font-body text-text-muted dark:text-gray-500 italic">
+                          <BookOpen className="h-4 w-4 mr-2" />
+                          <span>Grade not set</span>
+                        </div>
                       )}
-                      {bio && (
+                      {bio ? (
                         <p className="text-sm font-body text-text-secondary dark:text-gray-300 italic">
-                          {bio}
+                          &ldquo;{bio}&rdquo;
+                        </p>
+                      ) : (
+                        <p className="text-sm font-body text-text-muted dark:text-gray-500 italic">
+                          No bio added yet
                         </p>
                       )}
                       <div className="flex items-center font-body text-text-secondary dark:text-gray-300">
@@ -194,9 +289,9 @@ function ProfilePageWithAuth() {
                     </div>
                     <button
                       onClick={() => setIsEditing(true)}
-                      className="w-full px-4 py-2 bg-accent-1-600 text-white rounded-lg hover:bg-accent-1-700 transition flex items-center justify-center space-x-2"
+                      className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-md hover:shadow-lg flex items-center justify-center space-x-2 font-semibold"
                     >
-                      <Edit2 className="h-4 w-4" />
+                      <Edit2 className="h-5 w-5" />
                       <span>Edit Profile</span>
                     </button>
                   </>
