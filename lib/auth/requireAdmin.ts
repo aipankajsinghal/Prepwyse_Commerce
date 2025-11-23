@@ -25,19 +25,21 @@ export async function requireAdmin() {
   }
   
   // Ensure user exists in database
-  const dbUser = await prisma.user.upsert({
+  // Optimized: Read-first strategy to reduce DB writes.
+  let dbUser = await prisma.user.findUnique({
     where: { clerkId: userId },
-    update: {
-      email,
-      name: `${clerkUser?.firstName || ""} ${clerkUser?.lastName || ""}`.trim() || null,
-    },
-    create: {
-      clerkId: userId,
-      email,
-      name: `${clerkUser?.firstName || ""} ${clerkUser?.lastName || ""}`.trim() || null,
-      role: "STUDENT", // Default role for new users
-    },
   });
+
+  if (!dbUser) {
+    dbUser = await prisma.user.create({
+      data: {
+        clerkId: userId,
+        email,
+        name: `${clerkUser?.firstName || ""} ${clerkUser?.lastName || ""}`.trim() || null,
+        role: "STUDENT", // Default role for new users
+      },
+    });
+  }
 
   // Check if user has admin role
   if (dbUser.role !== "ADMIN") {

@@ -202,7 +202,7 @@ prepwyse-commerce/
 ┌─────▼─────────┐
 │   Chapter     │
 ├───────────────┤
-│ id            │
+│ id          │
 │ subjectId     │
 │ name          │
 │ description   │
@@ -877,3 +877,305 @@ See LICENSE file in repository.
 **Last Updated**: November 2024  
 **Version**: 1.0.0  
 **Maintained By**: PrepWyse Team
+
+---
+
+# Design System
+
+## Overview
+
+A distinctive, context-aware design system tailored for educational platforms serving commerce students in India. The design avoids generic "AI slop" aesthetics by prioritizing memorable typography, cohesive warm color systems, purposeful motion, and layered backgrounds while maintaining accessibility and performance.
+
+## 1. Typography
+
+### Philosophy
+Combines modern geometric display fonts with warm, readable serif body text to create a friendly yet academic feel.
+
+### Font Families
+
+#### Display/Headings: Space Grotesk
+- **Purpose**: Headlines, UI elements, buttons
+- **Characteristics**: Modern, geometric, friendly, slightly technical
+- **Weights**: 400 (regular), 500 (medium), 600 (semibold), 700 (bold)
+- **Usage**: All `h1-h6` tags, navigation, buttons, labels
+
+#### Body/Content: Crimson Pro
+- **Purpose**: Body text, descriptions, articles
+- **Characteristics**: Warm, readable, academic, slightly classical
+- **Weights**: 400 (regular), 500 (medium), 600 (semibold), 700 (bold)
+- **Usage**: Paragraphs, descriptions, explanations
+
+### Type Scale
+
+```css
+h1 { font-size: 3rem; font-weight: 700; letter-spacing: -0.02em; }      /* 48px */
+h2 { font-size: 2.25rem; font-weight: 700; letter-spacing: -0.015em; }  /* 36px */
+h3 { font-size: 1.875rem; font-weight: 600; }                           /* 30px */
+h4 { font-size: 1.5rem; font-weight: 600; }                             /* 24px */
+h5 { font-size: 1.25rem; font-weight: 600; }                            /* 20px */
+h6 { font-size: 1.125rem; font-weight: 600; }                           /* 18px */
+body { font-size: 1rem; line-height: 1.7; }                             /* 16px */
+```
+
+## 2. Color System
+
+### Philosophy
+Warm, supportive colors inspired by Indian education, paper textures, and terra cotta elements. Avoids cold blues and harsh contrasts in favor of warmth and approachability.
+
+### Core Brand Colors
+
+#### Primary: Deep Navy
+```css
+--primary: 28 41 73;           /* rgb(28, 41, 73) */
+```
+**Usage**: Authority, trust, headers
+
+#### Accent 1: Warm Terracotta
+```css
+--accent-1: 183 73 50;         /* rgb(183, 73, 50) - Main terracotta */
+```
+**Usage**: CTAs, highlights, primary actions
+
+#### Accent 2: Deep Teal
+```css
+--accent-2: 36 119 123;        /* rgb(36, 119, 123) */
+```
+**Usage**: Secondary actions, info badges, complementary highlights
+
+### Surface Colors
+- **Backgrounds**: Warm off-white (`#FCFAF7`)
+- **Surface**: Lighter surface for cards (`#FFFDFA`)
+- **Elevated**: Pure white for elevated cards
+
+### Dark Theme
+Automatically adjusts colors for dark mode with warmer, softer tones.
+
+## 3. Motion Design
+
+### Philosophy
+One signature motion sequence per screen with purposeful, delightful animations. CSS-first approach for performance.
+
+### Signature Animation: Staggered Reveal
+Primary page entrance animation.
+
+### Bloom Effect (Signature CTA)
+Button interaction with radial gradient bloom.
+
+## 4. Components
+
+### Educational Card (.edu-card)
+Primary container for content blocks with shadow and hover effects.
+
+### Buttons
+- **Primary**: Terracotta background, white text, bloom effect.
+- **Secondary**: Transparent background, terracotta border/text.
+
+## 5. Accessibility
+
+- ✅ All text meets WCAG AA (minimum 4.5:1)
+- ✅ Large text meets WCAG AAA (7:1)
+- ✅ Interactive elements have clear focus states
+- ✅ Keyboard navigation support
+- ✅ Screen reader support
+
+---
+
+# Contributing Guidelines
+
+## Getting Started
+
+1. Fork the repository
+2. Clone your fork: `git clone https://github.com/YOUR_USERNAME/Prepwyse_Commerce.git`
+3. Create a new branch: `git checkout -b feature/your-feature-name`
+4. Make your changes
+5. Test your changes thoroughly
+6. Commit your changes: `git commit -m "Add: your feature description"`
+7. Push to your fork: `git push origin feature/your-feature-name`
+8. Create a Pull Request
+
+## Code Style Guidelines
+
+### TypeScript
+- Use TypeScript for all new files
+- Define proper types and interfaces
+- Avoid `any` types when possible
+- Use meaningful variable and function names
+
+### React Components
+- Use functional components with hooks
+- Keep components small and focused
+- Extract reusable logic into custom hooks
+- Use proper prop typing
+
+### API Routes
+- Follow RESTful conventions
+- Use proper HTTP status codes
+- Implement error handling
+- Add authentication checks
+- Validate input data
+
+### Database
+- Always use Prisma for database operations
+- Create migrations for schema changes
+- Add proper indexes for performance
+- Use transactions for multi-step operations
+
+## Pull Request Guidelines
+
+### PR Title Format
+- `Add: New feature description`
+- `Fix: Bug description`
+- `Update: Change description`
+- `Refactor: Refactoring description`
+- `Docs: Documentation changes`
+
+### PR Description
+Include:
+- What changes were made
+- Why the changes were necessary
+- Any breaking changes
+- Screenshots (for UI changes)
+- Testing performed
+
+---
+
+# Local Testing Guide
+
+## 1. Environment Setup
+
+Ensure your local environment is correctly configured to mirror production as closely as possible.
+
+### 1.1. Environment Variables
+Check if you have a `.env` file in the root directory. If not, copy `.env.example`:
+
+```bash
+cp .env.example .env
+```
+
+**Critical Variables to Verify:**
+- `DATABASE_URL`: Should point to your local PostgreSQL instance.
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` & `CLERK_SECRET_KEY`: Use your **development** keys from Clerk.
+- `OPENAI_API_KEY`: Required for AI features (Quiz generation, recommendations).
+
+### 1.2. Install Dependencies
+Ensure all dependencies are up to date:
+
+```bash
+npm install
+```
+
+## 2. Database Preparation
+
+Start with a fresh or consistent database state.
+
+### 2.1. Run Migrations
+Apply the latest schema changes to your local database:
+
+```bash
+npx prisma migrate dev
+```
+
+### 2.2. Seed Data (Optional but Recommended)
+Populate the database with initial data (Subjects, Chapters, etc.) to make testing easier:
+
+```bash
+npm run seed
+```
+
+## 3. Automated Testing
+
+Run the existing unit and integration tests to catch regressions in core logic.
+
+```bash
+npm test
+```
+
+*Note: These tests cover API error handling, middleware, services, and validations.*
+
+## 4. Build Verification
+
+Simulate the production build process to ensure there are no type errors or build-time issues.
+
+```bash
+npm run build
+```
+
+If the build fails, fix the reported errors before proceeding.
+
+## 5. Manual End-to-End (E2E) Testing
+
+Run the application in production mode locally to test the exact artifact that will be deployed.
+
+```bash
+npm start
+```
+
+Open [http://localhost:3000](http://localhost:3000) and perform the following checks:
+
+### 5.1. Authentication Flow
+- [ ] **Sign Up**: Create a new account using email/password or social login.
+- [ ] **Onboarding**: Complete any onboarding steps (e.g., selecting class/stream).
+- [ ] **Sign Out**: Log out successfully.
+- [ ] **Sign In**: Log back in with the created credentials.
+- [ ] **Protected Routes**: Try accessing `/dashboard` while logged out (should redirect to sign-in).
+
+### 5.2. Dashboard & Navigation
+- [ ] **Dashboard Load**: Verify the dashboard loads without errors.
+- [ ] **Theme Switching**: Toggle between Light, Dark, Ocean, Forest, and Sunset themes.
+- [ ] **Responsiveness**: Resize browser to mobile view and check navigation menu.
+
+### 5.3. Quiz Feature (AI Powered)
+- [ ] **Generate Quiz**: Go to "Practice" -> "Create Quiz". Select subjects/chapters and generate.
+- [ ] **Attempt Quiz**: Answer questions. Check if UI updates correctly.
+- [ ] **Submit Quiz**: Submit the quiz and verify the results page loads.
+- [ ] **Review**: Check if the "Review Answers" feature works.
+
+### 5.4. Mock Tests
+- [ ] **List View**: Verify available mock tests are listed.
+- [ ] **Start Test**: Begin a mock test.
+- [ ] **Timer**: Verify the timer is working.
+- [ ] **Submission**: Submit the test and check the analysis report.
+
+### 5.5. User Profile
+- [ ] **View Profile**: Check if user details are displayed correctly.
+- [ ] **Edit Profile**: Update some fields (e.g., name, bio) and save. Verify changes persist.
+
+### 5.6. Admin Panel (If you have Admin Access)
+- [ ] **Access**: Navigate to `/admin`.
+- [ ] **User Management**: View list of users.
+- [ ] **Content**: Check if you can view Subjects/Chapters.
+
+---
+
+# Project Status
+
+## 📊 Quick Status
+
+```
+✅ Phase A: 100% Complete (Foundation: PWA, Analytics, Error Handling, Onboarding, GDPR)
+✅ Phase B: 100% Complete (Engagement: Gamification, Study Planner, Flashcards, i18n)
+⏳ Phase C: 60% Complete (Monetization: Backend ✅, UI ⬜)
+⬜ Phase D: 0% Complete (Advanced Features: Video Lessons, Forums, Practice Papers)
+✅ Phase E: 100% Complete (AI Learning: Adaptive Learning, AI Question Generation)
+
+Overall: 72% Complete (16 of 23 major features)
+```
+
+## 🚀 Current Priority
+
+**Focus:** Phase C UI Development
+
+**Critical Items:**
+1. Access control
+2. Subscription UI
+3. Admin dashboard
+
+## 📚 Phase Documentation
+
+- **Phase A (Foundation)**: Complete.
+- **Phase B (Engagement)**: Complete.
+- **Phase C (Monetization)**: Backend complete, UI pending.
+- **Phase D (Advanced Features)**: Planned.
+- **Phase E (AI Learning)**: Complete.
+
+For detailed pending items, please refer to the project management board or issue tracker.

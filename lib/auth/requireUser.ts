@@ -17,18 +17,21 @@ export async function requireUser(req: Request) {
   }
   
   // Ensure user exists in database
-  const dbUser = await prisma.user.upsert({
+  // Optimized: Read-first strategy to reduce DB writes. 
+  // TODO: Implement Clerk Webhooks for real-time profile updates.
+  let dbUser = await prisma.user.findUnique({
     where: { clerkId: userId },
-    update: {
-      email,
-      name: `${clerkUser?.firstName || ""} ${clerkUser?.lastName || ""}`.trim() || null,
-    },
-    create: {
-      clerkId: userId,
-      email,
-      name: `${clerkUser?.firstName || ""} ${clerkUser?.lastName || ""}`.trim() || null,
-    },
   });
+
+  if (!dbUser) {
+    dbUser = await prisma.user.create({
+      data: {
+        clerkId: userId,
+        email,
+        name: `${clerkUser?.firstName || ""} ${clerkUser?.lastName || ""}`.trim() || null,
+      },
+    });
+  }
 
   return dbUser;
 }

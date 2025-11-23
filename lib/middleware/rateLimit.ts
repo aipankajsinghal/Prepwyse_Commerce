@@ -38,16 +38,17 @@ interface RateLimitEntry {
 const rateLimitStore = new Map<string, RateLimitEntry>();
 
 /**
- * Clean up expired rate limit entries periodically
+ * Prune expired entries from the store
+ * Called lazily to avoid setInterval in serverless environments
  */
-setInterval(() => {
+function pruneStore() {
   const now = Date.now();
   for (const [key, entry] of rateLimitStore.entries()) {
     if (entry.resetAt < now) {
       rateLimitStore.delete(key);
     }
   }
-}, 60000); // Clean up every minute
+}
 
 /**
  * Get identifier from request (IP address or user ID)
@@ -84,6 +85,11 @@ export interface RateLimitResult {
  */
 export function createRateLimiter(config: RateLimitConfig) {
   return async (req: NextRequest): Promise<RateLimitResult> => {
+    // Lazy cleanup of expired entries (approx every 100 requests to avoid perf hit)
+    if (Math.random() < 0.01) {
+      pruneStore();
+    }
+
     const identifier = getIdentifier(req);
     const key = `${req.nextUrl.pathname}:${identifier}`;
     const now = Date.now();

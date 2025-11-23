@@ -1,20 +1,49 @@
-# Deployment Guide for PrepWyse Commerce
+# Deployment Guide
 
-This guide will help you deploy the PrepWyse Commerce application to production.
+This comprehensive guide covers everything you need to know about deploying PrepWyse Commerce to production.
 
-## Prerequisites
+## Table of Contents
+1. [Quick Start](#quick-start)
+2. [Deployment Options](#deployment-options)
+3. [Docker Deployment](#docker-deployment)
+4. [CI/CD Pipeline](#cicd-pipeline)
+5. [Security](#security)
+6. [Readiness Checklist](#readiness-checklist)
 
-Before deploying, ensure you have:
+---
 
-1. A PostgreSQL database (e.g., from Vercel Postgres, Supabase, or Railway)
-2. A Clerk account with API keys
-3. A hosting platform account (Vercel recommended for Next.js)
+## 1. Quick Start
 
-## Environment Variables
+**Estimated Time**: 30-45 minutes
+
+### Prerequisites Checklist
+- [ ] **Server/VPS** with Docker installed (or Vercel/Railway account)
+- [ ] **PostgreSQL Database** (local, cloud, or via docker-compose)
+- [ ] **Clerk Account** with API keys
+- [ ] **OpenAI Account** with API key
+- [ ] **Domain Name** (optional but recommended)
+
+### Deployment Path Selection
+
+#### Option A: Docker on VPS (Recommended for Testing)
+✅ Full control, Isolated environment, Easy to scale
+⏱️ Time: 30-45 minutes
+
+#### Option B: Vercel (Fastest for Serverless)
+✅ Zero server management, Automatic scaling, Built-in CI/CD
+⏱️ Time: 15-20 minutes
+
+#### Option C: Railway (Easiest All-in-One)
+✅ Includes database, Simple setup, Free tier available
+⏱️ Time: 20-30 minutes
+
+---
+
+## 2. Deployment Options
+
+### Environment Variables
 
 You need to set the following environment variables in your production environment:
-
-### Required Variables
 
 ```env
 # Database
@@ -29,193 +58,156 @@ NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
 NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
 NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
+
+# OpenAI
+OPENAI_API_KEY=sk-xxxxx
 ```
 
-## Step-by-Step Deployment
-
-### 1. Set Up Database
-
-#### Option A: Vercel Postgres
+### Option A: Vercel Postgres
 1. Go to your Vercel project
 2. Navigate to Storage tab
 3. Create a Postgres database
 4. Copy the connection string (it will be automatically added to environment variables)
 
-#### Option B: Supabase
+### Option B: Supabase
 1. Create a new project on Supabase
 2. Go to Settings > Database
 3. Copy the Connection String (URI format)
 4. Add it as `DATABASE_URL` in your environment variables
 
-#### Option C: Railway
-1. Create a new PostgreSQL database on Railway
-2. Copy the connection string
-3. Add it as `DATABASE_URL` in your environment variables
+---
 
-### 2. Set Up Clerk Authentication
+## 3. Docker Deployment
 
-1. Go to [Clerk Dashboard](https://dashboard.clerk.com)
-2. Create a new application or use an existing one
-3. Go to API Keys section
-4. Copy your Publishable Key and Secret Key
-5. Add them to your environment variables:
-   - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
-   - `CLERK_SECRET_KEY`
-6. Configure the redirect URLs in Clerk settings to match your domain
+### Prerequisites on VPS
+- Ubuntu 20.04+ or Debian 11+
+- Minimum 2GB RAM, 2 CPU cores
+- Docker 24.0+ and Docker Compose 2.0+
+- Domain name pointing to your VPS
 
-### 3. Deploy to Vercel (Recommended)
+### Quick Start
 
-1. **Install Vercel CLI** (if not already installed):
+1. **Clone Repository on VPS**
    ```bash
-   npm install -g vercel
+   git clone https://github.com/yourusername/Prepwyse_Commerce.git .
    ```
 
-2. **Login to Vercel**:
+2. **Configure Environment**
    ```bash
-   vercel login
+   cp .env.example .env
+   nano .env
    ```
 
-3. **Link your project**:
+3. **Deploy with Docker Compose**
    ```bash
-   vercel link
+   docker-compose up -d
    ```
 
-4. **Set environment variables**:
-   - Go to your project on Vercel dashboard
-   - Navigate to Settings > Environment Variables
-   - Add all required variables listed above
+### Docker Compose Services
 
-5. **Deploy**:
-   ```bash
-   vercel --prod
-   ```
+- **PostgreSQL**: `postgres:16-alpine` with persistent volume.
+- **Next.js App**: Built from Dockerfile, auto-migrations.
+- **Nginx (Optional)**: Reverse proxy with SSL termination.
 
-### 4. Run Database Migrations
+### SSL/TLS Setup (Certbot)
 
-After deploying, you need to set up the database schema:
+```bash
+sudo apt install -y certbot
+sudo certbot certonly --standalone -d your-domain.com
+```
 
-1. From your local machine, with the production DATABASE_URL:
-   ```bash
-   npx prisma migrate deploy
-   ```
+### Maintenance
 
-2. Generate Prisma Client (this happens automatically during build):
-   ```bash
-   npx prisma generate
-   ```
+- **Logs**: `docker-compose logs -f`
+- **Backup**: `docker-compose exec postgres pg_dump ...`
+- **Update**: `git pull && docker-compose build && docker-compose up -d`
 
-3. (Optional) Seed the database with sample data:
-   ```bash
-   npm run seed
-   ```
+---
 
-### 5. Verify Deployment
+## 4. CI/CD Pipeline
 
-1. Visit your deployed URL
-2. Test the following:
-   - Landing page loads correctly
-   - Sign up/Sign in works
-   - Dashboard is accessible after authentication
-   - Quiz creation interface loads
-   - Mock test page displays correctly
-   - Results page is accessible
+### Overview
+The project includes two GitHub Actions workflows:
+1. **CI Pipeline**: Linting, testing, building.
+2. **Docker Build & Deploy**: Container builds and automatic deployment.
 
-## Alternative Deployment Options
+### CI Pipeline (`.github/workflows/ci.yml`)
+- **Triggers**: Push/PR to `main` or `develop`.
+- **Jobs**:
+  - Linting & Type Checking
+  - Security Scanning (`npm audit`, Trivy)
+  - Build Verification
 
-### Deploy to Netlify
+### Docker Build & Deploy
+- **Triggers**: Push to `main` (deploy), PR (build only).
+- **Jobs**:
+  - Build Docker image
+  - Push to GitHub Container Registry (GHCR)
+  - Deploy to VPS (via SSH)
 
-1. Connect your GitHub repository to Netlify
-2. Set build command: `npm run build`
-3. Set publish directory: `.next`
-4. Add all environment variables in Netlify dashboard
-5. Deploy
+### Configuration
+Set the following secrets in GitHub Repository Settings:
+- `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`
+- `CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`
+- `DATABASE_URL`, `OPENAI_API_KEY`
 
-### Deploy to Railway
+---
 
-1. Create a new project on Railway
-2. Connect your GitHub repository
-3. Railway will auto-detect Next.js
-4. Add environment variables
-5. Deploy
+## 5. Security
 
-### Deploy to AWS Amplify
+### Authentication & Authorization
+- **Clerk Integration**: Secure session management, CSRF protection.
+- **Middleware**: All protected routes secured via middleware.
+- **Access Control**: User data isolated by Clerk ID.
 
-1. Connect your GitHub repository
-2. Set build settings for Next.js
-3. Add environment variables
-4. Deploy
+### Database Security
+- **Prisma ORM**: Parameterized queries to prevent SQL injection.
+- **No Raw SQL**: Unless absolutely necessary and audited.
 
-## Post-Deployment
+### Environment Variables
+- All secrets in environment variables.
+- `.env` file in `.gitignore`.
+- No hardcoded credentials.
 
-### Monitor Your Application
+### API Security
+- Request validation on all endpoints.
+- Rate limiting enabled.
+- HTTPS enabled in production.
 
-1. Set up error tracking (e.g., Sentry)
-2. Monitor database performance
-3. Set up uptime monitoring
-4. Review logs regularly
+---
 
-### Performance Optimization
+## 6. Readiness Checklist
 
-1. Enable caching in your hosting platform
-2. Set up a CDN for static assets
-3. Monitor and optimize database queries
-4. Consider implementing Redis for session storage
+### Code Quality
+- [ ] ⚠️ All code changes reviewed and approved
+- [ ] ⚠️ ESLint passes with no errors
+- [ ] ⚠️ TypeScript type check passes (`npx tsc --noEmit`)
+- [ ] ⚠️ Production build completes successfully (`npm run build`)
 
-### Security Checklist
+### Environment
+- [ ] ⚠️ `.env` file created for production
+- [ ] ⚠️ `DATABASE_URL` configured
+- [ ] ⚠️ `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` & `CLERK_SECRET_KEY` configured
+- [ ] ⚠️ `OPENAI_API_KEY` configured
 
-- [ ] HTTPS is enabled
-- [ ] Environment variables are secure
-- [ ] Database has proper access controls
-- [ ] Clerk authentication is properly configured
-- [ ] CORS is configured if needed
-- [ ] Rate limiting is in place for API routes
+### Database
+- [ ] ⚠️ Production database created
+- [ ] ⚠️ Migrations applied (`npx prisma migrate deploy`)
+- [ ] Backup strategy defined
 
-## Troubleshooting
+### Security
+- [ ] ⚠️ HTTPS/SSL enabled
+- [ ] ⚠️ `npm audit` shows no critical vulnerabilities
+- [ ] Admin routes protected
 
-### Build Fails
+### Pre-Launch Testing
+- [ ] ⚠️ Authentication works (sign-up, sign-in, sign-out)
+- [ ] ⚠️ Quiz creation and taking works
+- [ ] ⚠️ Mock test flow works
+- [ ] ⚠️ Results page displays correctly
 
-- Check that all environment variables are set
-- Ensure DATABASE_URL is accessible
-- Verify Clerk keys are valid
-- Check build logs for specific errors
+### Post-Deployment Verification
+- [ ] ⚠️ Application accessible at production URL
+- [ ] ⚠️ Health check endpoint returns healthy
+- [ ] ⚠️ No 500 errors in logs
 
-### Authentication Not Working
-
-- Verify Clerk keys are correct
-- Check that redirect URLs match your domain
-- Ensure middleware is properly configured
-- Check browser console for errors
-
-### Database Connection Issues
-
-- Verify DATABASE_URL is correct
-- Check that database is accessible from your hosting platform
-- Ensure migrations have been run
-- Check database logs
-
-## Maintenance
-
-### Regular Tasks
-
-1. **Update dependencies**: Run `npm update` regularly
-2. **Database backups**: Set up automatic backups
-3. **Monitor usage**: Track user activity and system performance
-4. **Security updates**: Keep all packages updated
-
-### Scaling Considerations
-
-As your user base grows:
-
-1. Upgrade database plan if needed
-2. Consider implementing caching (Redis)
-3. Optimize database queries
-4. Use database connection pooling
-5. Consider implementing a queue system for heavy operations
-
-## Support
-
-For issues during deployment:
-- Check Next.js documentation: https://nextjs.org/docs
-- Clerk documentation: https://clerk.com/docs
-- Prisma documentation: https://www.prisma.io/docs
-- Open an issue on the GitHub repository

@@ -1,16 +1,14 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { generateAIQuestions, determineAdaptiveDifficulty } from "@/lib/ai-services";
-import { handleApiError, unauthorizedError, notFoundError } from "@/lib/api-error-handler";
+import { handleApiError, notFoundError } from "@/lib/api-error-handler";
+import { requireUser } from "@/lib/auth/requireUser";
 
 // POST /api/ai/generate-quiz - Generate AI-powered quiz
 export async function POST(request: Request) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return unauthorizedError();
-    }
+    const dbUser = await requireUser(request);
+    const userId = dbUser.clerkId;
 
     const body = await request.json();
     const { subjectId, chapterIds, questionCount, difficulty: requestedDifficulty } = body;
@@ -55,16 +53,6 @@ export async function POST(request: Request) {
 
     // Determine adaptive difficulty if not specified
     const difficulty = requestedDifficulty || await determineAdaptiveDifficulty(userId);
-
-    // Ensure user exists in database
-    const dbUser = await prisma.user.upsert({
-      where: { clerkId: userId },
-      update: {},
-      create: {
-        clerkId: userId,
-        email: "", // Will be updated by user sync
-      },
-    });
 
     // Generate AI questions
     let aiQuestions;

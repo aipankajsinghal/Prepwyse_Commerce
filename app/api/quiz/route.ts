@@ -1,34 +1,15 @@
 import { NextResponse } from "next/server";
-import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { handleApiError, unauthorizedError } from "@/lib/api-error-handler";
+import { handleApiError } from "@/lib/api-error-handler";
+import { requireUser } from "@/lib/auth/requireUser";
 
 // POST /api/quiz - Create and start a new quiz
 export async function POST(request: Request) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return unauthorizedError();
-    }
-
-    const user = await currentUser();
+    const dbUser = await requireUser(request);
 
     const { title, description, subjectId, chapterIds, questionCount, duration } =
       await request.json();
-
-    // Ensure user exists in database
-    const dbUser = await prisma.user.upsert({
-      where: { clerkId: userId },
-      update: {
-        email: user?.emailAddresses?.[0]?.emailAddress || "",
-        name: `${user?.firstName || ""} ${user?.lastName || ""}`.trim() || null,
-      },
-      create: {
-        clerkId: userId,
-        email: user?.emailAddresses?.[0]?.emailAddress || "",
-        name: `${user?.firstName || ""} ${user?.lastName || ""}`.trim() || null,
-      },
-    });
 
     // Create quiz
     const quiz = await prisma.quiz.create({

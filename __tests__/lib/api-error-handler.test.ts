@@ -1,49 +1,58 @@
-/**
- * Unit tests for API Error Handler Logic
- */
+import { describe, it, expect, jest } from '@jest/globals';
+import { handleApiError, ApiError } from '../../lib/api-error-handler';
+import { NextResponse } from 'next/server';
 
-import { describe, it, expect } from '@jest/globals';
+// Mock logger
+jest.mock('../../lib/logger', () => ({
+  logger: {
+    error: jest.fn(),
+  },
+}));
 
-describe('API Error Handler Logic', () => {
-  it('should define error status codes', () => {
-    expect(400).toBe(400); // Bad Request
-    expect(401).toBe(401); // Unauthorized
-    expect(403).toBe(403); // Forbidden
-    expect(404).toBe(404); // Not Found
-    expect(500).toBe(500); // Internal Server Error
-  });
-
-  it('should extract error messages', () => {
-    const error = new Error('Test error');
+describe('ApiError', () => {
+  it('should create an instance with correct properties', () => {
+    const error = new ApiError('Test error', 400, 'TEST_CODE');
     expect(error.message).toBe('Test error');
-  });
-
-  it('should handle string errors', () => {
-    const errorMessage = 'String error';
-    expect(typeof errorMessage).toBe('string');
-    expect(errorMessage).toBe('String error');
-  });
-
-  it('should provide default error message', () => {
-    const defaultMessage = 'An unknown error occurred';
-    expect(defaultMessage).toBeDefined();
-    expect(typeof defaultMessage).toBe('string');
+    expect(error.statusCode).toBe(400);
+    expect(error.code).toBe('TEST_CODE');
+    expect(error.name).toBe('ApiError');
   });
 });
 
-describe('Error Classification', () => {
-  it('should classify validation errors', () => {
-    const statusCode = 400;
-    expect(statusCode >= 400 && statusCode < 500).toBe(true);
+describe('handleApiError', () => {
+  it('should handle ApiError correctly', async () => {
+    const error = new ApiError('Custom error', 404, 'NOT_FOUND');
+    const response = handleApiError(error);
+    
+    expect(response.status).toBe(404);
+    const data = await response.json();
+    expect(data).toEqual({ error: 'Custom error', code: 'NOT_FOUND' });
   });
 
-  it('should classify server errors', () => {
-    const statusCode = 500;
-    expect(statusCode >= 500).toBe(true);
+  it('should handle standard Error correctly', async () => {
+    const error = new Error('Standard error');
+    const response = handleApiError(error);
+    
+    expect(response.status).toBe(500);
+    const data = await response.json();
+    expect(data).toEqual({ error: 'Standard error' });
   });
 
-  it('should classify success responses', () => {
-    const statusCode = 200;
-    expect(statusCode >= 200 && statusCode < 300).toBe(true);
+  it('should handle unknown error correctly', async () => {
+    const error = 'Unknown string error';
+    const response = handleApiError(error);
+    
+    expect(response.status).toBe(500);
+    const data = await response.json();
+    expect(data).toEqual({ error: 'Unknown string error' });
+  });
+  
+  it('should use default message if error has no message', async () => {
+      const error = new Error('');
+      const response = handleApiError(error, 'Default message');
+      
+      expect(response.status).toBe(500);
+      const data = await response.json();
+      expect(data).toEqual({ error: 'Default message' });
   });
 });

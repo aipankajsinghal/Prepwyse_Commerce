@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { generateAdaptiveLearningPath } from "@/lib/adaptive-learning";
-import { handleApiError, unauthorizedError, validationError } from "@/lib/api-error-handler";
+import { handleApiError, validationError } from "@/lib/api-error-handler";
+import { requireUser } from "@/lib/auth/requireUser";
 
 /**
  * POST /api/adaptive-learning/generate-path
@@ -10,10 +10,7 @@ import { handleApiError, unauthorizedError, validationError } from "@/lib/api-er
  */
 export async function POST(request: Request) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return unauthorizedError();
-    }
+    const dbUser = await requireUser(request);
 
     const { subjectId, goalType, targetDate, weeklyHours } = await request.json();
 
@@ -21,16 +18,6 @@ export async function POST(request: Request) {
     if (!goalType || !["exam_prep", "chapter_mastery", "skill_improvement"].includes(goalType)) {
       return validationError("Invalid goal type. Must be one of: exam_prep, chapter_mastery, skill_improvement");
     }
-
-    // Ensure user exists in database
-    const dbUser = await prisma.user.upsert({
-      where: { clerkId: userId },
-      update: {},
-      create: {
-        clerkId: userId,
-        email: "", // Will be updated by user sync
-      },
-    });
 
     // Generate adaptive learning path
     const learningPath = await generateAdaptiveLearningPath({
