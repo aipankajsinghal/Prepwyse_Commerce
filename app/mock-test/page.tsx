@@ -40,8 +40,9 @@ export default function MockTestPage() {
         
         const data = await response.json();
         setMockTests(data);
-      } catch (err: any) {
-        console.error("Error fetching mock tests:", err);
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : "Unknown error";
+        console.error("Error fetching mock tests:", errorMessage);
         setError("Failed to load mock tests. Please refresh the page.");
       } finally {
         setLoading(false);
@@ -74,9 +75,10 @@ export default function MockTestPage() {
       
       // TODO: Uncomment when mock test taking page is implemented
       // router.push(`/mock-test/${data.attemptId}`);
-    } catch (err: any) {
-      console.error("Error starting mock test:", err);
-      setError(err.message || "Failed to start mock test. Please try again.");
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to start mock test. Please try again.";
+      console.error("Error starting mock test:", errorMessage);
+      setError(errorMessage);
     } finally {
       setStartingTest(null);
     }
@@ -166,7 +168,7 @@ export default function MockTestPage() {
                     </div>
 
                     {/* Sections */}
-                    {test.sections && Array.isArray(test.sections) && test.sections.length > 0 && (
+                    {test.sections && test.sections.length > 0 && (
                       <div className="mb-4">
                         <h4 className="text-sm font-display font-semibold text-text-primary mb-2">Sections:</h4>
                         <div className="space-y-1">

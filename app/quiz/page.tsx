@@ -45,8 +45,9 @@ export default function QuizPage() {
         
         const data = await response.json();
         setSubjects(data);
-      } catch (err: any) {
-        console.error("Error fetching subjects:", err);
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : "Unknown error";
+        console.error("Error fetching subjects:", errorMessage);
         setError("Failed to load subjects. Please refresh the page.");
       } finally {
         setLoading(false);
