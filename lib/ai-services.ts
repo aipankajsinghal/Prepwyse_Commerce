@@ -86,17 +86,6 @@ export async function generateAIMockTest(params: {
 
   const { title, examType, description, duration, totalQuestions, sections } = params;
 
-  // Get subjects from database for context
-  const subjects = await prisma.subject.findMany({
-    include: {
-      chapters: {
-        orderBy: { order: "asc" },
-      },
-    },
-  });
-
-  const subjectMap = new Map(subjects.map(s => [s.id, s]));
-
   const prompt = `You are an expert in creating comprehensive mock tests for Indian commerce education. Generate a complete mock test with the following specifications:
 
 Title: ${title}

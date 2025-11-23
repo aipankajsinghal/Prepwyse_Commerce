@@ -108,8 +108,21 @@ export async function POST(request: Request) {
       }
     }
 
-    // Note: We would need to create a MockTestQuestion model to store these
-    // For now, we'll return them for the client to use
+    // NOTE: Questions are returned but not persisted to database
+    // To persist questions, create a MockTestQuestion model in Prisma schema:
+    // model MockTestQuestion {
+    //   id String @id @default(cuid())
+    //   mockTestId String
+    //   mockTest MockTest @relation(fields: [mockTestId], references: [id])
+    //   questionNumber Int
+    //   section String
+    //   questionText String
+    //   options Json
+    //   correctAnswer String
+    //   explanation String
+    //   difficulty String
+    // }
+    // Then store questions using: await prisma.mockTestQuestion.createMany({ data: allQuestions })
     
     return NextResponse.json({
       mockTestId: mockTest.id,
