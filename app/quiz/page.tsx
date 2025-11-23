@@ -1,49 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import { BookOpen, CheckCircle2, Clock, Play, Sparkles } from "lucide-react";
 
-// Mock data - In production, this would come from the database
-const subjects = [
-  {
-    id: "1",
-    name: "Business Studies",
-    chapters: [
-      { id: "1-1", name: "Nature and Significance of Management" },
-      { id: "1-2", name: "Principles of Management" },
-      { id: "1-3", name: "Business Environment" },
-      { id: "1-4", name: "Planning" },
-      { id: "1-5", name: "Organizing" },
-    ],
-  },
-  {
-    id: "2",
-    name: "Accountancy",
-    chapters: [
-      { id: "2-1", name: "Accounting for Partnership Firms" },
-      { id: "2-2", name: "Admission of a Partner" },
-      { id: "2-3", name: "Retirement/Death of a Partner" },
-      { id: "2-4", name: "Dissolution of Partnership Firm" },
-      { id: "2-5", name: "Accounting for Share Capital" },
-    ],
-  },
-  {
-    id: "3",
-    name: "Economics",
-    chapters: [
-      { id: "3-1", name: "Introduction to Microeconomics" },
-      { id: "3-2", name: "Theory of Consumer Behaviour" },
-      { id: "3-3", name: "Production and Costs" },
-      { id: "3-4", name: "The Theory of the Firm" },
-      { id: "3-5", name: "Market Equilibrium" },
-    ],
-  },
-];
+interface Chapter {
+  id: string;
+  name: string;
+  order: number;
+}
+
+interface Subject {
+  id: string;
+  name: string;
+  description?: string;
+  icon?: string;
+  chapters: Chapter[];
+}
 
 export default function QuizPage() {
   const router = useRouter();
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedSubject, setSelectedSubject] = useState("");
   const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
   const [questionCount, setQuestionCount] = useState(10);
@@ -52,6 +31,30 @@ export default function QuizPage() {
   const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard" | "adaptive">("adaptive");
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState("");
+
+  // Fetch subjects and chapters from API
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch("/api/subjects");
+        
+        if (!response.ok) {
+          throw new Error("Failed to fetch subjects");
+        }
+        
+        const data = await response.json();
+        setSubjects(data);
+      } catch (err: any) {
+        console.error("Error fetching subjects:", err);
+        setError("Failed to load subjects. Please refresh the page.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSubjects();
+  }, []);
 
   const handleChapterToggle = (chapterId: string) => {
     setSelectedChapters((prev) =>
@@ -157,6 +160,21 @@ export default function QuizPage() {
 
   const currentSubject = subjects.find((s) => s.id === selectedSubject);
 
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[rgb(var(--bg))] bg-pattern">
+        <Navbar />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="animate-spin h-12 w-12 border-4 border-accent-1 border-t-transparent rounded-full mx-auto mb-4" />
+            <p className="text-text-secondary font-body">Loading subjects...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[rgb(var(--bg))] bg-pattern">
       <Navbar />
@@ -169,37 +187,51 @@ export default function QuizPage() {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Left Column - Subject & Chapter Selection */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Subject Selection */}
-            <div className="edu-card animate-reveal delay-100">
-              <h2 className="text-xl font-display font-semibold mb-4 flex items-center text-primary">
-                <BookOpen className="h-5 w-5 mr-2 text-accent-1" />
-                Select Subject
-              </h2>
-              <div className="grid md:grid-cols-3 gap-4">
-                {subjects.map((subject) => (
-                  <button
-                    key={subject.id}
-                    onClick={() => {
-                      setSelectedSubject(subject.id);
-                      setSelectedChapters([]);
-                    }}
-                    className={`p-4 border-2 rounded-lg text-left font-display transition ${
-                      selectedSubject === subject.id
-                        ? "border-accent-1 bg-accent-1/10"
-                        : "border-text-primary/10 hover:border-accent-1/50"
-                    }`}
-                  >
-                    <h3 className="font-semibold text-text-primary break-words">{subject.name}</h3>
-                    <p className="text-sm font-body text-text-secondary mt-1 break-words">
-                      {subject.chapters.length} chapters
-                    </p>
-                  </button>
-                ))}
+        {subjects.length === 0 ? (
+          <div className="edu-card text-center py-12">
+            <BookOpen className="h-16 w-16 text-text-muted mx-auto mb-4" />
+            <h3 className="text-xl font-display font-semibold text-text-primary mb-2">
+              No Subjects Available
+            </h3>
+            <p className="text-text-secondary font-body mb-4">
+              The database needs to be seeded with subjects and chapters.
+            </p>
+            <p className="text-sm text-text-muted font-body">
+              Run <code className="bg-surface-elevated px-2 py-1 rounded">npm run seed</code> to populate the database.
+            </p>
+          </div>
+        ) : (
+          <div className="grid lg:grid-cols-3 gap-6">
+            {/* Left Column - Subject & Chapter Selection */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Subject Selection */}
+              <div className="edu-card animate-reveal delay-100">
+                <h2 className="text-xl font-display font-semibold mb-4 flex items-center text-primary">
+                  <BookOpen className="h-5 w-5 mr-2 text-accent-1" />
+                  Select Subject
+                </h2>
+                <div className="grid md:grid-cols-3 gap-4">
+                  {subjects.map((subject) => (
+                    <button
+                      key={subject.id}
+                      onClick={() => {
+                        setSelectedSubject(subject.id);
+                        setSelectedChapters([]);
+                      }}
+                      className={`p-4 border-2 rounded-lg text-left font-display transition ${
+                        selectedSubject === subject.id
+                          ? "border-accent-1 bg-accent-1/10"
+                          : "border-text-primary/10 hover:border-accent-1/50"
+                      }`}
+                    >
+                      <h3 className="font-semibold text-text-primary break-words">{subject.name}</h3>
+                      <p className="text-sm font-body text-text-secondary mt-1 break-words">
+                        {subject.chapters.length} chapters
+                      </p>
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
 
             {/* Chapter Selection */}
             {selectedSubject && currentSubject && (
@@ -394,6 +426,7 @@ export default function QuizPage() {
             </div>
           </div>
         </div>
+        )}
       </main>
     </div>
   );
