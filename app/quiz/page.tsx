@@ -96,6 +96,12 @@ export default function QuizPage() {
           }),
         });
 
+        // Check if response is HTML (likely a redirect to sign-in)
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("text/html")) {
+          throw new Error("Authentication required. Please sign in to generate AI quizzes.");
+        }
+
         const data = await response.json();
         
         if (!response.ok) {
@@ -144,11 +150,12 @@ export default function QuizPage() {
     } catch (error: any) {
       console.error("Quiz creation error:", error.message || "Unknown error");
       let errorMessage = error.message || "An error occurred";
-      if (useAI) {
-        errorMessage += ". AI quiz generation requires API keys to be configured. Try disabling AI mode or contact support.";
-      } else {
-        errorMessage += ". Please try again or contact support.";
+      
+      // Only append AI hint if it's a generic error and not a specific API error
+      if (useAI && !errorMessage.includes("Authentication required") && !errorMessage.includes("Subject") && !errorMessage.includes("Invalid input")) {
+        errorMessage += ". (Hint: Check if AI API keys are configured)";
       }
+      
       setError(errorMessage);
     } finally {
       setIsGenerating(false);
@@ -272,6 +279,7 @@ export default function QuizPage() {
                       Difficulty Level
                     </label>
                     <select
+                      title="Difficulty"
                       value={difficulty}
                       onChange={(e) => setDifficulty(e.target.value as any)}
                       className="w-full px-4 py-2 font-body border border-text-primary/20 rounded-lg focus:ring-2 focus:ring-accent-1 focus:border-transparent bg-surface-elevated"
@@ -294,6 +302,7 @@ export default function QuizPage() {
                     Number of Questions
                   </label>
                   <select
+                    title="Number of Questions"
                     value={questionCount}
                     onChange={(e) => setQuestionCount(Number(e.target.value))}
                     className="w-full px-4 py-2 font-body border border-text-primary/20 rounded-lg focus:ring-2 focus:ring-accent-1 focus:border-transparent bg-surface-elevated"
@@ -312,6 +321,7 @@ export default function QuizPage() {
                       Duration
                     </label>
                     <select
+                      title="Duration"
                       value={duration}
                       onChange={(e) => setDuration(Number(e.target.value))}
                       className="w-full px-4 py-2 font-body border border-text-primary/20 rounded-lg focus:ring-2 focus:ring-accent-1 focus:border-transparent bg-surface-elevated"

@@ -64,6 +64,7 @@ Visit [http://localhost:3000](http://localhost:3000) to see the app.
 ## ✨ Features
 
 ### 🤖 AI-Powered Learning
+
 - **AI-Generated Quizzes**: OpenAI GPT-4 generates contextual questions tailored to selected chapters
 - **Adaptive Difficulty**: Automatic difficulty adjustment based on last 10 quiz performances
 - **Adaptive Learning Paths**: ML-based personalized learning journeys with performance pattern detection
@@ -72,6 +73,7 @@ Visit [http://localhost:3000](http://localhost:3000) to see the app.
 - **Smart Explanations**: Context-aware, detailed explanations for every question
 
 ### 🎓 Student Features
+
 - **Multi-Chapter Quizzes**: Select multiple chapters across subjects for custom quizzes
 - **Mock Tests**: Full-length exams matching CUET, Class 11, and Class 12 patterns
 - **Performance Analytics**: Comprehensive tracking with subject-wise insights
@@ -80,6 +82,7 @@ Visit [http://localhost:3000](http://localhost:3000) to see the app.
 - **Responsive Design**: Optimized for mobile, tablet, and desktop
 
 ### 👨‍💼 Admin Panel
+
 - **User Management**: View, search, edit, and manage users
 - **Content Management**: Organize subjects, chapters, and questions
 - **Analytics Dashboard**: Key metrics and platform statistics

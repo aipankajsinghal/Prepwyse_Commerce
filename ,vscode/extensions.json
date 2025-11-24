@@ -1,0 +1,71 @@
+{
+
+  "recommendations": [
+
+    // Essential
+
+    "dbaeumer.vscode-eslint",
+
+    "esbenp.prettier-vscode",
+
+    "bradlc.vscode-tailwindcss",
+
+    "prisma.prisma",
+
+ 
+
+    // TypeScript
+
+    "usernamehw.errorlens",
+
+    "yoavbls.pretty-ts-errors",
+
+ 
+
+    // Next.js & React
+
+    "dsznajder.es7-react-js-snippets",
+
+    "rodrigovallades.es7-react-js-snippets",
+
+ 
+
+    // Testing
+
+    "orta.vscode-jest",
+
+    "firsttris.vscode-jest-runner",
+
+ 
+
+    // Git
+
+    "eamodio.gitlens",
+
+    "github.vscode-pull-request-github",
+
+ 
+
+    // Utilities
+
+    "christian-kohler.path-intellisense",
+
+    "zignd.html-css-class-completion",
+
+    "formulahendry.auto-rename-tag",
+
+    "naumovs.color-highlight",
+
+    "ms-vscode.vscode-typescript-next",
+
+ 
+
+    // Docker (for deployment)
+
+    "ms-azuretools.vscode-docker"
+
+  ],
+
+  "unwantedRecommendations": []
+
+}

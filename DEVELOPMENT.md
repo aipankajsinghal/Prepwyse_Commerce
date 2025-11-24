@@ -3,6 +3,7 @@
 Comprehensive technical documentation for PrepWyse Commerce platform.
 
 ## Table of Contents
+
 1. [Architecture Overview](#architecture-overview)
 2. [Technology Stack](#technology-stack)
 3. [Project Structure](#project-structure)
@@ -78,6 +79,7 @@ app/
 ## Technology Stack
 
 ### Frontend
+
 - **Framework**: Next.js 14+ (App Router)
 - **Language**: TypeScript 5.9+
 - **Styling**: Tailwind CSS 3.4
@@ -87,6 +89,7 @@ app/
 - **Theme Management**: next-themes 0.3.x
 
 ### Backend
+
 - **Runtime**: Node.js 20+
 - **API**: Next.js API Routes
 - **ORM**: Prisma 6.19
@@ -95,6 +98,7 @@ app/
 - **AI Integration**: OpenAI SDK 4.x
 
 ### DevOps
+
 - **Containerization**: Docker & Docker Compose
 - **CI/CD**: GitHub Actions
 - **Reverse Proxy**: Nginx
@@ -236,6 +240,7 @@ prepwyse-commerce/
 ### Prisma Schema Models
 
 #### User Model
+
 ```prisma
 model User {
   id                  String   @id @default(cuid())
@@ -259,6 +264,7 @@ model User {
 ```
 
 #### Subject, Chapter, Question Models
+
 ```prisma
 model Subject {
   id          String    @id @default(cuid())
@@ -294,6 +300,7 @@ model Question {
 ```
 
 #### Quiz and Attempt Models
+
 ```prisma
 model Quiz {
   id            String        @id @default(cuid())
@@ -327,12 +334,14 @@ model QuizAttempt {
 #### Quiz Management
 
 **POST /api/quiz**
+
 - Creates a new quiz and returns questions
 - Body: `{ chapterIds: string[], questionCount: number, duration: number, difficulty: string }`
 - Returns: `{ quiz: Quiz, questions: Question[] }`
 - Authentication: Required (Clerk)
 
 **GET /api/subjects**
+
 - Lists all subjects with their chapters
 - Returns: `{ subjects: Subject[] }`
 - Authentication: Required (Clerk)
@@ -340,24 +349,28 @@ model QuizAttempt {
 #### AI Features
 
 **POST /api/ai/generate-quiz**
+
 - Generates AI-powered quiz questions
 - Body: `{ subjectName: string, chapterNames: string[], questionCount: number, difficulty: string }`
 - Returns: `{ quiz: Quiz, questions: Question[] }`
 - Authentication: Required (Clerk)
 
 **GET /api/ai/recommendations**
+
 - Gets personalized study recommendations
 - Query: `userId` (from auth)
 - Returns: `{ recommendations: Recommendation[], weakAreas: string[], strongAreas: string[] }`
 - Authentication: Required (Clerk)
 
 **POST /api/ai/explain**
+
 - Generates explanation for a question
 - Body: `{ questionText: string, options: string[], correctAnswer: string, userAnswer: string, subject: string, chapter: string }`
 - Returns: `{ explanation: string }`
 - Authentication: Required (Clerk)
 
 **GET /api/ai/content-suggestions**
+
 - Suggests content to study next
 - Query: `userId, subjectId` (optional)
 - Returns: `{ suggestions: ContentSuggestion[] }`
@@ -366,6 +379,7 @@ model QuizAttempt {
 #### User Management
 
 **POST /api/user/sync**
+
 - Syncs Clerk user with database
 - Body: Auto-populated from Clerk
 - Returns: `{ user: User }`
@@ -374,6 +388,7 @@ model QuizAttempt {
 ### API Response Format
 
 #### Success Response
+
 ```json
 {
   "success": true,
@@ -383,6 +398,7 @@ model QuizAttempt {
 ```
 
 #### Error Response
+
 ```json
 {
   "success": false,
@@ -863,6 +879,7 @@ DEBUG="prisma:*" npm run dev
 ## Contributing
 
 See CONTRIBUTING.md for detailed guidelines on:
+
 - Code standards
 - Pull request process
 - Testing requirements
@@ -889,17 +906,20 @@ A distinctive, context-aware design system tailored for educational platforms se
 ## 1. Typography
 
 ### Philosophy
+
 Combines modern geometric display fonts with warm, readable serif body text to create a friendly yet academic feel.
 
 ### Font Families
 
 #### Display/Headings: Space Grotesk
+
 - **Purpose**: Headlines, UI elements, buttons
 - **Characteristics**: Modern, geometric, friendly, slightly technical
 - **Weights**: 400 (regular), 500 (medium), 600 (semibold), 700 (bold)
 - **Usage**: All `h1-h6` tags, navigation, buttons, labels
 
 #### Body/Content: Crimson Pro
+
 - **Purpose**: Body text, descriptions, articles
 - **Characteristics**: Warm, readable, academic, slightly classical
 - **Weights**: 400 (regular), 500 (medium), 600 (semibold), 700 (bold)
@@ -920,53 +940,67 @@ body { font-size: 1rem; line-height: 1.7; }                             /* 16px 
 ## 2. Color System
 
 ### Philosophy
+
 Warm, supportive colors inspired by Indian education, paper textures, and terra cotta elements. Avoids cold blues and harsh contrasts in favor of warmth and approachability.
 
 ### Core Brand Colors
 
 #### Primary: Deep Navy
+
 ```css
 --primary: 28 41 73;           /* rgb(28, 41, 73) */
 ```
+
 **Usage**: Authority, trust, headers
 
 #### Accent 1: Warm Terracotta
+
 ```css
 --accent-1: 183 73 50;         /* rgb(183, 73, 50) - Main terracotta */
 ```
+
 **Usage**: CTAs, highlights, primary actions
 
 #### Accent 2: Deep Teal
+
 ```css
 --accent-2: 36 119 123;        /* rgb(36, 119, 123) */
 ```
+
 **Usage**: Secondary actions, info badges, complementary highlights
 
 ### Surface Colors
+
 - **Backgrounds**: Warm off-white (`#FCFAF7`)
 - **Surface**: Lighter surface for cards (`#FFFDFA`)
 - **Elevated**: Pure white for elevated cards
 
 ### Dark Theme
+
 Automatically adjusts colors for dark mode with warmer, softer tones.
 
 ## 3. Motion Design
 
 ### Philosophy
+
 One signature motion sequence per screen with purposeful, delightful animations. CSS-first approach for performance.
 
 ### Signature Animation: Staggered Reveal
+
 Primary page entrance animation.
 
 ### Bloom Effect (Signature CTA)
+
 Button interaction with radial gradient bloom.
 
 ## 4. Components
 
 ### Educational Card (.edu-card)
+
 Primary container for content blocks with shadow and hover effects.
 
 ### Buttons
+
 - **Primary**: Terracotta background, white text, bloom effect.
 - **Secondary**: Transparent background, terracotta border/text.
 
@@ -996,18 +1030,21 @@ Primary container for content blocks with shadow and hover effects.
 ## Code Style Guidelines
 
 ### TypeScript
+
 - Use TypeScript for all new files
 - Define proper types and interfaces
 - Avoid `any` types when possible
 - Use meaningful variable and function names
 
 ### React Components
+
 - Use functional components with hooks
 - Keep components small and focused
 - Extract reusable logic into custom hooks
 - Use proper prop typing
 
 ### API Routes
+
 - Follow RESTful conventions
 - Use proper HTTP status codes
 - Implement error handling
@@ -1015,6 +1052,7 @@ Primary container for content blocks with shadow and hover effects.
 - Validate input data
 
 ### Database
+
 - Always use Prisma for database operations
 - Create migrations for schema changes
 - Add proper indexes for performance
@@ -1023,6 +1061,7 @@ Primary container for content blocks with shadow and hover effects.
 ## Pull Request Guidelines
 
 ### PR Title Format
+
 - `Add: New feature description`
 - `Fix: Bug description`
 - `Update: Change description`
@@ -1030,7 +1069,9 @@ Primary container for content blocks with shadow and hover effects.
 - `Docs: Documentation changes`
 
 ### PR Description
+
 Include:
+
 - What changes were made
 - Why the changes were necessary
 - Any breaking changes
@@ -1046,6 +1087,7 @@ Include:
 Ensure your local environment is correctly configured to mirror production as closely as possible.
 
 ### 1.1. Environment Variables
+
 Check if you have a `.env` file in the root directory. If not, copy `.env.example`:
 
 ```bash
@@ -1053,11 +1095,13 @@ cp .env.example .env
 ```
 
 **Critical Variables to Verify:**
+
 - `DATABASE_URL`: Should point to your local PostgreSQL instance.
 - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` & `CLERK_SECRET_KEY`: Use your **development** keys from Clerk.
 - `OPENAI_API_KEY`: Required for AI features (Quiz generation, recommendations).
 
 ### 1.2. Install Dependencies
+
 Ensure all dependencies are up to date:
 
 ```bash
@@ -1069,6 +1113,7 @@ npm install
 Start with a fresh or consistent database state.
 
 ### 2.1. Run Migrations
+
 Apply the latest schema changes to your local database:
 
 ```bash
@@ -1076,6 +1121,7 @@ npx prisma migrate dev
 ```
 
 ### 2.2. Seed Data (Optional but Recommended)
+
 Populate the database with initial data (Subjects, Chapters, etc.) to make testing easier:
 
 ```bash
@@ -1113,6 +1159,7 @@ npm start
 Open [http://localhost:3000](http://localhost:3000) and perform the following checks:
 
 ### 5.1. Authentication Flow
+
 - [ ] **Sign Up**: Create a new account using email/password or social login.
 - [ ] **Onboarding**: Complete any onboarding steps (e.g., selecting class/stream).
 - [ ] **Sign Out**: Log out successfully.
@@ -1120,27 +1167,32 @@ Open [http://localhost:3000](http://localhost:3000) and perform the following ch
 - [ ] **Protected Routes**: Try accessing `/dashboard` while logged out (should redirect to sign-in).
 
 ### 5.2. Dashboard & Navigation
+
 - [ ] **Dashboard Load**: Verify the dashboard loads without errors.
 - [ ] **Theme Switching**: Toggle between Light, Dark, Ocean, Forest, and Sunset themes.
 - [ ] **Responsiveness**: Resize browser to mobile view and check navigation menu.
 
 ### 5.3. Quiz Feature (AI Powered)
+
 - [ ] **Generate Quiz**: Go to "Practice" -> "Create Quiz". Select subjects/chapters and generate.
 - [ ] **Attempt Quiz**: Answer questions. Check if UI updates correctly.
 - [ ] **Submit Quiz**: Submit the quiz and verify the results page loads.
 - [ ] **Review**: Check if the "Review Answers" feature works.
 
 ### 5.4. Mock Tests
+
 - [ ] **List View**: Verify available mock tests are listed.
 - [ ] **Start Test**: Begin a mock test.
 - [ ] **Timer**: Verify the timer is working.
 - [ ] **Submission**: Submit the test and check the analysis report.
 
 ### 5.5. User Profile
+
 - [ ] **View Profile**: Check if user details are displayed correctly.
 - [ ] **Edit Profile**: Update some fields (e.g., name, bio) and save. Verify changes persist.
 
 ### 5.6. Admin Panel (If you have Admin Access)
+
 - [ ] **Access**: Navigate to `/admin`.
 - [ ] **User Management**: View list of users.
 - [ ] **Content**: Check if you can view Subjects/Chapters.
@@ -1166,6 +1218,7 @@ Overall: 72% Complete (16 of 23 major features)
 **Focus:** Phase C UI Development
 
 **Critical Items:**
+
 1. Access control
 2. Subscription UI
 3. Admin dashboard

@@ -1,0 +1,287 @@
+{
+
+  "version": "2.0.0",
+
+  "tasks": [
+
+    {
+
+      "label": "Next.js: Dev Server",
+
+      "type": "npm",
+
+      "script": "dev",
+
+      "problemMatcher": [],
+
+      "presentation": {
+
+        "reveal": "always",
+
+        "panel": "new"
+
+      },
+
+      "group": {
+
+        "kind": "build",
+
+        "isDefault": false
+
+      }
+
+    },
+
+    {
+
+      "label": "Next.js: Build",
+
+      "type": "npm",
+
+      "script": "build",
+
+      "problemMatcher": [
+
+        "$tsc"
+
+      ],
+
+      "presentation": {
+
+        "reveal": "always",
+
+        "panel": "shared"
+
+      },
+
+      "group": {
+
+        "kind": "build",
+
+        "isDefault": true
+
+      }
+
+    },
+
+    {
+
+      "label": "Next.js: Production Server",
+
+      "type": "npm",
+
+      "script": "start",
+
+      "problemMatcher": [],
+
+      "presentation": {
+
+        "reveal": "always",
+
+        "panel": "new"
+
+      },
+
+      "dependsOn": ["Next.js: Build"]
+
+    },
+
+    {
+
+      "label": "ESLint: Lint",
+
+      "type": "npm",
+
+      "script": "lint",
+
+      "problemMatcher": [
+
+        "$eslint-stylish"
+
+      ],
+
+      "presentation": {
+
+        "reveal": "always",
+
+        "panel": "shared"
+
+      }
+
+    },
+
+    {
+
+      "label": "Jest: Run Tests",
+
+      "type": "npm",
+
+      "script": "test",
+
+      "problemMatcher": [],
+
+      "presentation": {
+
+        "reveal": "always",
+
+        "panel": "shared"
+
+      },
+
+      "group": {
+
+        "kind": "test",
+
+        "isDefault": true
+
+      }
+
+    },
+
+    {
+
+      "label": "Jest: Watch Mode",
+
+      "type": "npm",
+
+      "script": "test:watch",
+
+      "problemMatcher": [],
+
+      "presentation": {
+
+        "reveal": "always",
+
+        "panel": "dedicated"
+
+      },
+
+      "isBackground": true
+
+    },
+
+    {
+
+      "label": "Jest: Coverage",
+
+      "type": "npm",
+
+      "script": "test:coverage",
+
+      "problemMatcher": [],
+
+      "presentation": {
+
+        "reveal": "always",
+
+        "panel": "shared"
+
+      }
+
+    },
+
+    {
+
+      "label": "Prisma: Generate",
+
+      "type": "shell",
+
+      "command": "npx prisma generate",
+
+      "problemMatcher": [],
+
+      "presentation": {
+
+        "reveal": "always",
+
+        "panel": "shared"
+
+      }
+
+    },
+
+    {
+
+      "label": "Prisma: Studio",
+
+      "type": "shell",
+
+      "command": "npx prisma studio",
+
+      "problemMatcher": [],
+
+      "presentation": {
+
+        "reveal": "always",
+
+        "panel": "new"
+
+      },
+
+      "isBackground": true
+
+    },
+
+    {
+
+      "label": "Prisma: Migrate Dev",
+
+      "type": "shell",
+
+      "command": "npx prisma migrate dev",
+
+      "problemMatcher": [],
+
+      "presentation": {
+
+        "reveal": "always",
+
+        "panel": "shared"
+
+      }
+
+    },
+
+    {
+
+      "label": "Install Dependencies",
+
+      "type": "npm",
+
+      "script": "install",
+
+      "problemMatcher": [],
+
+      "presentation": {
+
+        "reveal": "always",
+
+        "panel": "shared"
+
+      }
+
+    },
+
+    {
+
+      "label": "Clean Install",
+
+      "type": "shell",
+
+      "command": "rm -rf node_modules package-lock.json && npm install",
+
+      "problemMatcher": [],
+
+      "presentation": {
+
+        "reveal": "always",
+
+        "panel": "shared"
+
+      }
+
+    }
+
+  ]
+
+}
