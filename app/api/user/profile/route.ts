@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { auth, clerkClient } from "@clerk/nextjs/server";
+import { auth, clerkClient, currentUser } from "@clerk/nextjs/server";
+import { prisma } from "@/lib/prisma";
 
 // PATCH /api/user/profile - Update user profile
 export async function PATCH(request: Request) {
@@ -9,16 +10,16 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { firstName, lastName, grade, bio, profilePromptDismissed } = await request.json();
+    const { firstName, lastName, grade, bio, profilePromptDismissed, preferredLanguage, favoriteSubjects } = await request.json();
 
     // Update user's public metadata using Clerk API
     const client = await clerkClient();
     
     // Get current metadata to preserve existing values
-    const currentUser = await client.users.getUser(userId);
-    const currentMetadata = currentUser.publicMetadata || {};
+    const user = await currentUser();
+    const currentMetadata = user?.publicMetadata || {};
     
-    // Prepare update data
+    // Prepare update data for Clerk
     const updateData: any = {};
     
     // Update basic profile fields (firstName, lastName)
@@ -33,7 +34,37 @@ export async function PATCH(request: Request) {
     
     updateData.publicMetadata = updatedMetadata;
     
+    // Update Clerk user
     await client.users.updateUser(userId, updateData);
+
+    // Sync with Prisma database
+    const email = user?.emailAddresses?.[0]?.emailAddress;
+    if (!email) {
+      return NextResponse.json(
+        { error: "User email not found" },
+        { status: 400 }
+      );
+    }
+
+    // Prepare data for Prisma update
+    const prismaUpdateData: any = {
+      email,
+      name: `${firstName || user?.firstName || ""} ${lastName || user?.lastName || ""}`.trim() || null,
+    };
+
+    if (grade !== undefined) prismaUpdateData.grade = grade;
+    if (preferredLanguage !== undefined) prismaUpdateData.preferredLanguage = preferredLanguage;
+    if (favoriteSubjects !== undefined) prismaUpdateData.favoriteSubjects = favoriteSubjects;
+
+    // Upsert user in Prisma database
+    await prisma.user.upsert({
+      where: { clerkId: userId },
+      update: prismaUpdateData,
+      create: {
+        clerkId: userId,
+        ...prismaUpdateData,
+      },
+    });
 
     return NextResponse.json({ 
       success: true, 

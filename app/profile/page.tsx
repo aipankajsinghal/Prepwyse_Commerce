@@ -71,7 +71,19 @@ function ProfilePageWithAuth() {
       
       setIsEditing(false);
       setSuccess("Profile updated successfully!");
-      setTimeout(() => setSuccess(""), 3000);
+      
+      // Check if this is first-time profile setup (redirected from FirstLoginProfilePrompt)
+      const isFirstTimeSetup = !user.publicMetadata?.profilePromptDismissed && grade;
+      
+      if (isFirstTimeSetup) {
+        // Redirect to dashboard after brief delay
+        setTimeout(() => {
+          window.location.href = "/dashboard";
+        }, 1500);
+      } else {
+        // Just show success message for regular profile updates
+        setTimeout(() => setSuccess(""), 3000);
+      }
     } catch (err: any) {
       setError("Failed to update profile. Please try again.");
       console.error("Profile update error:", err.message || "Unknown error");

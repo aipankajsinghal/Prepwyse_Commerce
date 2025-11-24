@@ -71,12 +71,8 @@ export default function MockTestPage() {
 
       const data = await response.json();
       
-      // Navigate to mock test attempt page (placeholder for now)
-      // In a full implementation, this would go to /mock-test/[attemptId]
-      alert(`Mock test started successfully!\n\nAttempt ID: ${data.attemptId}\n\nNote: Mock test taking interface is not yet implemented. This functionality will redirect to a test-taking page in a complete implementation.`);
-      
-      // TODO: Uncomment when mock test taking page is implemented
-      // router.push(`/mock-test/${data.attemptId}`);
+      // Navigate to mock test attempt page
+      router.push(`/mock-test/${data.attemptId}`);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "Failed to start mock test. Please try again.";
       console.error("Error starting mock test:", errorMessage);

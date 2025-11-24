@@ -1,5 +1,60 @@
 import { generateChatCompletion, isAnyAIConfigured } from "./ai-provider";
 import { prisma } from "./prisma";
+import { z } from "zod";
+
+// Zod schemas for AI response validation
+const QuestionSchema = z.object({
+  questionText: z.string().min(10, "Question text must be at least 10 characters"),
+  options: z.array(z.string()).length(4, "Must have exactly 4 options"),
+  correctAnswer: z.string().min(1, "Correct answer is required"),
+  explanation: z.string().optional(),
+  difficulty: z.enum(["easy", "medium", "hard"]).optional(),
+});
+
+const QuestionsArraySchema = z.array(QuestionSchema).min(1, "At least one question is required");
+
+const MockTestSectionSchema = z.object({
+  name: z.string().min(1, "Section name is required"),
+  questions: z.array(QuestionSchema).min(1, "Section must have at least one question"),
+});
+
+const MockTestResponseSchema = z.object({
+  mockTest: z.object({
+    title: z.string().min(1, "Title is required"),
+    examType: z.string().min(1, "Exam type is required"),
+    description: z.string().optional(),
+    duration: z.number().positive("Duration must be positive"),
+    totalQuestions: z.number().positive("Total questions must be positive"),
+  }),
+  sections: z.array(MockTestSectionSchema).min(1, "At least one section is required"),
+});
+
+const RecommendationSchema = z.object({
+  type: z.enum(["study_plan", "topic", "difficulty_adjustment", "content"]),
+  title: z.string().min(1, "Title is required"),
+  description: z.string().min(1, "Description is required"),
+  priority: z.number().min(1).max(10),
+  actionItems: z.array(z.string()).optional(),
+});
+
+const RecommendationsResponseSchema = z.object({
+  recommendations: z.array(RecommendationSchema),
+  weakAreas: z.array(z.string()).optional(),
+  strongAreas: z.array(z.string()).optional(),
+  suggestedDifficulty: z.enum(["easy", "medium", "hard"]).optional(),
+});
+
+const ContentRecommendationSchema = z.object({
+  subject: z.string().min(1, "Subject is required"),
+  chapter: z.string().min(1, "Chapter is required"),
+  reason: z.string().min(1, "Reason is required"),
+  priority: z.number().min(1).max(5),
+  estimatedTime: z.string().min(1, "Estimated time is required"),
+});
+
+const ContentRecommendationsResponseSchema = z.object({
+  recommendations: z.array(ContentRecommendationSchema),
+});
 
 /**
  * Generate AI-powered quiz questions based on chapters and difficulty
@@ -62,8 +117,16 @@ Return format (JSON array):
     parsed = JSON.parse(content);
     // Handle if the response is wrapped in a questions array
     const questions = parsed.questions || parsed;
-    return Array.isArray(questions) ? questions : [questions];
+    const questionsArray = Array.isArray(questions) ? questions : [questions];
+    
+    // Validate with Zod schema
+    const validatedQuestions = QuestionsArraySchema.parse(questionsArray);
+    return validatedQuestions;
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      console.error("AI response validation failed:", error.issues);
+      throw new Error(`Invalid AI response format: ${error.issues.map(e => e.message).join(", ")}`);
+    }
     console.error("Failed to parse AI response:", content);
     throw new Error("Invalid AI response format");
   }
@@ -143,8 +206,15 @@ Return format (JSON object):
   let parsed;
   try {
     parsed = JSON.parse(content);
-    return parsed;
+    
+    // Validate with Zod schema
+    const validatedResponse = MockTestResponseSchema.parse(parsed);
+    return validatedResponse;
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      console.error("AI mock test response validation failed:", error.issues);
+      throw new Error(`Invalid AI mock test response: ${error.issues.map(e => e.message).join(", ")}`);
+    }
     console.error("Failed to parse AI mock test response:", content);
     throw new Error("Invalid AI response format for mock test");
   }
@@ -232,7 +302,17 @@ Return ONLY valid JSON in this format:
     jsonMode: true,
   });
 
-  return JSON.parse(content);
+  try {
+    const parsed = JSON.parse(content);
+    const validated = RecommendationsResponseSchema.parse(parsed);
+    return validated;
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      console.error("AI recommendations response validation failed:", error.issues);
+      throw new Error(`Invalid AI recommendations response: ${error.issues.map(e => e.message).join(", ")}`);
+    }
+    throw error;
+  }
 }
 
 /**
@@ -377,5 +457,15 @@ Return ONLY valid JSON:
     jsonMode: true,
   });
 
-  return JSON.parse(content);
+  try {
+    const parsed = JSON.parse(content);
+    const validated = ContentRecommendationsResponseSchema.parse(parsed);
+    return validated;
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      console.error("AI content recommendations response validation failed:", error.issues);
+      throw new Error(`Invalid AI content recommendations response: ${error.issues.map(e => e.message).join(", ")}`);
+    }
+    throw error;
+  }
 }
