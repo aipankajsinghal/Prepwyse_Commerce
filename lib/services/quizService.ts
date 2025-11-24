@@ -9,6 +9,15 @@ import { prisma } from "@/lib/prisma";
 import { Quiz, QuizAttempt, Question, Prisma } from "@prisma/client";
 
 /**
+ * Business logic constants
+ * Can be configured per environment or subscription tier
+ */
+const QUIZ_LIMITS = {
+  FREE_TIER_DAILY_LIMIT: 5,
+  // Future: can add PREMIUM_TIER_DAILY_LIMIT, etc.
+};
+
+/**
  * Create a new quiz
  */
 export async function createQuiz(
@@ -32,11 +41,16 @@ export async function getQuizById(id: string): Promise<Quiz | null> {
 }
 
 /**
- * Get all quizzes with optional filters
+ * Get all quizzes with optional filters and pagination
  */
 export async function getQuizzes(filters?: {
   subjectId?: string;
+  skip?: number;
+  take?: number;
 }) {
+  const skip = filters?.skip ?? 0;
+  const take = filters?.take ?? 20; // Default page size
+
   return await prisma.quiz.findMany({
     where: {
       ...(filters?.subjectId && { subjectId: filters.subjectId }),
@@ -49,6 +63,8 @@ export async function getQuizzes(filters?: {
       },
     },
     orderBy: { createdAt: "desc" },
+    skip,
+    take,
   });
 }
 
@@ -128,16 +144,26 @@ export async function getQuizAttempt(attemptId: string) {
 }
 
 /**
+ * Quiz Answer type
+ */
+export interface QuizAnswer {
+  questionId: string;
+  selectedAnswer: string;
+  markedForReview?: boolean;
+  answeredAt?: string;
+}
+
+/**
  * Update quiz attempt progress
  */
 export async function updateQuizAttemptProgress(
   attemptId: string,
-  answers: Record<string, any>
+  answers: QuizAnswer[]
 ): Promise<QuizAttempt> {
   return await prisma.quizAttempt.update({
     where: { id: attemptId },
     data: {
-      answers: answers as any,
+      answers: answers as unknown as Prisma.InputJsonValue,
     },
   });
 }
@@ -277,6 +303,6 @@ export async function canUserAttemptQuiz(userId: string): Promise<boolean> {
   });
 
   // Simple check: For now, allow if user is a student (expand with subscription logic later)
-  // For free users, limit to 5 quizzes per day
-  return attemptsToday < 5;
+  // For free users, limit to daily quota
+  return attemptsToday < QUIZ_LIMITS.FREE_TIER_DAILY_LIMIT;
 }

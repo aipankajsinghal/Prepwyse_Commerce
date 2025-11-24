@@ -24,21 +24,13 @@ export async function requireAdmin() {
     throw new Error("User email address is required");
   }
   
-  // Ensure user exists in database
-  // Optimized: Read-first strategy to reduce DB writes.
-  let dbUser = await prisma.user.findUnique({
+  // Check if user exists in database - do NOT create if missing
+  const dbUser = await prisma.user.findUnique({
     where: { clerkId: userId },
   });
 
   if (!dbUser) {
-    dbUser = await prisma.user.create({
-      data: {
-        clerkId: userId,
-        email,
-        name: `${clerkUser?.firstName || ""} ${clerkUser?.lastName || ""}`.trim() || null,
-        role: "STUDENT", // Default role for new users
-      },
-    });
+    throw new Error("Unauthorized: User not found in database");
   }
 
   // Check if user has admin role
