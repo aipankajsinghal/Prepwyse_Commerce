@@ -12,6 +12,12 @@ import { withAdminAuthParams } from "@/lib/auth/withAdminAuth";
  * Update a subject
  */
 export const PATCH = withAdminAuthParams(async (req: NextRequest, { user, params }) => {
+  if (!params?.subjectId) {
+    return NextResponse.json(
+      { error: "Subject ID is required" },
+      { status: 400 }
+    );
+  }
   const { subjectId } = params;
   const data = await req.json();
 
@@ -59,6 +65,12 @@ export const PATCH = withAdminAuthParams(async (req: NextRequest, { user, params
  * Delete a subject (will cascade delete chapters and questions)
  */
 export const DELETE = withAdminAuthParams(async (req: NextRequest, { user, params }) => {
+  if (!params?.subjectId) {
+    return NextResponse.json(
+      { error: "Subject ID is required" },
+      { status: 400 }
+    );
+  }
   const { subjectId } = params;
 
   const subject = await prisma.subject.findUnique({

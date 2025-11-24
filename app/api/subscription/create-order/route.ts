@@ -109,13 +109,16 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     // Create Razorpay order
     const amount = finalAmount;
     const receipt = `sub_${user.id}_${Date.now()}`;
-    const notes = {
+    const notes: Record<string, string> = {
       userId: user.id,
       planId: plan.id,
       planName: plan.name,
       userEmail: user.email,
-      couponCode: appliedCoupon?.code || null,
     };
+    
+    if (appliedCoupon?.code) {
+      notes.couponCode = appliedCoupon.code;
+    }
 
     const order = await createRazorpayOrder(amount, 'INR', receipt, notes);
 

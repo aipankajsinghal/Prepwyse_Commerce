@@ -12,6 +12,12 @@ import { withAdminAuthParams } from "@/lib/auth/withAdminAuth";
  * Update a chapter
  */
 export const PATCH = withAdminAuthParams(async (req: NextRequest, { user, params }) => {
+  if (!params?.chapterId) {
+    return NextResponse.json(
+      { error: "Chapter ID is required" },
+      { status: 400 }
+    );
+  }
   const { chapterId } = params;
   const data = await req.json();
 
@@ -64,6 +70,12 @@ export const PATCH = withAdminAuthParams(async (req: NextRequest, { user, params
  * Delete a chapter (will cascade delete questions)
  */
 export const DELETE = withAdminAuthParams(async (req: NextRequest, { user, params }) => {
+  if (!params?.chapterId) {
+    return NextResponse.json(
+      { error: "Chapter ID is required" },
+      { status: 400 }
+    );
+  }
   const { chapterId } = params;
 
   const chapter = await prisma.chapter.findUnique({

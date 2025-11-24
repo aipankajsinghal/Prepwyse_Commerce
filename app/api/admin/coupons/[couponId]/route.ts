@@ -12,6 +12,12 @@ import { withAdminAuthParams } from "@/lib/auth/withAdminAuth";
  * Get coupon details including usage statistics
  */
 export const GET = withAdminAuthParams(async (req: NextRequest, { user, params }) => {
+  if (!params?.couponId) {
+    return NextResponse.json(
+      { error: "Coupon ID is required" },
+      { status: 400 }
+    );
+  }
   const { couponId } = params;
 
   const coupon = await prisma.coupon.findUnique({
@@ -47,6 +53,12 @@ export const GET = withAdminAuthParams(async (req: NextRequest, { user, params }
  * Update a coupon
  */
 export const PATCH = withAdminAuthParams(async (req: NextRequest, { user, params }) => {
+  if (!params?.couponId) {
+    return NextResponse.json(
+      { error: "Coupon ID is required" },
+      { status: 400 }
+    );
+  }
   const { couponId } = params;
   const data = await req.json();
 
@@ -109,6 +121,12 @@ export const PATCH = withAdminAuthParams(async (req: NextRequest, { user, params
  * Delete a coupon
  */
 export const DELETE = withAdminAuthParams(async (req: NextRequest, { user, params }) => {
+  if (!params?.couponId) {
+    return NextResponse.json(
+      { error: "Coupon ID is required" },
+      { status: 400 }
+    );
+  }
   const { couponId } = params;
 
   const coupon = await prisma.coupon.findUnique({

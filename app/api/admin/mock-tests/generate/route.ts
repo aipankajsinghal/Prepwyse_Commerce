@@ -6,7 +6,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { withAdminAuth } from "@/lib/auth/withAdminAuth";
-import { generateAIContent } from "@/lib/ai-provider";
+import { generateChatCompletion } from "@/lib/ai-provider";
 
 /**
  * POST /api/admin/mock-tests/generate
@@ -102,7 +102,9 @@ Format the response as a JSON array with this structure:
 
 Chapter IDs: ${chapters.map((c) => `${c.id}:${c.name}`).join(", ")}`;
 
-    const aiResponse = await generateAIContent(prompt, {
+    const aiResponse = await generateChatCompletion({
+      prompt: prompt,
+      systemPrompt: "You are an expert in creating commerce education questions for Indian students preparing for Class 11, Class 12, and CUET exams.",
       temperature: 0.7,
       maxTokens: 4000,
     });

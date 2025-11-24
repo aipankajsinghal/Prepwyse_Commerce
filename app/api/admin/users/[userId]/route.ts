@@ -12,6 +12,12 @@ import { withAdminAuthParams } from "@/lib/auth/withAdminAuth";
  * Get detailed user information
  */
 export const GET = withAdminAuthParams(async (req: NextRequest, { user, params }) => {
+  if (!params?.userId) {
+    return NextResponse.json(
+      { error: "User ID is required" },
+      { status: 400 }
+    );
+  }
   const { userId } = params;
 
   const targetUser = await prisma.user.findUnique({
@@ -47,6 +53,12 @@ export const GET = withAdminAuthParams(async (req: NextRequest, { user, params }
  * Update user details (including role)
  */
 export const PATCH = withAdminAuthParams(async (req: NextRequest, { user, params }) => {
+  if (!params?.userId) {
+    return NextResponse.json(
+      { error: "User ID is required" },
+      { status: 400 }
+    );
+  }
   const { userId } = params;
   const data = await req.json();
 
@@ -115,6 +127,12 @@ export const PATCH = withAdminAuthParams(async (req: NextRequest, { user, params
  * Delete a user (soft delete or hard delete)
  */
 export const DELETE = withAdminAuthParams(async (req: NextRequest, { user, params }) => {
+  if (!params?.userId) {
+    return NextResponse.json(
+      { error: "User ID is required" },
+      { status: 400 }
+    );
+  }
   const { userId } = params;
 
   // Check if user exists
