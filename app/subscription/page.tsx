@@ -44,6 +44,9 @@ export default function SubscriptionPage() {
   const [status, setStatus] = useState<SubscriptionStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
+  const [couponCode, setCouponCode] = useState("");
+  const [couponDiscount, setCouponDiscount] = useState<any>(null);
+  const [couponError, setCouponError] = useState("");
 
   useEffect(() => {
     loadData();
@@ -67,16 +70,54 @@ export default function SubscriptionPage() {
     }
   };
 
+  const handleValidateCoupon = async (planId: string, planPrice: string) => {
+    if (!couponCode.trim()) {
+      setCouponError("");
+      setCouponDiscount(null);
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/coupons/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: couponCode,
+          planId,
+          amount: parseFloat(planPrice),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.valid) {
+        setCouponDiscount(data.discount);
+        setCouponError("");
+      } else {
+        setCouponError(data.error || "Invalid coupon code");
+        setCouponDiscount(null);
+      }
+    } catch (error) {
+      setCouponError("Failed to validate coupon");
+      setCouponDiscount(null);
+    }
+  };
+
   const handleSelectPlan = async (planId: string) => {
     if (processing) return;
 
     setProcessing(true);
     try {
       // Create Razorpay order
+      const body: any = { planId };
+      if (couponCode && couponDiscount) {
+        body.couponCode = couponCode;
+      }
+
       const orderRes = await fetch("/api/subscription/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ planId }),
+        body: JSON.stringify(body),
       });
 
       const orderData = await orderRes.json();
@@ -247,6 +288,45 @@ export default function SubscriptionPage() {
                     <div className="text-text-muted text-sm">
                       for {plan.durationDays} days
                     </div>
+                  </div>
+
+                  {/* Coupon Input */}
+                  <div className="mb-6 space-y-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Have a coupon code?
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={couponCode}
+                        onChange={(e) => {
+                          setCouponCode(e.target.value.toUpperCase());
+                          setCouponError("");
+                          setCouponDiscount(null);
+                        }}
+                        placeholder="ENTER CODE"
+                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleValidateCoupon(plan.id, plan.price)}
+                        disabled={!couponCode.trim()}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Apply
+                      </button>
+                    </div>
+                    {couponError && (
+                      <p className="text-xs text-red-600 dark:text-red-400">{couponError}</p>
+                    )}
+                    {couponDiscount && (
+                      <div className="text-xs text-green-600 dark:text-green-400">
+                        ✓ Discount applied: ₹{couponDiscount.amount.toFixed(2)} off
+                        <div className="font-semibold mt-1">
+                          Final price: ₹{couponDiscount.finalAmount.toFixed(2)}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="space-y-3 mb-8">

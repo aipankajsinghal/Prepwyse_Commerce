@@ -661,6 +661,125 @@ model SearchHistory {
   @@index([userId, createdAt])
 }
 
+// Phase I: Coupon System Models
+model Coupon {
+  id              String   @id @default(cuid())
+  code            String   @unique
+  description     String?
+  discountType    String   // "percentage", "fixed"
+  discountValue   Decimal  @db.Decimal(10, 2) // Percentage (e.g., 20.00) or fixed amount (e.g., 100.00)
+  maxDiscount     Decimal? @db.Decimal(10, 2) // Max discount for percentage type
+  minPurchase     Decimal? @db.Decimal(10, 2) // Minimum purchase amount
+  usageLimit      Int?     // Total usage limit (null = unlimited)
+  usageCount      Int      @default(0) // Current usage count
+  userUsageLimit  Int      @default(1) // Per-user usage limit
+  startDate       DateTime @default(now())
+  endDate         DateTime?
+  isActive        Boolean  @default(true)
+  applicablePlans Json?    // Array of plan IDs (null = all plans)
+  createdBy       String   // Admin user ID
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  usages          CouponUsage[]
+  
+  @@index([code, isActive])
+  @@index([startDate, endDate])
+}
+
+model CouponUsage {
+  id              String   @id @default(cuid())
+  couponId        String
+  coupon          Coupon   @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  userId          String
+  transactionId   String?  // Reference to Transaction
+  discountAmount  Decimal  @db.Decimal(10, 2)
+  usedAt          DateTime @default(now())
+  
+  @@index([couponId, userId])
+  @@index([userId])
+}
+
+// Phase I: Affiliate Marketing Models
+model Affiliate {
+  id                  String            @id @default(cuid())
+  userId              String?           @unique // Optional: linked user account
+  companyName         String
+  contactName         String
+  email               String            @unique
+  phone               String?
+  website             String?
+  status              String            @default("pending") // "pending", "approved", "rejected", "suspended"
+  affiliateCode       String            @unique
+  commissionRate      Decimal           @db.Decimal(5, 2) // Percentage (e.g., 15.00)
+  paymentMethod       String?           // "bank_transfer", "upi", "paypal"
+  paymentDetails      Json?             // Bank/UPI details
+  approvedBy          String?           // Admin user ID
+  approvedAt          DateTime?
+  rejectedReason      String?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  clicks              AffiliateClick[]
+  conversions         AffiliateConversion[]
+  payouts             AffiliatePayout[]
+  
+  @@index([status])
+  @@index([affiliateCode])
+}
+
+model AffiliateClick {
+  id              String    @id @default(cuid())
+  affiliateId     String
+  affiliate       Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+  ipAddress       String?
+  userAgent       String?
+  referrerUrl     String?
+  landingPage     String?
+  utmSource       String?
+  utmMedium       String?
+  utmCampaign     String?
+  clickedAt       DateTime  @default(now())
+  
+  @@index([affiliateId, clickedAt])
+}
+
+model AffiliateConversion {
+  id                  String    @id @default(cuid())
+  affiliateId         String
+  affiliate           Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+  userId              String
+  subscriptionId      String?
+  transactionId       String?
+  orderValue          Decimal   @db.Decimal(10, 2)
+  commissionAmount    Decimal   @db.Decimal(10, 2)
+  commissionRate      Decimal   @db.Decimal(5, 2)
+  status              String    @default("pending") // "pending", "approved", "paid", "cancelled"
+  approvedAt          DateTime?
+  paidAt              DateTime?
+  createdAt           DateTime  @default(now())
+  
+  @@index([affiliateId, status])
+  @@index([userId])
+}
+
+model AffiliatePayout {
+  id              String    @id @default(cuid())
+  affiliateId     String
+  affiliate       Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+  amount          Decimal   @db.Decimal(10, 2)
+  conversionIds   Json      // Array of conversion IDs included
+  paymentMethod   String
+  transactionRef  String?   // Bank/UPI transaction reference
+  status          String    @default("pending") // "pending", "processing", "completed", "failed"
+  paidBy          String?   // Admin user ID
+  paidAt          DateTime?
+  notes           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@index([affiliateId, status])
+  @@index([status, createdAt])
+}
+
 // User roles for authorization
 enum UserRole {
   STUDENT
