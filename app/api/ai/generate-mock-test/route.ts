@@ -101,28 +101,19 @@ export async function POST(request: Request) {
           questionText: question.questionText,
           options: question.options,
           correctAnswer: question.correctAnswer,
-          explanation: question.explanation,
+          explanation: question.explanation || "",
           difficulty: question.difficulty || "medium",
         });
         questionNumber++;
       }
     }
 
-    // NOTE: Questions are returned but not persisted to database
-    // To persist questions, create a MockTestQuestion model in Prisma schema:
-    // model MockTestQuestion {
-    //   id String @id @default(cuid())
-    //   mockTestId String
-    //   mockTest MockTest @relation(fields: [mockTestId], references: [id])
-    //   questionNumber Int
-    //   section String
-    //   questionText String
-    //   options Json
-    //   correctAnswer String
-    //   explanation String
-    //   difficulty String
-    // }
-    // Then store questions using: await prisma.mockTestQuestion.createMany({ data: allQuestions })
+    // Persist questions to database
+    if (allQuestions.length > 0) {
+      await prisma.mockTestQuestion.createMany({
+        data: allQuestions,
+      });
+    }
     
     return NextResponse.json({
       mockTestId: mockTest.id,

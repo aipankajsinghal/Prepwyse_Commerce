@@ -120,15 +120,16 @@ model QuizAttempt {
 }
 
 model MockTest {
-  id              String            @id @default(cuid())
+  id              String              @id @default(cuid())
   title           String
   description     String?
-  examType        String            // "CUET", "Class11", "Class12"
+  examType        String              // "CUET", "Class11", "Class12"
   totalQuestions  Int
-  duration        Int               // in minutes
-  sections        Json              // Array of sections with subjects
-  createdAt       DateTime          @default(now())
+  duration        Int                 // in minutes
+  sections        Json                // Array of sections with subjects
+  createdAt       DateTime            @default(now())
   attempts        MockTestAttempt[]
+  questions       MockTestQuestion[]
 }
 
 model MockTestAttempt {
@@ -144,6 +145,22 @@ model MockTestAttempt {
   startedAt       DateTime  @default(now())
   completedAt     DateTime?
   timeSpent       Int?      // in seconds
+}
+
+model MockTestQuestion {
+  id              String    @id @default(cuid())
+  mockTestId      String
+  mockTest        MockTest  @relation(fields: [mockTestId], references: [id], onDelete: Cascade)
+  questionNumber  Int
+  section         String
+  questionText    String
+  options         Json      // Array of options
+  correctAnswer   String
+  explanation     String?
+  difficulty      String    @default("medium") // "easy", "medium", "hard"
+  createdAt       DateTime  @default(now())
+  
+  @@index([mockTestId, questionNumber])
 }
 
 model Recommendation {

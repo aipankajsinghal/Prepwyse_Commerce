@@ -50,7 +50,9 @@ export async function createRazorpayOrder(
     return order;
   } catch (error) {
     console.error('Error creating Razorpay order:', error);
-    throw new Error('Failed to create payment order');
+    // Preserve the original error message for debugging
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    throw new Error(`Failed to create payment order: ${errorMessage}`);
   }
 }
 

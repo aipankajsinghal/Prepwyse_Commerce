@@ -41,6 +41,7 @@ npm install
    - `DATABASE_URL`: Your PostgreSQL connection string
    - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`: Your Clerk Publishable Key
    - `CLERK_SECRET_KEY`: Your Clerk Secret Key
+   - `CLERK_WEBHOOK_SECRET`: Your Clerk Webhook Secret (see [WEBHOOK_SETUP.md](./WEBHOOK_SETUP.md))
    - `OPENAI_API_KEY`: Your OpenAI API Key (for AI features)
 
 ### Step 3: Database Setup
