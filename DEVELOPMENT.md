@@ -1209,6 +1209,7 @@ Open [http://localhost:3000](http://localhost:3000) and perform the following ch
 ⏳ Phase C: 60% Complete (Monetization: Backend ✅, UI ⬜)
 ⬜ Phase D: 0% Complete (Advanced Features: Video Lessons, Forums, Practice Papers)
 ✅ Phase E: 100% Complete (AI Learning: Adaptive Learning, AI Question Generation)
+⬜ Phase F: 0% Complete (Coupons, Referral & Affiliate Marketing)
 
 Overall: 72% Complete (16 of 23 major features)
 ```
@@ -1230,5 +1231,116 @@ Overall: 72% Complete (16 of 23 major features)
 - **Phase C (Monetization)**: Backend complete, UI pending.
 - **Phase D (Advanced Features)**: Planned.
 - **Phase E (AI Learning)**: Complete.
+- **Phase F (Coupons & Affiliates)**: Planned.
 
 For detailed pending items, please refer to the project management board or issue tracker.
+
+---
+
+# Phase F: Coupons, Referral & Affiliate Marketing System
+
+This section outlines the implementation plan for a robust Coupon and Affiliate Marketing system, extending the existing Referral functionality.
+
+## F.1: Database Schema Updates
+
+**Goal:** Add support for Coupons and Affiliate tracking in the database.
+
+### Prisma Schema Changes
+
+1. **Create `Coupon` Model:**
+   - Fields: `id` (CUID), `code` (String, Unique), `description` (String?), `discountType` (Enum: PERCENTAGE, FIXED), `discountValue` (Decimal), `maxUses` (Int?), `usedCount` (Int, default 0), `validFrom` (DateTime), `validUntil` (DateTime?), `isActive` (Boolean, default true), `createdAt`, `updatedAt`.
+   - Add relation to `Transaction` (optional, to track which coupon was used).
+
+2. **Create `Affiliate` Model:**
+   - Fields: `id` (CUID), `userId` (String, Unique, relation to User), `commissionRate` (Decimal, default 10.0), `totalEarnings` (Decimal, default 0), `status` (Enum: PENDING, ACTIVE, SUSPENDED), `payoutDetails` (Json?), `createdAt`, `updatedAt`.
+   - Add relation to `User`.
+
+3. **Update `User` Model:**
+   - Add `affiliateProfile` (Relation to Affiliate).
+
+4. **Update `Transaction` Model:**
+   - Add `couponId` (String?, relation to Coupon).
+   - Add `affiliateId` (String?, relation to Affiliate).
+   - Add `commissionAmount` (Decimal?).
+
+5. **Run Migration:**
+   ```bash
+   npx prisma migrate dev --name add_coupons_and_affiliates
+   ```
+
+## F.2: Coupon System Implementation
+
+**Goal:** Allow admins to create coupons and users to redeem them during checkout.
+
+### Service Layer
+
+Create `lib/services/couponService.ts`:
+
+- `createCoupon(data)`: Admin function to generate new coupons.
+- `validateCoupon(code, cartAmount)`:
+  - Check if coupon exists and `isActive` is true.
+  - Check `validFrom` and `validUntil`.
+  - Check `maxUses` vs `usedCount`.
+  - Return discount amount and final price.
+- `incrementCouponUsage(id)`: Atomic increment of `usedCount`.
+
+### API Updates
+
+Update Subscription API (`app/api/subscription/create-order/route.ts`):
+- Accept an optional `couponCode` in the request body.
+- If provided, call `validateCoupon`.
+- Calculate the discounted amount *before* creating the Razorpay order.
+- Store the `couponId` in the transaction metadata/record.
+
+### Admin Dashboard
+
+- `app/admin/coupons/page.tsx`: List all coupons with stats (usage, expiry).
+- `app/admin/coupons/create/page.tsx`: Form to create new coupons.
+
+## F.3: Affiliate System Implementation
+
+**Goal:** Allow users to become affiliates and earn commissions.
+
+### Service Layer
+
+Create `lib/services/affiliateService.ts`:
+
+- `registerAffiliate(userId)`: Create an Affiliate profile for a user.
+- `trackAffiliateClick(affiliateId)`: (Optional) Track link clicks.
+- `processAffiliateCommission(transactionId)`:
+  - Called after successful payment.
+  - Check if transaction has an `affiliateId`.
+  - Calculate commission based on `Affiliate.commissionRate`.
+  - Update `Affiliate.totalEarnings` and create a `Payout` record.
+
+### Referral Integration
+
+Update `lib/referral.ts`:
+- Integrate with Affiliate system: If a referrer is also an `ACTIVE` affiliate, they earn cash commission instead of just points/days.
+- Update `generateReferralCode` to potentially use the Affiliate's custom slug if available.
+
+### Affiliate Dashboard
+
+Create `app/affiliate/page.tsx`:
+- Show total earnings, commission rate, and payout history.
+- Display unique affiliate link (e.g., `?ref=AFFILIATE_CODE`).
+- Show list of referred users who subscribed.
+
+## F.4: Integration & Testing
+
+### Middleware/Tracking
+
+- Capture `ref` query parameter from URL when a user first visits.
+- Store in a cookie (`affiliate_ref`) with a 30-day expiry.
+- When `create-order` is called, check for this cookie if no explicit code is provided.
+
+### Webhooks (Razorpay)
+
+- Ensure the payment success webhook triggers `processAffiliateCommission` and `incrementCouponUsage`.
+
+### Testing Checklist
+
+- [ ] Test coupon expiry and usage limits.
+- [ ] Test affiliate commission calculation for different plan prices.
+- [ ] Verify that a user cannot refer themselves.
+- [ ] Test cookie-based affiliate tracking across sessions.
