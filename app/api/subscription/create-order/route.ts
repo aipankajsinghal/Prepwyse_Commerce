@@ -34,7 +34,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     }
 
     const body = await req.json();
-    const { planId } = body;
+    const { planId, couponCode } = body;
 
     if (!planId) {
       return validationError('Plan ID is required');
@@ -53,24 +53,81 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       return validationError('This subscription plan is not active');
     }
 
+    // Calculate amount with coupon discount if provided
+    let finalAmount = Number(plan.price);
+    let discountAmount = 0;
+    let appliedCoupon = null;
+
+    if (couponCode) {
+      const coupon = await prisma.coupon.findUnique({
+        where: { code: couponCode.toUpperCase() },
+      });
+
+      if (coupon) {
+        // Validate coupon
+        const now = new Date();
+        const isValid =
+          coupon.isActive &&
+          now >= coupon.startDate &&
+          (!coupon.endDate || now <= coupon.endDate) &&
+          (!coupon.usageLimit || coupon.usageCount < coupon.usageLimit) &&
+          (!coupon.applicablePlans || (coupon.applicablePlans as any).includes(planId));
+
+        if (isValid) {
+          // Check user usage limit
+          const userUsageCount = await prisma.couponUsage.count({
+            where: {
+              couponId: coupon.id,
+              userId: user.id,
+            },
+          });
+
+          if (userUsageCount < coupon.userUsageLimit) {
+            // Check minimum purchase requirement
+            if (!coupon.minPurchase || finalAmount >= Number(coupon.minPurchase)) {
+              // Calculate discount
+              if (coupon.discountType === 'percentage') {
+                discountAmount = (finalAmount * Number(coupon.discountValue)) / 100;
+                if (coupon.maxDiscount && discountAmount > Number(coupon.maxDiscount)) {
+                  discountAmount = Number(coupon.maxDiscount);
+                }
+              } else {
+                // Fixed discount
+                discountAmount = Number(coupon.discountValue);
+              }
+
+              // Ensure discount doesn't exceed the plan price
+              discountAmount = Math.min(discountAmount, finalAmount);
+              finalAmount = finalAmount - discountAmount;
+              appliedCoupon = coupon;
+            }
+          }
+        }
+      }
+    }
+
     // Create Razorpay order
-    const amount = Number(plan.price);
+    const amount = finalAmount;
     const receipt = `sub_${user.id}_${Date.now()}`;
-    const notes = {
+    const notes: Record<string, string> = {
       userId: user.id,
       planId: plan.id,
       planName: plan.name,
       userEmail: user.email,
     };
+    
+    if (appliedCoupon?.code) {
+      notes.couponCode = appliedCoupon.code;
+    }
 
     const order = await createRazorpayOrder(amount, 'INR', receipt, notes);
 
     // Create transaction record
-    await prisma.transaction.create({
+    const transaction = await prisma.transaction.create({
       data: {
         userId: user.id,
         type: 'subscription',
-        amount: plan.price,
+        amount: finalAmount,
         currency: 'INR',
         status: 'pending',
         razorpayOrderId: order.id,
@@ -79,9 +136,32 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           planId: plan.id,
           planName: plan.name,
           durationDays: plan.durationDays,
+          originalAmount: Number(plan.price),
+          discountAmount: discountAmount,
+          couponCode: appliedCoupon?.code || null,
         },
       },
     });
+
+    // Record coupon usage if applied
+    if (appliedCoupon) {
+      await prisma.couponUsage.create({
+        data: {
+          couponId: appliedCoupon.id,
+          userId: user.id,
+          transactionId: transaction.id,
+          discountAmount: discountAmount,
+        },
+      });
+
+      // Increment coupon usage count
+      await prisma.coupon.update({
+        where: { id: appliedCoupon.id },
+        data: {
+          usageCount: { increment: 1 },
+        },
+      });
+    }
 
     return NextResponse.json(
       {
@@ -96,6 +176,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           price: plan.price,
           durationDays: plan.durationDays,
         },
+        discount: appliedCoupon
+          ? {
+              code: appliedCoupon.code,
+              amount: discountAmount,
+              finalAmount: finalAmount,
+            }
+          : null,
       },
       { status: 200 }
     );
