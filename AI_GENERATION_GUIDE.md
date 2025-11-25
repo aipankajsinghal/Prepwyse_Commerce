@@ -507,8 +507,8 @@ If AI is not configured or fails:
 - [Next.js API Routes](https://nextjs.org/docs/api-routes/introduction)
 
 ### Support
-- Check `ISSUES_FIXED.md` for resolved issues
-- Review `TECHNICAL_DOCUMENTATION.md` for architecture
+- Review `DEVELOPMENT.md` for architecture and technical details
+- Review `COMPREHENSIVE_CODEBASE_REVIEW_NOV2025.md` for known issues
 - Consult `README.md` for setup instructions
 
 ---

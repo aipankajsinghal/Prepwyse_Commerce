@@ -55,7 +55,7 @@ prepwyse-commerce/
 ├── prisma/                  # Database schema and migrations
 │   ├── schema.prisma       # Prisma schema definition
 │   └── seed.ts             # Database seed data
-├── middleware.ts            # Clerk authentication middleware
+├── proxy.ts                 # Clerk authentication middleware (Next.js 15+)
 ├── .github/workflows/       # CI/CD pipelines
 └── Documentation files      # Extensive documentation
 ```

@@ -140,7 +140,7 @@ prepwyse-commerce/
 │   └── workflows/
 │       ├── ci.yml
 │       └── docker-build.yml
-├── middleware.ts             # Next.js middleware (Clerk auth)
+├── proxy.ts                  # Next.js middleware (Clerk auth, Next.js 15+)
 ├── next.config.js            # Next.js configuration
 ├── tailwind.config.ts        # Tailwind configuration
 ├── tsconfig.json             # TypeScript configuration

@@ -16,6 +16,7 @@
 5. [Low-Priority Issues (Priority 4)](#low-priority-issues-priority-4)
 6. [Observations & Best Practice Recommendations](#observations--best-practice-recommendations)
 7. [Issue Summary Matrix](#issue-summary-matrix)
+8. [Dependency & SDK Audit](#dependency--sdk-audit)
 
 ---
 
@@ -29,8 +30,11 @@ This comprehensive review analyzed the PrepWyse Commerce codebase across all app
 - Authentication flows
 - AI integration services
 - Subscription and payment systems
+- **889 npm dependencies (258 prod, 584 dev)**
 
 **Overall Assessment:** The codebase is well-structured with good patterns (withAdminAuth, centralized error handling, Zod validation). However, several issues exist that could cause runtime failures or unexpected behavior.
+
+**Security Status:** ✅ No known vulnerabilities (npm audit clean)
 
 ### Key Findings Summary
 
@@ -40,33 +44,31 @@ This comprehensive review analyzed the PrepWyse Commerce codebase across all app
 | High | 8 | Issues affecting core functionality |
 | Medium | 10 | Issues impacting user experience or maintainability |
 | Low | 6 | Minor improvements and best practices |
+| Dependencies | 1 Critical, 3 Major | Missing package + major version updates available |
 
 ---
 
 ## Critical Issues (Priority 1)
 
-### 1.1 Missing Middleware File
+### ~~1.1 Missing Middleware File~~ ✅ RESOLVED
 
-**Location:** Project root - `middleware.ts` expected but not found  
-**Impact:** Authentication middleware not properly configured
+**Status:** False positive - middleware exists as `proxy.ts`
 
-**Problem Description:**
-The `middleware.ts` file referenced in project documentation does not exist. Clerk authentication requires a middleware file to protect routes.
+**Clarification:** Next.js 15+ with certain configurations uses `proxy.ts` instead of `middleware.ts`. The file exists at project root with proper Clerk authentication middleware configured.
 
-**Expected Behavior:** All protected routes should be guarded by Clerk middleware.  
-**Current Behavior:** Without middleware, routes may not be properly protected at the Next.js level.
+**Location:** `proxy.ts` (project root)
 
-**Solution:**
 ```typescript
-// middleware.ts (create at project root)
+// proxy.ts - Clerk middleware is properly configured
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
 const isPublicRoute = createRouteMatcher([
-  '/',
-  '/sign-in(.*)',
-  '/sign-up(.*)',
-  '/api/health',
-  '/api/webhooks/clerk',
+  "/",
+  "/sign-in(.*)",
+  "/sign-up(.*)",
+  "/api/webhooks(.*)",
+  "/privacy",
+  "/terms"
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
@@ -74,10 +76,6 @@ export default clerkMiddleware(async (auth, request) => {
     await auth.protect();
   }
 });
-
-export const config = {
-  matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
-};
 ```
 
 ---
@@ -863,17 +861,164 @@ logger.info('Successfully generated response', { provider: 'openai' });
 
 ---
 
+## Dependency & SDK Audit
+
+**Audit Date:** November 25, 2025  
+**Total Dependencies:** 889 (258 prod, 584 dev, 72 optional)  
+**Security Vulnerabilities:** 0 (npm audit clean ✅)
+
+### Current Dependency Versions
+
+| Package | Current | Wanted | Latest | Status |
+|---------|---------|--------|--------|--------|
+| next | 16.0.3 | 16.0.4 | 16.0.4 | ✅ Current (patch available) |
+| react | 19.2.0 | 19.2.0 | 19.2.0 | ✅ Current |
+| react-dom | 19.2.0 | 19.2.0 | 19.2.0 | ✅ Current |
+| typescript | 5.9.3 | 5.9.3 | 5.9.3 | ✅ Current |
+| @clerk/nextjs | 6.35.2 | 6.35.5 | 6.35.5 | ✅ Current (patch available) |
+| @prisma/client | 6.19.0 | 6.19.0 | **7.0.0** | ⚠️ Major update available |
+| prisma | 6.19.0 | 6.19.0 | **7.0.0** | ⚠️ Major update available |
+| tailwindcss | 3.4.18 | 3.4.18 | **4.1.17** | ⚠️ Major update available |
+| eslint | 8.57.1 | 8.57.1 | **9.39.1** | ⚠️ Major update available |
+| eslint-config-next | 15.1.4 | 15.5.6 | 16.0.4 | ⚠️ Update recommended |
+| openai | 6.9.1 | 6.9.1 | 6.9.1 | ✅ Current |
+| @google/generative-ai | 0.24.1 | 0.24.1 | 0.24.1 | ✅ Current |
+| framer-motion | 12.23.24 | 12.23.24 | 12.23.24 | ✅ Current |
+| zod | 4.1.12 | 4.1.13 | 4.1.13 | ✅ Current (patch available) |
+| svix | **MISSING** | 1.81.0 | 1.81.0 | 🔴 Not installed |
+| lucide-react | 0.553.0 | 0.553.0 | 0.554.0 | ✅ Current (patch available) |
+| next-intl | 4.5.5 | 4.5.5 | 4.5.5 | ✅ Current |
+| next-themes | 0.4.6 | 0.4.6 | 0.4.6 | ✅ Current |
+| razorpay | 2.9.6 | 2.9.6 | 2.9.6 | ✅ Current |
+| isomorphic-dompurify | 2.32.0 | 2.33.0 | 2.33.0 | ✅ Current (patch available) |
+
+### Critical Dependency Issues
+
+#### 🔴 Issue D.1: Missing `svix` Package (CRITICAL)
+
+**Impact:** Clerk webhook signature verification will fail  
+**Location:** `package.json` lists `svix@^1.81.0` but it's not installed
+
+**Solution:**
+```bash
+npm install svix@^1.81.0
+```
+
+### Major Version Updates Available
+
+#### ⚠️ Issue D.2: Prisma 6.x → 7.0.0
+
+**Current:** 6.19.0  
+**Latest:** 7.0.0  
+**Breaking Changes:** Yes
+
+**Migration Considerations:**
+- Review [Prisma 7.0 upgrade guide](https://www.prisma.io/docs/guides/upgrade-guides)
+- Test all database queries after upgrade
+- May require schema adjustments
+
+**Recommendation:** ⏳ Schedule for next major release cycle
+
+#### ⚠️ Issue D.3: Tailwind CSS 3.x → 4.x
+
+**Current:** 3.4.18  
+**Latest:** 4.1.17  
+**Breaking Changes:** Yes (significant architecture changes)
+
+**Migration Considerations:**
+- Tailwind v4 uses CSS-first configuration
+- Class name changes and deprecations
+- Build tooling changes
+- Extensive UI testing required
+
+**Recommendation:** ⏳ Major effort - schedule for dedicated sprint
+
+#### ⚠️ Issue D.4: ESLint 8.x → 9.x
+
+**Current:** 8.57.1  
+**Latest:** 9.39.1  
+**Breaking Changes:** Yes (flat config required)
+
+**Migration Considerations:**
+- New flat config format (eslint.config.js)
+- Plugin compatibility changes
+- Rule changes
+
+**Recommendation:** ⏳ Medium effort - coordinate with Tailwind upgrade
+
+### Recommended Update Actions
+
+#### Immediate (This Week)
+
+| Priority | Action | Command | Risk |
+|----------|--------|---------|------|
+| 🔴 Critical | Install missing svix | `npm install svix@^1.81.0` | Low |
+| 🟡 Low | Patch updates | `npm update` | Very Low |
+
+#### Patch Updates (Safe to Apply)
+
+```bash
+# Apply all safe patch updates
+npm update @clerk/nextjs next zod lucide-react isomorphic-dompurify @types/react
+```
+
+#### Deferred (Requires Planning)
+
+| Package | Current → Target | Effort | Schedule |
+|---------|------------------|--------|----------|
+| prisma + @prisma/client | 6.19 → 7.0 | Medium | Q1 2026 |
+| tailwindcss | 3.4 → 4.x | High | Q1 2026 |
+| eslint + config | 8.x → 9.x | Medium | With Tailwind |
+| eslint-config-next | 15.1 → 16.x | Low | After ESLint 9 |
+
+### Security Assessment
+
+```
+npm audit results:
+✅ 0 vulnerabilities found
+
+Vulnerability Summary:
+- Critical: 0
+- High: 0
+- Moderate: 0
+- Low: 0
+- Info: 0
+```
+
+**Security Status:** All dependencies are currently secure with no known vulnerabilities.
+
+### Version Compatibility Matrix
+
+| Core Stack | Version | Compatibility |
+|------------|---------|---------------|
+| Node.js | 20+ | ✅ Required |
+| Next.js | 16.0.3 | ✅ Latest stable |
+| React | 19.2.0 | ✅ Latest stable |
+| TypeScript | 5.9.3 | ✅ Latest stable |
+| Prisma | 6.19.0 | ✅ Stable (7.0 available) |
+
+### Documentation Updates Needed
+
+Update `.env.example` to document all required environment variables:
+- `GEMINI_API_KEY` (optional, for AI fallback)
+- `NEXT_PUBLIC_RAZORPAY_KEY_ID` (required for payments)
+- `CLERK_WEBHOOK_SECRET` (required for webhooks)
+
+---
+
 ## Recommended Fix Order
 
 1. **Phase 1 (Critical - Immediate):**
-   - Create `middleware.ts`
+   - ~~Create `middleware.ts`~~ ✅ (exists as `proxy.ts` for Next.js 15+)
    - Create missing quiz endpoints
    - Fix subscription status enum
+   - **Install missing `svix` package**
 
 2. **Phase 2 (High - This Week):**
    - Fix admin authorization issues
    - Add missing function definitions
    - Fix import issues
+   - **Apply safe patch updates**
 
 3. **Phase 3 (Medium - Next Sprint):**
    - Implement pagination
@@ -885,7 +1030,13 @@ logger.info('Successfully generated response', { provider: 'openai' });
    - Documentation updates
    - Testing coverage
 
+5. **Phase 5 (Major Upgrades - Q1 2026):**
+   - Prisma 7.0 migration
+   - Tailwind CSS 4.x migration
+   - ESLint 9.x migration
+
 ---
 
 **Report Generated:** November 25, 2025  
+**Report Updated:** November 25, 2025 (Added Dependency Audit)  
 **Next Review Recommended:** After Phase 2 completion
