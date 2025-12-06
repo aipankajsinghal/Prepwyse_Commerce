@@ -26,6 +26,7 @@
     "@clerk/nextjs": "^6.35.1",
     "@google/generative-ai": "^0.24.1",
     "@prisma/client": "^6.19.0",
+    "@sentry/nextjs": "^8.5.0",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
