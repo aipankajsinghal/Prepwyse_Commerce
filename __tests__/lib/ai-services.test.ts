@@ -9,12 +9,7 @@
  */
 
 import { z } from 'zod';
-import {
-  generateAIQuestions,
-  generateAIMockTest,
-  generateQuestionExplanation,
-  determineAdaptiveDifficulty,
-} from '@/lib/ai-services';
+// Removed unused imports from '@/lib/ai-services'
 import { sanitizePromptInput, sanitizePromptArray } from '@/lib/prompt-sanitizer';
 
 // Mock AI provider
