@@ -82,14 +82,15 @@ async function handler(req: NextRequest): Promise<NextResponse> {
     // Wrap all subscription updates in a database transaction
     // This ensures all-or-nothing: if any step fails, everything is rolled back
     const subscription = await prisma.$transaction(async (tx) => {
-      // Activate subscription
+      // Activate subscription (pass transaction client for ACID compliance)
       const activatedSubscription = await activateSubscription(
         user.id,
         planId,
         plan.durationDays,
         razorpay_order_id,
         razorpay_payment_id,
-        razorpay_signature
+        razorpay_signature,
+        tx // Pass transaction client to ensure all operations are atomic
       );
 
       // Update transaction as completed (within transaction)

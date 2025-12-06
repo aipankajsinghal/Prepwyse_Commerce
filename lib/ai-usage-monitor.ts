@@ -6,7 +6,7 @@
  */
 
 import { prisma } from './prisma';
-import Sentry from './Sentry';
+import Sentry from '@/sentry.config';
 
 // Token pricing (as of 2024) - update as prices change
 const PRICING = {
@@ -229,7 +229,8 @@ async function triggerAlert(
     });
 
     // Log to Sentry for visibility
-    Sentry.captureMessage(message, 'warning', {
+    Sentry.captureMessage(message, {
+      level: 'warning',
       tags: { component: 'api-usage-monitor', alertType, provider },
     });
 
