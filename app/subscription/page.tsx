@@ -54,8 +54,8 @@ export default function SubscriptionPage() {
 
   const loadData = async () => {
     try {
-      // Load plans
-      const plansRes = await fetch("/api/admin/subscription-plans");
+      // Load plans from public endpoint
+      const plansRes = await fetch("/api/subscription-plans");
       const plansData = await plansRes.json();
       setPlans(plansData.plans || []);
 
