@@ -44,7 +44,8 @@ pnpm-debug.log*
 next-env.d.ts
 
 # prisma
-/prisma/migrations
+# migrations should be committed for production deployments
+# /prisma/migrations
 
 # docker
 .dockerignore.backup
