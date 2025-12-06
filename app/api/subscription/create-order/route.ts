@@ -125,7 +125,7 @@ async function handler(req: NextRequest): Promise<NextResponse> {
 
     // Wrap transaction and coupon usage in a database transaction
     // This ensures all-or-nothing: if any step fails, everything is rolled back
-    const transaction = await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx) => {
       // Create transaction record
       const newTransaction = await tx.transaction.create({
         data: {
