@@ -10,7 +10,6 @@
 
 import { verifyRazorpaySignature } from '@/lib/razorpay';
 import { activateSubscription } from '@/lib/subscription';
-import { handleApiError, validationError } from '@/lib/api-error-handler';
 
 // Mock Razorpay signature verification
 jest.mock('@/lib/razorpay', () => ({
