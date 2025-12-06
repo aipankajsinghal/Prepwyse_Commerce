@@ -1,6 +1,12 @@
 import { generateChatCompletion, isAnyAIConfigured } from "./ai-provider";
 import { prisma } from "./prisma";
 import { z } from "zod";
+import {
+  sanitizePromptInput,
+  sanitizePromptArray,
+  buildPromptLine,
+  buildPromptList,
+} from "./prompt-sanitizer";
 
 // Zod schemas for AI response validation
 const QuestionSchema = z.object({
@@ -72,6 +78,10 @@ export async function generateAIQuestions(params: {
 
   const { subjectName, chapterNames, questionCount, difficulty, userId } = params;
 
+  // Sanitize user inputs to prevent prompt injection
+  const sanitizedSubject = sanitizePromptInput(subjectName);
+  const sanitizedChapters = sanitizePromptArray(chapterNames);
+
   // Get user's performance history to personalize questions
   const userAttempts = await prisma.quizAttempt.findMany({
     where: { userId },
@@ -79,12 +89,21 @@ export async function generateAIQuestions(params: {
     take: 5,
   });
 
+  const userScoreInfo =
+    userAttempts.length > 0
+      ? `User's recent average score: ${Math.round(
+          (userAttempts.reduce((acc, a) => acc + a.score / a.totalQuestions, 0) /
+            userAttempts.length) *
+            100
+        )}%`
+      : "";
+
   const prompt = `You are an expert commerce education content creator. Generate ${questionCount} multiple-choice questions for students preparing for Indian commerce exams.
 
-Subject: ${subjectName}
-Chapters: ${chapterNames.join(", ")}
-Difficulty: ${difficulty}
-${userAttempts.length > 0 ? `User's recent average score: ${Math.round((userAttempts.reduce((acc, a) => acc + (a.score / a.totalQuestions), 0) / userAttempts.length) * 100)}%` : ""}
+${buildPromptLine("Subject", sanitizedSubject)}
+${buildPromptList("Chapters", sanitizedChapters)}
+${buildPromptLine("Difficulty", difficulty)}
+${userScoreInfo ? userScoreInfo : ""}
 
 Requirements:
 1. Each question should have exactly 4 options (A, B, C, D)
@@ -149,15 +168,29 @@ export async function generateAIMockTest(params: {
 
   const { title, examType, description, duration, totalQuestions, sections } = params;
 
+  // Sanitize user inputs to prevent prompt injection
+  const sanitizedTitle = sanitizePromptInput(title);
+  const sanitizedExamType = sanitizePromptInput(examType);
+  const sanitizedDescription = sanitizePromptInput(
+    description || `Complete mock test for ${examType}`
+  );
+
+  const sectionsInfo = sections
+    .map(
+      (s, i) =>
+        `${i + 1}. ${sanitizePromptInput(s.name)}: ${s.questions} questions`
+    )
+    .join("\n");
+
   const prompt = `You are an expert in creating comprehensive mock tests for Indian commerce education. Generate a complete mock test with the following specifications:
 
-Title: ${title}
-Exam Type: ${examType}
-Duration: ${duration} minutes
-Total Questions: ${totalQuestions}
+${buildPromptLine("Title", sanitizedTitle)}
+${buildPromptLine("Exam Type", sanitizedExamType)}
+${buildPromptLine("Duration", String(duration) + " minutes")}
+${buildPromptLine("Total Questions", String(totalQuestions))}
 
 Sections:
-${sections.map((s, i) => `${i + 1}. ${s.name}: ${s.questions} questions`).join("\n")}
+${sectionsInfo}
 
 Requirements:
 1. Generate exactly ${totalQuestions} multiple-choice questions distributed across the sections as specified
@@ -172,9 +205,9 @@ Requirements:
 Return format (JSON object):
 {
   "mockTest": {
-    "title": "${title}",
-    "examType": "${examType}",
-    "description": "${description || `Complete mock test for ${examType}`}",
+    "title": "${sanitizedTitle}",
+    "examType": "${sanitizedExamType}",
+    "description": "${sanitizedDescription}",
     "duration": ${duration},
     "totalQuestions": ${totalQuestions}
   },
@@ -332,14 +365,24 @@ export async function generateQuestionExplanation(params: {
 
   const { questionText, options, correctAnswer, userAnswer, subject, chapter } = params;
 
+  // Sanitize user inputs to prevent prompt injection
+  const sanitizedSubject = sanitizePromptInput(subject);
+  const sanitizedChapter = sanitizePromptInput(chapter);
+  const sanitizedQuestion = sanitizePromptInput(questionText);
+  const sanitizedOptions = sanitizePromptArray(options);
+  const sanitizedCorrectAnswer = sanitizePromptInput(correctAnswer);
+  const sanitizedUserAnswer = userAnswer
+    ? sanitizePromptInput(userAnswer)
+    : "";
+
   const prompt = `Generate a detailed, student-friendly explanation for this commerce question.
 
-Subject: ${subject}
-Chapter: ${chapter}
-Question: ${questionText}
-Options: ${options.join(", ")}
-Correct Answer: ${correctAnswer}
-${userAnswer ? `Student's Answer: ${userAnswer}` : ""}
+${buildPromptLine("Subject", sanitizedSubject)}
+${buildPromptLine("Chapter", sanitizedChapter)}
+${buildPromptLine("Question", sanitizedQuestion)}
+${buildPromptList("Options", sanitizedOptions)}
+${buildPromptLine("Correct Answer", sanitizedCorrectAnswer)}
+${sanitizedUserAnswer ? buildPromptLine("Student's Answer", sanitizedUserAnswer) : ""}
 
 Provide:
 1. Why the correct answer is right
@@ -424,12 +467,16 @@ export async function generateContentRecommendations(params: {
     },
   });
 
+  // Sanitize subject names to prevent prompt injection
+  const sanitizedSubjects = sanitizePromptArray(subjects.map((s) => s.name));
+  const recentPerformance = quizAttempts.slice(0, 5)
+    .map((a) => `${Math.round((a.score / a.totalQuestions) * 100)}%`)
+    .join(", ");
+
   const prompt = `Based on the student's quiz history, recommend specific chapters and topics they should study next.
 
-Available Subjects: ${subjects.map(s => s.name).join(", ")}
-Recent Quiz Performance: ${quizAttempts.slice(0, 5).map(a => 
-  `${Math.round((a.score / a.totalQuestions) * 100)}%`
-).join(", ")}
+${buildPromptList("Available Subjects", sanitizedSubjects)}
+${buildPromptLine("Recent Quiz Performance", recentPerformance)}
 
 Recommend:
 1. 3-5 specific chapters to focus on
