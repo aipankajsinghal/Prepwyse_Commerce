@@ -54,8 +54,11 @@ docker-compose.override.yml
 # backups
 *.backup
 *.bak
-*.sql
 *.dump
+
+# SQL files (except migrations which should be committed)
+*.sql
+!prisma/migrations/**/*.sql
 
 # SSL certificates (don't commit)
 /nginx/ssl/*.key

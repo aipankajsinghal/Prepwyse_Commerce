@@ -129,6 +129,8 @@ Return format (JSON array):
     systemPrompt: "You are an expert commerce education content creator specializing in Indian commerce curriculum. Always return valid JSON only.",
     temperature: 0.7,
     jsonMode: true,
+    userId,
+    endpoint: 'generateAIQuestions',
   });
 
   let parsed;
@@ -234,6 +236,7 @@ Return format (JSON object):
     temperature: 0.7,
     jsonMode: true,
     maxTokens: 8000, // Large token limit for full mock test
+    endpoint: 'generateAIMockTest',
   });
 
   let parsed;
@@ -333,6 +336,8 @@ Return ONLY valid JSON in this format:
     systemPrompt: "You are an expert education advisor specializing in personalized learning strategies. Always return valid JSON only.",
     temperature: 0.7,
     jsonMode: true,
+    userId,
+    endpoint: 'generatePersonalizedRecommendations',
   });
 
   try {
@@ -398,6 +403,7 @@ Keep it concise but thorough, in a friendly teaching tone.`;
     systemPrompt: "You are a friendly and knowledgeable commerce teacher who explains concepts clearly.",
     temperature: 0.7,
     maxTokens: 500,
+    endpoint: 'generateQuestionExplanation',
   });
 }
 
@@ -502,6 +508,8 @@ Return ONLY valid JSON:
     systemPrompt: "You are an education advisor providing study recommendations. Always return valid JSON only.",
     temperature: 0.7,
     jsonMode: true,
+    userId,
+    endpoint: 'generateContentRecommendations',
   });
 
   try {

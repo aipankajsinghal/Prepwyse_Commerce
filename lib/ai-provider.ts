@@ -1,5 +1,6 @@
 import { openai, isOpenAIConfigured } from "./openai";
 import { getGeminiModel, isGeminiConfigured } from "./gemini";
+import { recordAPIUsage } from "./ai-usage-monitor";
 
 export type AIProvider = "openai" | "gemini";
 
@@ -61,8 +62,20 @@ export async function generateChatCompletion(params: {
   temperature?: number;
   maxTokens?: number;
   jsonMode?: boolean;
+  userId?: string;
+  endpoint?: string;
+  trackUsage?: boolean;
 }): Promise<string> {
-  const { prompt, systemPrompt, temperature = 0.7, maxTokens, jsonMode = false } = params;
+  const {
+    prompt,
+    systemPrompt,
+    temperature = 0.7,
+    maxTokens,
+    jsonMode = false,
+    userId,
+    endpoint = 'unknown',
+    trackUsage = true,
+  } = params;
 
   const configuredProviders = getConfiguredProviders();
 
@@ -71,6 +84,7 @@ export async function generateChatCompletion(params: {
   }
 
   let lastError: Error | null = null;
+  const startTime = Date.now();
 
   // Try each configured provider in priority order
   for (const provider of configuredProviders) {
@@ -95,6 +109,28 @@ export async function generateChatCompletion(params: {
         }
 
         console.log(`✓ Successfully generated response using OpenAI`);
+
+        // Record usage if tracking is enabled
+        if (trackUsage) {
+          const duration = Date.now() - startTime;
+          recordAPIUsage({
+            provider: 'openai',
+            model: 'gpt-4o-mini',
+            userId,
+            endpoint,
+            promptTokens: completion.usage?.prompt_tokens || 0,
+            completionTokens: completion.usage?.completion_tokens || 0,
+            responseLength: content.length,
+            duration,
+            success: true,
+            metadata: {
+              temperature,
+              maxTokens,
+              jsonMode,
+            },
+          }).catch((err) => console.error('Failed to record usage:', err));
+        }
+
         return content;
       } else if (provider === "gemini") {
         const model = getGeminiModel("gemini-1.5-flash");
@@ -121,11 +157,56 @@ export async function generateChatCompletion(params: {
         }
 
         console.log(`✓ Successfully generated response using Gemini`);
+
+        // Record usage if tracking is enabled (Gemini doesn't provide token usage directly)
+        if (trackUsage) {
+          const duration = Date.now() - startTime;
+          // Estimate tokens (roughly 1 token per 4 characters)
+          const estimatedPromptTokens = Math.ceil(fullPrompt.length / 4);
+          const estimatedCompletionTokens = Math.ceil(content.length / 4);
+
+          recordAPIUsage({
+            provider: 'gemini',
+            model: 'gemini-1.5-flash',
+            userId,
+            endpoint,
+            promptTokens: estimatedPromptTokens,
+            completionTokens: estimatedCompletionTokens,
+            responseLength: content.length,
+            duration,
+            success: true,
+            metadata: {
+              temperature,
+              maxTokens,
+              jsonMode,
+              tokenEstimated: true,
+            },
+          }).catch((err) => console.error('Failed to record usage:', err));
+        }
+
         return content;
       }
     } catch (error) {
       console.error(`✗ Failed to generate with ${provider}:`, error);
       lastError = error as Error;
+
+      // Record failed usage if tracking is enabled
+      if (trackUsage) {
+        const duration = Date.now() - startTime;
+        recordAPIUsage({
+          provider,
+          model: provider === 'openai' ? 'gpt-4o-mini' : 'gemini-1.5-flash',
+          userId,
+          endpoint,
+          promptTokens: 0,
+          completionTokens: 0,
+          responseLength: 0,
+          duration,
+          success: false,
+          errorMessage: (error as Error).message,
+        }).catch((err) => console.error('Failed to record error usage:', err));
+      }
+
       // Continue to next provider
     }
   }
