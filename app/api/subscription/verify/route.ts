@@ -79,41 +79,49 @@ async function handler(req: NextRequest): Promise<NextResponse> {
       return notFoundError('Subscription plan not found');
     }
 
-    // Activate subscription
-    const subscription = await activateSubscription(
-      user.id,
-      planId,
-      plan.durationDays,
-      razorpay_order_id,
-      razorpay_payment_id,
-      razorpay_signature
-    );
+    // Wrap all subscription updates in a database transaction
+    // This ensures all-or-nothing: if any step fails, everything is rolled back
+    const subscription = await prisma.$transaction(async (tx) => {
+      // Activate subscription
+      const activatedSubscription = await activateSubscription(
+        user.id,
+        planId,
+        plan.durationDays,
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature
+      );
 
-    // Update transaction as completed
-    await prisma.transaction.updateMany({
-      where: {
-        userId: user.id,
-        razorpayOrderId: razorpay_order_id,
-      },
-      data: {
-        status: 'completed',
-        razorpayPaymentId: razorpay_payment_id,
-        razorpaySignature: razorpay_signature,
-      },
+      // Update transaction as completed (within transaction)
+      await tx.transaction.updateMany({
+        where: {
+          userId: user.id,
+          razorpayOrderId: razorpay_order_id,
+        },
+        data: {
+          status: 'completed',
+          razorpayPaymentId: razorpay_payment_id,
+          razorpaySignature: razorpay_signature,
+        },
+      });
+
+      return activatedSubscription;
     });
 
-    // Apply any pending referral rewards
+    // Apply rewards after transaction succeeds (these are non-critical)
     try {
       await applyPendingRewards(user.id);
     } catch (error) {
       console.error('Error applying pending rewards:', error);
+      // Don't fail the entire operation if rewards fail
     }
 
-    // Process referral reward for referrer if user was referred
+    // Process referral reward after transaction succeeds (non-critical)
     try {
       await processReferralSubscription(user.id);
     } catch (error) {
       console.error('Error processing referral subscription:', error);
+      // Don't fail the entire operation if referral fails
     }
 
     return NextResponse.json(
