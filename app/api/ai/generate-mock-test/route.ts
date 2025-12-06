@@ -1,11 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { generateAIMockTest } from "@/lib/ai-services";
 import { handleApiError, unauthorizedError } from "@/lib/api-error-handler";
+import { withRedisRateLimit, aiRateLimit } from "@/lib/middleware/redis-rateLimit";
 
 // POST /api/ai/generate-mock-test - Generate AI-powered mock test
-export async function POST(request: Request) {
+async function handler(request: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {
@@ -126,3 +127,6 @@ export async function POST(request: Request) {
     return handleApiError(error, "Failed to generate AI mock test");
   }
 }
+
+// Apply rate limiting: 5 requests per hour
+export const POST = withRedisRateLimit(handler, aiRateLimit);

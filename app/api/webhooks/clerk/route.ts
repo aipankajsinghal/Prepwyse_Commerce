@@ -1,7 +1,8 @@
 import { Webhook } from "svix";
 import { headers } from "next/headers";
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { withRedisRateLimit, webhookRateLimit } from "@/lib/middleware/redis-rateLimit";
 
 // Clerk Webhook Event Types
 type WebhookEvent = {
@@ -19,7 +20,7 @@ type WebhookEvent = {
 };
 
 // POST /api/webhooks/clerk - Handle Clerk webhook events
-export async function POST(req: Request) {
+async function handler(req: NextRequest) {
   // Get webhook secret from environment
   const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
 
@@ -172,3 +173,6 @@ async function handleUserDeleted(evt: WebhookEvent) {
 
   console.log(`User deleted from database: ${id}`);
 }
+
+// Apply rate limiting: 100 requests per 15 minutes (webhook rate limiter)
+export const POST = withRedisRateLimit(handler, webhookRateLimit);

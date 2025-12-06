@@ -13,12 +13,13 @@ import { verifyRazorpaySignature } from '@/lib/razorpay';
 import { activateSubscription } from '@/lib/subscription';
 import { applyPendingRewards, processReferralSubscription } from '@/lib/referral';
 import { handleApiError, unauthorizedError, notFoundError, validationError } from '@/lib/api-error-handler';
+import { withRedisRateLimit, strictRateLimit } from '@/lib/middleware/redis-rateLimit';
 
 /**
  * POST /api/subscription/verify
  * Verify payment signature and activate subscription
  */
-export async function POST(req: NextRequest): Promise<NextResponse> {
+async function handler(req: NextRequest): Promise<NextResponse> {
   try {
     const { userId: clerkUserId } = await auth();
 
@@ -126,3 +127,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return handleApiError(error, 'Failed to verify payment');
   }
 }
+
+// Apply rate limiting: 10 requests per minute (strict limit for sensitive payment endpoint)
+export const POST = withRedisRateLimit(handler, strictRateLimit);
