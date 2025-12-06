@@ -1,11 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateAIQuestions, determineAdaptiveDifficulty } from "@/lib/ai-services";
 import { handleApiError, notFoundError } from "@/lib/api-error-handler";
 import { requireUser } from "@/lib/auth/requireUser";
+import { withRedisRateLimit, aiRateLimit } from "@/lib/middleware/redis-rateLimit";
 
 // POST /api/ai/generate-quiz - Generate AI-powered quiz
-export async function POST(request: Request) {
+async function handler(request: NextRequest) {
   try {
     const dbUser = await requireUser(request);
     const userId = dbUser.clerkId;
@@ -133,7 +134,7 @@ export async function POST(request: Request) {
   } catch (error: any) {
     console.error("Quiz generation error:", error);
     return NextResponse.json(
-      { 
+      {
         error: "Failed to generate AI quiz",
         details: error.message || "An unexpected error occurred. Please try again."
       },
@@ -141,3 +142,6 @@ export async function POST(request: Request) {
     );
   }
 }
+
+// Apply rate limiting: 5 requests per hour
+export const POST = withRedisRateLimit(handler, aiRateLimit);

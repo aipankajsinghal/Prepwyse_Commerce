@@ -8,7 +8,11 @@ import { OnboardingProvider } from "@/components/OnboardingProvider";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { CookieConsent } from "@/components/CookieConsent";
+import { ensureInitialized } from "@/lib/init";
 import "./globals.css";
+
+// Validate environment variables at application startup
+ensureInitialized();
 
 export const metadata: Metadata = {
   title: {

@@ -1,11 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { generatePersonalizedRecommendations } from "@/lib/ai-services";
 import { handleApiError, unauthorizedError, notFoundError } from "@/lib/api-error-handler";
+import { withRedisRateLimit, aiRateLimit } from "@/lib/middleware/redis-rateLimit";
 
 // GET /api/ai/recommendations - Get personalized recommendations
-export async function GET() {
+async function getHandler(request: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {
@@ -65,7 +66,7 @@ export async function GET() {
 }
 
 // POST /api/ai/recommendations/mark-read - Mark recommendation as read
-export async function POST(request: Request) {
+async function postHandler(request: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {
@@ -97,3 +98,7 @@ export async function POST(request: Request) {
     return handleApiError(error, "Failed to update recommendation");
   }
 }
+
+// Apply rate limiting: 5 requests per hour
+export const GET = withRedisRateLimit(getHandler, aiRateLimit);
+export const POST = withRedisRateLimit(postHandler, aiRateLimit);

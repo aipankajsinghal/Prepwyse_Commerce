@@ -11,12 +11,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createRazorpayOrder } from '@/lib/razorpay';
 import { handleApiError, unauthorizedError, notFoundError, validationError } from '@/lib/api-error-handler';
+import { withRedisRateLimit, strictRateLimit } from '@/lib/middleware/redis-rateLimit';
 
 /**
  * POST /api/subscription/create-order
  * Create Razorpay order for subscription payment
  */
-export async function POST(req: NextRequest): Promise<NextResponse> {
+async function handler(req: NextRequest): Promise<NextResponse> {
   try {
     const { userId: clerkUserId } = await auth();
 
@@ -122,46 +123,52 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     const order = await createRazorpayOrder(amount, 'INR', receipt, notes);
 
-    // Create transaction record
-    const transaction = await prisma.transaction.create({
-      data: {
-        userId: user.id,
-        type: 'subscription',
-        amount: finalAmount,
-        currency: 'INR',
-        status: 'pending',
-        razorpayOrderId: order.id,
-        description: `Subscription to ${plan.displayName}`,
-        metadata: {
-          planId: plan.id,
-          planName: plan.name,
-          durationDays: plan.durationDays,
-          originalAmount: Number(plan.price),
-          discountAmount: discountAmount,
-          couponCode: appliedCoupon?.code || null,
-        },
-      },
-    });
-
-    // Record coupon usage if applied
-    if (appliedCoupon) {
-      await prisma.couponUsage.create({
+    // Wrap transaction and coupon usage in a database transaction
+    // This ensures all-or-nothing: if any step fails, everything is rolled back
+    await prisma.$transaction(async (tx) => {
+      // Create transaction record
+      const newTransaction = await tx.transaction.create({
         data: {
-          couponId: appliedCoupon.id,
           userId: user.id,
-          transactionId: transaction.id,
-          discountAmount: discountAmount,
+          type: 'subscription',
+          amount: finalAmount,
+          currency: 'INR',
+          status: 'pending',
+          razorpayOrderId: order.id,
+          description: `Subscription to ${plan.displayName}`,
+          metadata: {
+            planId: plan.id,
+            planName: plan.name,
+            durationDays: plan.durationDays,
+            originalAmount: Number(plan.price),
+            discountAmount: discountAmount,
+            couponCode: appliedCoupon?.code || null,
+          },
         },
       });
 
-      // Increment coupon usage count
-      await prisma.coupon.update({
-        where: { id: appliedCoupon.id },
-        data: {
-          usageCount: { increment: 1 },
-        },
-      });
-    }
+      // Record coupon usage if applied (within transaction)
+      if (appliedCoupon) {
+        await tx.couponUsage.create({
+          data: {
+            couponId: appliedCoupon.id,
+            userId: user.id,
+            transactionId: newTransaction.id,
+            discountAmount: discountAmount,
+          },
+        });
+
+        // Increment coupon usage count (within transaction)
+        await tx.coupon.update({
+          where: { id: appliedCoupon.id },
+          data: {
+            usageCount: { increment: 1 },
+          },
+        });
+      }
+
+      return newTransaction;
+    });
 
     return NextResponse.json(
       {
@@ -190,3 +197,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return handleApiError(error, 'Failed to create payment order');
   }
 }
+
+// Apply rate limiting: 10 requests per minute (strict limit for sensitive payment endpoint)
+export const POST = withRedisRateLimit(handler, strictRateLimit);

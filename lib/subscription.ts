@@ -118,6 +118,14 @@ export async function createTrialSubscription(
 
 /**
  * Activate paid subscription after successful payment
+ *
+ * @param userId - User ID
+ * @param planId - Subscription plan ID
+ * @param durationDays - Duration in days
+ * @param razorpayOrderId - Razorpay order ID
+ * @param razorpayPaymentId - Razorpay payment ID
+ * @param razorpaySignature - Razorpay signature
+ * @param tx - Optional transaction client (for ACID compliance in transactions)
  */
 export async function activateSubscription(
   userId: string,
@@ -125,19 +133,23 @@ export async function activateSubscription(
   durationDays: number,
   razorpayOrderId: string,
   razorpayPaymentId: string,
-  razorpaySignature: string
+  razorpaySignature: string,
+  tx?: any // Prisma transaction client - if provided, uses transaction; otherwise uses global prisma
 ): Promise<Subscription> {
   const now = new Date();
   const endDate = new Date(now.getTime() + durationDays * 24 * 60 * 60 * 1000);
 
+  // Use transaction client if provided, otherwise use global prisma
+  const client = tx || prisma;
+
   // Check if user already has a subscription
-  const existingSubscription = await prisma.subscription.findUnique({
+  const existingSubscription = await client.subscription.findUnique({
     where: { userId },
   });
 
   if (existingSubscription) {
     // Update existing subscription
-    const subscription = await prisma.subscription.update({
+    const subscription = await client.subscription.update({
       where: { userId },
       data: {
         planId,
@@ -155,7 +167,7 @@ export async function activateSubscription(
     return subscription;
   } else {
     // Create new subscription
-    const subscription = await prisma.subscription.create({
+    const subscription = await client.subscription.create({
       data: {
         userId,
         planId,

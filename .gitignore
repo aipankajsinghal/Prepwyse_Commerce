@@ -44,7 +44,8 @@ pnpm-debug.log*
 next-env.d.ts
 
 # prisma
-/prisma/migrations
+# migrations should be committed for production deployments
+# /prisma/migrations
 
 # docker
 .dockerignore.backup
@@ -53,8 +54,11 @@ docker-compose.override.yml
 # backups
 *.backup
 *.bak
-*.sql
 *.dump
+
+# SQL files (except migrations which should be committed)
+*.sql
+!prisma/migrations/**/*.sql
 
 # SSL certificates (don't commit)
 /nginx/ssl/*.key

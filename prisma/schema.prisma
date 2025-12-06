@@ -780,6 +780,46 @@ model AffiliatePayout {
   @@index([status, createdAt])
 }
 
+model APIUsage {
+  id                  String    @id @default(cuid())
+  provider            String    // "openai" or "gemini"
+  model               String    // "gpt-4", "gpt-3.5-turbo", "gemini-pro", etc.
+  userId              String?   // User who triggered this API call (nullable for system calls)
+  endpoint            String    // Which AI function called this (e.g., "generateAIQuestions", "generateAIMockTest")
+  promptTokens        Int       // Tokens used in the prompt
+  completionTokens    Int       // Tokens used in the response
+  totalTokens         Int       // Total tokens used
+  estimatedCost       Decimal   @db.Decimal(10, 6) // Cost in USD
+  responseLength      Int       // Length of response in characters
+  duration            Int       // Duration of API call in milliseconds
+  success             Boolean   @default(true)
+  errorMessage        String?   // Error message if failed
+  metadata            Json?     // Additional metadata (e.g., temperature, max_tokens)
+  createdAt           DateTime  @default(now())
+
+  @@index([provider, createdAt])
+  @@index([userId, createdAt])
+  @@index([endpoint, createdAt])
+  @@index([createdAt]) // For daily/monthly aggregation queries
+}
+
+model APIUsageAlert {
+  id                  String    @id @default(cuid())
+  provider            String    // "openai" or "gemini"
+  alertType           String    // "daily_cost", "hourly_calls", "monthly_budget"
+  threshold           Decimal   @db.Decimal(10, 2) // Dollar amount or number
+  currentValue        Decimal   @db.Decimal(10, 2)
+  isTriggered         Boolean   @default(false)
+  notificationSent    Boolean   @default(false)
+  sentAt              DateTime?
+  message             String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([provider, alertType])
+  @@index([isTriggered])
+}
+
 // User roles for authorization
 enum UserRole {
   STUDENT

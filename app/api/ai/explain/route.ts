@@ -1,11 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { generateQuestionExplanation } from "@/lib/ai-services";
 import { handleApiError, unauthorizedError, notFoundError } from "@/lib/api-error-handler";
+import { withRedisRateLimit, aiRateLimit } from "@/lib/middleware/redis-rateLimit";
 
 // POST /api/ai/explain - Generate AI explanation for a question
-export async function POST(request: Request) {
+async function handler(request: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {
@@ -49,3 +50,6 @@ export async function POST(request: Request) {
     return handleApiError(error, "Failed to generate explanation", { questionId: request.url });
   }
 }
+
+// Apply rate limiting: 5 requests per hour
+export const POST = withRedisRateLimit(handler, aiRateLimit);
